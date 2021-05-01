@@ -3,7 +3,7 @@
   --menu-bg: #e7f0f3;
   --content-bg: #edf6f9;
   --icon-color: #edf6f9;
-  --task-form-inactive: black;
+  --todo-form-inactive: black;
 }
 
 html {
@@ -55,10 +55,10 @@ input {
   font-size: 1.6rem;
   line-height: 4rem;
 }
-#new-task-btn {
+#new-todo-btn {
   transform: translateY(4px);
 }
-#new-task-form {
+#new-todo-form {
   font-size: 1.6rem;
   position: fixed;
   margin-top: 4rem;
@@ -67,31 +67,37 @@ input {
   box-shadow: 1em 1em 5px rgba(0, 0, 0, 0.2);
   display: grid;
   grid-template-areas:
-    "title title title title"
-    "day priority cancel add"
-    "expand expand expand expand"
-    "notes notes notes notes";
+    "title title title title title"
+    "day project priority cancel add"
+    "expand expand expand expand expand"
+    "notes notes notes notes notes";
   row-gap: 1em;
 }
-input[name="task-title"] {
+input[name="todo-title"] {
   grid-area: title;
-  border-bottom: 1px var(--task-form-inactive) solid;
+  border-bottom: 1px var(--todo-form-inactive) solid;
+}
+#pj-ctn-form {
+  grid-area: project;
 }
 #schedule-ctn-form {
   grid-area: day;
   display: flex;
   align-items: center;
 }
-label[for="task-day"] {
+label[for="todo-day"] {
   margin-right: 0.5em;
 }
-input[name="task-day"] {
-  border-bottom: 1px var(--task-form-inactive) solid;
+input[name="todo-day"] {
+  border-bottom: 1px var(--todo-form-inactive) solid;
 }
 #priority-ctn-form {
   grid-area: priority;
 }
-#add-task-btn {
+#cancel-todo-btn {
+  grid-area: cancel;
+}
+#add-todo-btn {
   grid-area: add;
 }
 #expand-btn {
@@ -131,24 +137,24 @@ input[name="task-day"] {
   background-color: var(--content-bg);
   font-size: 1.6rem;
 }
-.task-ctn {
+.todo-ctn {
   display: grid;
   grid-template-areas:
     "title actions"
     "day day";
   align-content: center;
 }
-.task-title {
+.todo-title {
   grid-area: title;
 }
-.task-day {
+.todo-day {
   grid-area: day;
 }
-.task-actions {
+.todo-actions {
   grid-area: actions;
   display: flex;
   align-items: center;
 }
-.task-actions button {
+.todo-actions button {
   margin-left: 1em;
 }

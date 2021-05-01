@@ -1,7 +1,10 @@
-import { createProject, createTodo } from "./projects.js";
+import { pjFactory, todoFactory } from "./projects.js";
 
 let listOfPjs = [];
-let listOfTasks = [];
+let listOfTodos = [];
+
+var pjFact = new pjFactory();
+var todoFact = new todoFactory();
 
 const helpers = (() => ({
   pushTo(list, obj) {
@@ -13,114 +16,107 @@ const helpers = (() => ({
   hide(el) {
     el.classList.add("inactive");
   },
-  findPj(title) {
-    return listOfPjs.find((pj) => pj.title === title);
+  findPj(id) {
+    return listOfPjs.find((pj) => pj.id.toString() === id.toString());
   },
 }))();
+
+var pj = pjFact.createProject("fd;lkeaj;f");
+var fdlkaTodo = todoFact.createTodo(pj.id, "fdlka", "2021-06-01", "urgent", "");
+fdlkaTodo.pushToProject(pj);
+
+helpers.pushTo(listOfPjs, pj);
+helpers.pushTo(listOfTodos, fdlkaTodo);
+
+const init = (() => {
+  (function displayPjs() {
+    listOfPjs.forEach((pj) => pj.addToMenu());
+  })();
+  (function displayPjOptions() {
+    listOfPjs.forEach((pj) => pj.addToForm());
+  })();
+})();
 
 const menu = (() => {
   var menu = document.getElementById("menu");
   var today = menu.querySelector("#today-menu");
   var upcoming = menu.querySelector("#upcoming-menu");
-  var newPjForm = menu.querySelector("#new-pj-form");
-  var newPjBtn = menu.querySelector("#new-pj-btn");
-  var addPjBtn = menu.querySelector("#add-pj-btn");
-  var cancelPjBtn = menu.querySelector("#cancel-pj-btn");
+  var form = menu.querySelector("#new-pj-form");
+  var newBtn = menu.querySelector("#new-pj-btn");
+  var addBtn = menu.querySelector("#add-pj-btn");
+  var cancelBtn = menu.querySelector("#cancel-pj-btn");
 
   var titleInput = document.querySelector("#new-pj-form input[name=pj-title]");
 
-  function hidePjForm() {
-    helpers.hide(newPjForm);
-    titleInput.value = "";
+  function onPjItem(e) {
+    var pjId = e.target.id;
+    var pj = helpers.findPj(pjId);
+    content.display(pj);
   }
+
+  function hideForm() {
+    helpers.hide(form);
+    form.reset();
+  }
+
+  var pjListItems = menu.querySelectorAll(".pj-list-item");
 
   return {
     today,
     upcoming,
-    newPjForm,
-    newPjBtn,
-    addPjBtn,
-    cancelPjBtn,
-    displayPjs() {
-      listOfPjs.forEach((pj) => pj.addToMenu());
-    },
+    form,
+    newBtn,
+    addBtn,
+    cancelBtn,
+    pjListItems,
     onToday() {},
     onUpcoming() {},
-    onPjItem(e) {
-      var pjTitle = e.target.textContent;
-      var pj = helpers.findPj(pjTitle);
-      content.display(pj);
-    },
     onNewPj() {
-      helpers.show(newPjForm);
+      helpers.show(form);
     },
     onAddPj() {
       if (!titleInput.value) return helpers.inputError("empty");
-      if (helpers.findPj(titleInput.value))
-        return helpers.inputError("duplicate");
-      var newPj = createProject(titleInput.value);
+      var newPj = pjFact.createProject(titleInput.value);
       helpers.pushTo(listOfPjs, newPj);
-      newPj.addToMenu();
-      console.log(hidePjForm);
-      hidePjForm();
+      newPj.addToMenu().addEventListener("click", (e) => onPjItem(e));
+      newPj.addToForm();
+      hideForm();
     },
-    hidePjForm,
+    hideForm,
+    onPjItem,
   };
 })();
 
-window.onload = menu.displayPjs;
 menu.today.addEventListener("click", menu.onToday);
 menu.upcoming.addEventListener("click", menu.onUpcoming);
-menu.newPjBtn.addEventListener("click", menu.onNewPj);
-menu.addPjBtn.addEventListener("click", menu.onAddPj);
-menu.cancelPjBtn.addEventListener("click", menu.hidePjForm);
+menu.newBtn.addEventListener("click", menu.onNewPj);
+menu.addBtn.addEventListener("click", menu.onAddPj);
+menu.cancelBtn.addEventListener("click", menu.hideForm);
+menu.pjListItems.forEach((item) =>
+  item.addEventListener("click", (e) => menu.onPjItem(e))
+);
 
 const content = (() => {
   var content = document.getElementById("content");
   var contentTitle = content.querySelector(".content-title");
-  var taskList = content.querySelector("#task-list");
-
-  function createSection(task) {
-    var taskSection = document.createElement("section");
-    taskSection.classList.add("task-ctn");
-    var taskTitle = document.createElement("p");
-    taskTitle.classList.add("task-title");
-    var taskDay = document.createElement("p");
-    taskDay.classList.add("task-day");
-
-    var taskActions = document.createElement("div");
-    taskActions.classList.add("task-actions");
-    var editBtn = createBtn("edit", "pen");
-    var notesBtn = createBtn("notes", "comment");
-    var moreBtn = createBtn("more", "more-1");
-    function createBtn(name, icon) {
-      var btn = document.createElement("button");
-      btn.innerHTML = `<i class="flaticon flaticon-${icon}></i>"`;
-      btn.classList.add(`${name - btn}`, "btn");
-      taskActions.appendChild(btn);
-      return btn;
-    }
-
-    taskSection.appendChild(taskTitle);
-    taskSection.appendChild(taskDay);
-    taskSection.appendChild(taskActions);
-
-    taskList.appendChild(taskSection);
-  }
-
+  var todoList = content.querySelector("#todo-list");
   var editBtns = content.querySelectorAll(".edit-btn");
   var notesBtns = content.querySelectorAll(".notes-btn");
   var moreBtns = content.querySelectorAll(".more-btn");
 
   return {
     contentTitle,
-    taskList,
+    todoList,
     editBtns,
     notesBtns,
     moreBtns,
     display(pj) {
       contentTitle.textContent = pj.title;
-      pj.taskList.forEach((task) => createSection(task));
+      var visibleTodos = todoList.querySelectorAll(".todo-ctn");
+      visibleTodos.forEach((ctn) => helpers.hide(ctn));
+      pj.todoList.forEach((todo) => {
+        todo.ctn.classList.remove("inactive");
+      });
     },
     onMoreBtn() {},
   };
@@ -133,44 +129,58 @@ const content = (() => {
 const todo = (() => {
   var newTodoBtns = document.querySelectorAll(".new-todo-btn");
   var form = document.getElementById("new-todo-form");
-  var addTodoBtn = form.querySelector("#add-todo-btn");
+  var addBtn = form.querySelector("#add-todo-btn");
+  var cancelBtn = form.querySelector("#cancel-todo-btn");
+  function hideForm() {
+    helpers.hide(form);
+    form.reset();
+  }
   return {
     newTodoBtns,
     form,
-    addTodoBtn,
+    addBtn,
+    cancelBtn,
     onAddTodo() {
-      var projectInput = form.querySelector("#todo-project-input");
+      var projectInput = form.querySelector("select");
       var titleInput = form.querySelector("input[name=todo-title]");
-      var descInput = form.querySelector("input[name=todo-notes]");
-      var dayInput = form.querySelector("#input[name=todo-day]");
+      var notesInput = form.querySelector("input[name=todo-notes]");
+      var dayInput = form.querySelector("input[name=todo-day]");
       var priorityInput = form.querySelector("input[name=todo-priority]");
 
-      var newTodo = createTodo(
+      var newTodo = todoFact.createTodo(
         projectInput.value,
         titleInput.value,
-        descInput.value,
         dayInput.value,
-        priorityInput.value
+        priorityInput.value,
+        notesInput.value
       );
 
-      helpers.pushTo(listOfTasks, newTodo);
+      var pj = helpers.findPj(projectInput.value);
+      newTodo.pushToProject(pj);
+
+      helpers.pushTo(listOfTodos, newTodo);
+      content.display(pj);
+      hideForm();
     },
+    hideForm,
   };
 })();
 
+// window.onload = todo.displayPjOptions;
 todo.newTodoBtns.forEach((btn) =>
   btn.addEventListener("click", () => helpers.show(todo.form))
 );
-todo.addTodoBtn.addEventListener("click", todo.onAddTodo);
+todo.addBtn.addEventListener("click", todo.onAddTodo);
+todo.cancelBtn.addEventListener("click", () => helpers.hide(todo.form));
 
 const today = () => {
   var today = new Date();
   var thisMonth = today.getMonth;
   var thisDay = today.getDate;
   var todayStr = `${thisMonth}/${thisDay}`;
-  function getTodayTasks() {
-    listOfTasks.filter((task) => {
-      return task.day === todayStr;
+  function getTodaytodos() {
+    listOftodos.filter((todo) => {
+      return todo.day === todayStr;
     });
   }
 };

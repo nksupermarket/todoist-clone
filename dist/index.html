@@ -49,11 +49,11 @@
     </div>
     <div id="content">
       <h2 class="content-title">Title</h2>
-      <div id="task-list">
-        <section class="task-ctn">
-          <p class="task-title">task title</p>
-          <p class="task-day">task day</p>
-          <div class="task-actions">
+      <div id="todo-list">
+        <section class="todo-ctn">
+          <p class="todo-title">todo title</p>
+          <p class="todo-day">todo day</p>
+          <div class="todo-actions">
             <button class="edit-btn btn">
               <i class="flaticon flaticon-pen"></i>
             </button>
@@ -71,24 +71,31 @@
       <input type="text" name="todo-title" placeholder="Title" />
       <div id="schedule-ctn-form">
         <label for="todo-day">Schedule</label>
-        <input type="date" name="task-day" value="Schedule" />
+        <input type="date" name="todo-day" value="Schedule" />
+      </div>
+      <div id="pj-ctn-form">
+        <label for="todo-pj">Project</label>
+        <select name="todo-pj">
+          <option value="None">None</option>
+        </select>
       </div>
       <div id="priority-ctn-form">
-        <input type="radio" name="task-priority" value="Urgent" />
+        <input type="radio" name="todo-priority" value="Urgent" />
         <label for=""></label>
-        <input type="radio" name="task-priority" value="Urgent" />
+        <input type="radio" name="todo-priority" value="Urgent" />
         <label for=""></label>
-        <input type="radio" name="task-priority" value="Urgent" />
+        <input type="radio" name="todo-priority" value="Urgent" />
         <label for=""></label>
       </div>
+      <input type="button" value="Cancel" class="btn" id="cancel-todo-btn" />
       <input type="button" value="Add" class="btn" id="add-todo-btn" />
       <div class="btn" id="expand-btn">
         <i class="flaticon flaticon-arrow-down-sign-to-navigate"></i
         ><span id="expand-btn-text">Expand to add notes</span>
       </div>
       <section id="notes-ctn-form">
-        <label for="task-notes">Notes</label>
-        <input type="text" name="task-notes" />
+        <label for="todo-notes">Notes</label>
+        <input type="text" name="todo-notes" />
       </section>
     </form>
   </body>
