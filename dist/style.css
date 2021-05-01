@@ -1,0 +1,154 @@
+:root {
+  --header-bg: #006d77;
+  --menu-bg: #e7f0f3;
+  --content-bg: #edf6f9;
+  --icon-color: #edf6f9;
+  --task-form-inactive: black;
+}
+
+html {
+  font-size: 10px;
+}
+body {
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "menu content";
+  grid-template-columns: 1fr 3fr;
+}
+.inactive {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.btn,
+input {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  outline: inherit;
+}
+.btn {
+  cursor: pointer;
+}
+.flaticon {
+  display: inline-block;
+}
+
+#header {
+  grid-area: header;
+  background-color: var(--header-bg);
+  height: 4rem;
+  display: grid;
+  grid-template-areas: "logo search icons";
+  grid-template-columns: 1fr 1fr 1fr;
+}
+#searchbar {
+  grid-area: search;
+}
+#icons {
+  grid-area: icons;
+  margin-left: 5em;
+  color: var(--icon-color);
+  font-size: 1.6rem;
+  line-height: 4rem;
+}
+#new-task-btn {
+  transform: translateY(4px);
+}
+#new-task-form {
+  font-size: 1.6rem;
+  position: fixed;
+  margin-top: 4rem;
+  padding: 1em 3em;
+  background-color: var(--content-bg);
+  box-shadow: 1em 1em 5px rgba(0, 0, 0, 0.2);
+  display: grid;
+  grid-template-areas:
+    "title title title title"
+    "day priority cancel add"
+    "expand expand expand expand"
+    "notes notes notes notes";
+  row-gap: 1em;
+}
+input[name="task-title"] {
+  grid-area: title;
+  border-bottom: 1px var(--task-form-inactive) solid;
+}
+#schedule-ctn-form {
+  grid-area: day;
+  display: flex;
+  align-items: center;
+}
+label[for="task-day"] {
+  margin-right: 0.5em;
+}
+input[name="task-day"] {
+  border-bottom: 1px var(--task-form-inactive) solid;
+}
+#priority-ctn-form {
+  grid-area: priority;
+}
+#add-task-btn {
+  grid-area: add;
+}
+#expand-btn {
+  grid-area: expand;
+}
+#expand-btn-text {
+  margin-left: 0.5em;
+}
+.flaticon-arrow-down-sign-to-navigate {
+  transform: translateY(2px);
+}
+#notes-ctn-form {
+  grid-area: notes;
+}
+
+#menu {
+  grid-area: menu;
+  background-color: var(--menu-bg);
+  font-size: 1.6rem;
+}
+#menu ul {
+  list-style: none;
+}
+#pj-menu .small-title {
+  text-align: center;
+}
+#pj-menu .title-ctn {
+  display: flex;
+  justify-content: space-between;
+}
+#new-pj-btn .flaticon-plus {
+  transform: translateY(2px);
+}
+
+#content {
+  grid-area: content;
+  background-color: var(--content-bg);
+  font-size: 1.6rem;
+}
+.task-ctn {
+  display: grid;
+  grid-template-areas:
+    "title actions"
+    "day day";
+  align-content: center;
+}
+.task-title {
+  grid-area: title;
+}
+.task-day {
+  grid-area: day;
+}
+.task-actions {
+  grid-area: actions;
+  display: flex;
+  align-items: center;
+}
+.task-actions button {
+  margin-left: 1em;
+}

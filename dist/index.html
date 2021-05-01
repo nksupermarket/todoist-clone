@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="stylesheet" type="text/css" href="font/flaticon.css" />
+    <script type="module" src="../src/dom.js"></script>
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="header">
+      <input type="text" id="searchbar" />
+      <div id="icons">
+        <button class="new-todo-btn btn">
+          <i class="flaticon flaticon-plus"></i>
+        </button>
+      </div>
+    </div>
+    <div id="menu">
+      <ul id="nav">
+        <li id="today-menu" class="menu-links">Today</li>
+        <li id="upcoming-menu" class="menu-links">Upcoming</li>
+      </ul>
+      <div id="pj-menu">
+        <div class="title-ctn">
+          <h5 class="small-title">Projects</h5>
+          <button id="new-pj-btn" class="btn">
+            <i class="flaticon flaticon-plus"></i>
+          </button>
+        </div>
+        <ul id="pj-list"></ul>
+        <form id="new-pj-form" class="popup inactive">
+          <div>
+            <input type="text" name="pj-title" placeholder="Project Title" />
+          </div>
+          <div class="btn-ctn">
+            <input type="button" value="Add" class="btn" id="add-pj-btn" />
+            <input
+              type="button"
+              value="Cancel"
+              class="btn"
+              id="cancel-pj-btn"
+            />
+          </div>
+        </form>
+      </div>
+    </div>
+    <div id="content">
+      <h2 class="content-title">Title</h2>
+      <div id="task-list">
+        <section class="task-ctn">
+          <p class="task-title">task title</p>
+          <p class="task-day">task day</p>
+          <div class="task-actions">
+            <button class="edit-btn btn">
+              <i class="flaticon flaticon-pen"></i>
+            </button>
+            <button class="notes-btn btn">
+              <i class="flaticon flaticon-comment"></i>
+            </button>
+            <button class="more-btn btn">
+              <i class="flaticon flaticon-more-1"></i>
+            </button>
+          </div>
+        </section>
+      </div>
+    </div>
+    <form id="new-todo-form" class="popup inactive">
+      <input type="text" name="todo-title" placeholder="Title" />
+      <div id="schedule-ctn-form">
+        <label for="todo-day">Schedule</label>
+        <input type="date" name="task-day" value="Schedule" />
+      </div>
+      <div id="priority-ctn-form">
+        <input type="radio" name="task-priority" value="Urgent" />
+        <label for=""></label>
+        <input type="radio" name="task-priority" value="Urgent" />
+        <label for=""></label>
+        <input type="radio" name="task-priority" value="Urgent" />
+        <label for=""></label>
+      </div>
+      <input type="button" value="Add" class="btn" id="add-todo-btn" />
+      <div class="btn" id="expand-btn">
+        <i class="flaticon flaticon-arrow-down-sign-to-navigate"></i
+        ><span id="expand-btn-text">Expand to add notes</span>
+      </div>
+      <section id="notes-ctn-form">
+        <label for="task-notes">Notes</label>
+        <input type="text" name="task-notes" />
+      </section>
+    </form>
+  </body>
+</html>
