@@ -18,54 +18,62 @@
         </button>
       </div>
     </div>
-    <div id="menu">
-      <ul id="nav">
-        <li id="today-menu" class="menu-links">Today</li>
-        <li id="upcoming-menu" class="menu-links">Upcoming</li>
-      </ul>
-      <div id="pj-menu">
-        <div class="title-ctn">
-          <h5 class="small-title">Projects</h5>
-          <button id="new-pj-btn" class="btn">
-            <i class="flaticon flaticon-plus"></i>
-          </button>
+    <div id="not-header">
+      <div id="menu">
+        <div id="menu-ctn">
+          <ul id="nav">
+            <li id="today-menu" class="menu-links btn">Today</li>
+            <li id="upcoming-menu" class="menu-links btn">Upcoming</li>
+          </ul>
+          <div id="pj-menu">
+            <div class="title-ctn">
+              <p class="small-title">Projects</p>
+              <button id="new-pj-btn" class="btn">
+                <i class="flaticon flaticon-plus"></i>
+              </button>
+            </div>
+            <ul id="pj-list"></ul>
+            <form id="new-pj-form" class="popup inactive">
+              <div>
+                <input
+                  type="text"
+                  name="pj-title"
+                  placeholder="Project Title"
+                />
+              </div>
+              <div class="btn-ctn">
+                <input type="button" value="Add" class="btn" id="add-pj-btn" />
+                <input
+                  type="button"
+                  value="Cancel"
+                  class="btn"
+                  id="cancel-pj-btn"
+                />
+              </div>
+            </form>
+          </div>
         </div>
-        <ul id="pj-list"></ul>
-        <form id="new-pj-form" class="popup inactive">
-          <div>
-            <input type="text" name="pj-title" placeholder="Project Title" />
-          </div>
-          <div class="btn-ctn">
-            <input type="button" value="Add" class="btn" id="add-pj-btn" />
-            <input
-              type="button"
-              value="Cancel"
-              class="btn"
-              id="cancel-pj-btn"
-            />
-          </div>
-        </form>
       </div>
-    </div>
-    <div id="content">
-      <h2 class="content-title">Title</h2>
-      <div id="todo-list">
-        <section class="todo-ctn">
-          <p class="todo-title">todo title</p>
-          <p class="todo-day">todo day</p>
-          <div class="todo-actions">
-            <button class="edit-btn btn">
-              <i class="flaticon flaticon-pen"></i>
-            </button>
-            <button class="notes-btn btn">
-              <i class="flaticon flaticon-comment"></i>
-            </button>
-            <button class="more-btn btn">
-              <i class="flaticon flaticon-more-1"></i>
-            </button>
-          </div>
-        </section>
-      </div>
+      <main id="content">
+        <h2 class="content-title">Title</h2>
+        <div id="todo-list">
+          <section class="todo-ctn">
+            <p class="todo-title">todo title</p>
+            <p class="todo-day">todo day</p>
+            <div class="todo-actions">
+              <button class="edit-btn btn">
+                <i class="flaticon flaticon-pen"></i>
+              </button>
+              <button class="notes-btn btn">
+                <i class="flaticon flaticon-comment"></i>
+              </button>
+              <button class="more-btn btn">
+                <i class="flaticon flaticon-more-1"></i>
+              </button>
+            </div>
+          </section>
+        </div>
+      </main>
     </div>
     <form id="new-todo-form" class="popup inactive">
       <input type="text" name="todo-title" placeholder="Title" />
