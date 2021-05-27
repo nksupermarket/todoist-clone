@@ -12,10 +12,18 @@ const today = (() => {
       var todayStr = `${year}-${month}-${day}`;
       return todayStr;
     },
+    getTodayTodos(list) {
+      var today = this.getToday();
+      var todoList = list.filter((item) => item.day == today);
+      return todoList;
+    },
+    getOverdueTodos(list) {
+      var today = new Date(this.getToday());
+      var todoList = list.filter((item) => {
+        var dueDay = new Date(item.day);
+        return dueDay < today;
+      });
+      return todoList;
+    },
   };
-  //   function getTodaytodos() {
-  //     listOftodos.filter((todo) => {
-  //       return todoForm.day === todayStr;
-  //     });
-  //   }
 })();

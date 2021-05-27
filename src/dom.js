@@ -4,18 +4,22 @@ import { today } from "./today.js";
 import { commentModal } from "./comments.js";
 import { menu, content } from "./menu.js";
 import { todoForm } from "./todoForm.js";
+import { samples } from "./samples.js";
 
-var pj = pjFact.createProject("fd;lkeaj;f");
-var fdlkaTodo = todoFact.createTodo(pj.id, "fdlka", "2021-06-01", "4", {
+var pjWork = pjFact.createProject("Work");
+var pjHome = pjFact.createProject("Home");
+var pjCode = pjFact.createProject("Code");
+
+var fdlkaTodo = todoFact.createTodo(pjWork.id, "fdlka", "2021-06-01", "4", {
   text: [],
   date: [],
 });
-pj.pushToList();
-fdlkaTodo.pushToList();
-fdlkaTodo.pushToProject();
-fdlkaTodo.appendContent();
+pjWork.pushToList();
+pjHome.pushToList();
+pjCode.pushToList();
 
 const init = (() => {
+  samples.generate(30);
   (function displayPjs() {
     listOfPjs.forEach((pj) => {
       pj.addToMenu().addEventListener("click", (e) => menu.onPjItem(e));
@@ -66,12 +70,13 @@ todoForm.commentCloseBtn.addEventListener("click", todoForm.hidePopups);
 window.onresize = function movePopups() {
   var active = findActivePopup();
   if (!active) return;
+  console.log(active);
   var btn = document.querySelector(`[data-id = "${active.dataset.btn}"]`);
   btn.dataset.id.includes("editor")
     ? helpers.findTodoFrom(btn, listOfTodos).placePopup(btn, active)
     : todoForm.placePopup(active, btn);
   function findActivePopup() {
-    return document.querySelector(".active");
+    return document.querySelector(".active .popup-popup");
   }
 };
 todoForm.prioritySelectorBtns.forEach((btn) =>

@@ -65,7 +65,6 @@ todoFactory.prototype.createTodo = function (
     commentModal.changeTodoTitle(title);
     if (!notes) return;
     for (var i = 0; i < notes.text.length; i++) {
-      console.log(notes);
       commentModal.fillCommentList(notes.text[i], notes.date[i]);
     }
   }
@@ -225,7 +224,6 @@ todoFactory.prototype.createTodo = function (
           var todo = getTodo(todoId);
           todoTitle.textContent = todo.title;
           todoDayInput.value = todo.day;
-          console.log(todo.priority);
           switch (todo.priority) {
             case "1":
               todoCheckbox.classList.add("priority-1");
