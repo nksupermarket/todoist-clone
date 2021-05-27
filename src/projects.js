@@ -1,4 +1,10 @@
-export { pjFactory, todoFactory };
+export { pjFact, todoFact, listOfPjs, listOfTodos };
+import { helpers } from "./helpers.js";
+import { commentModal } from "./comments.js";
+import { todoForm } from "./todoForm.js";
+
+let listOfPjs = [];
+let listOfTodos = [];
 
 function pjFactory() {
   this.id = 1;
@@ -9,21 +15,21 @@ pjFactory.prototype.createProject = function (title) {
     id: this.id++,
     title,
     todoList,
-    addToForm() {
-      var newTodoForm = document.getElementById("new-todo-form");
-      var pjSelect = newTodoForm.querySelector("select");
-
+    pushToList() {
+      listOfPjs.push(this);
+    },
+    addToForm(input) {
       var pjOption = document.createElement("option");
       pjOption.textContent = this.title;
       pjOption.value = this.id;
 
-      pjSelect.appendChild(pjOption);
+      input.appendChild(pjOption);
     },
     addToMenu() {
       var pjLink = document.createElement("li");
       pjLink.classList.add("pj-list-item", "btn");
       pjLink.textContent = title;
-      pjLink.id = this.id;
+      pjLink.dataset.project = this.id;
       var pjMenu = document.querySelector("#pj-list");
       pjMenu.appendChild(pjLink);
       return pjLink;
@@ -34,6 +40,7 @@ pjFactory.prototype.createProject = function (title) {
     },
   };
 };
+var pjFact = new pjFactory();
 
 function todoFactory() {
   this.id = 1;
@@ -45,67 +52,486 @@ todoFactory.prototype.createTodo = function (
   priority,
   notes
 ) {
-  var ctn = (function createContent() {
-    var todoSection = document.createElement("article");
-    todoSection.classList.add("todo-ctn", "inactive");
-    var todoTitle = document.createElement("p");
-    todoTitle.classList.add("todo-title");
-    todoTitle.textContent = title;
-    var todoDay = document.createElement("p");
-    todoDay.classList.add("todo-day");
-    todoDay.textContent = day;
-
-    var todoActions = document.createElement("div");
-    todoActions.classList.add("todo-actions");
-    var editBtn = createBtn("edit", "pen");
-    var notesBtn = createBtn("notes", "comment");
-    var moreBtn = createBtn("more", "more-1");
-    function createBtn(name, icon) {
-      var btn = document.createElement("button");
-      btn.classList.add(`${name}-btn`, "btn");
-      var btnIcon = document.createElement("i");
-      btnIcon.classList.add("flaticon", `flaticon-${icon}`);
-      btn.appendChild(btnIcon);
-      todoActions.appendChild(btn);
-      return btn;
+  var todoId = this.id;
+  function getTodo(id) {
+    var todo = helpers.findItem(listOfTodos, id);
+    return todo;
+  }
+  function onTodoComment() {
+    helpers.show(commentModal.modal);
+    var pj = helpers.findItem(listOfPjs, project);
+    commentModal.attachTodoId(todoId);
+    commentModal.changePjTitle(pj.title);
+    commentModal.changeTodoTitle(title);
+    if (!notes) return;
+    for (var i = 0; i < notes.text.length; i++) {
+      console.log(notes);
+      commentModal.fillCommentList(notes.text[i], notes.date[i]);
     }
+  }
+  function onTodoEditor() {
+    var todo = getTodo(this.dataset.todo);
+    (function addPjOptions() {
+      var select = todo.editor.main.querySelector("select");
+      listOfPjs.forEach((pj) => pj.addToForm(select));
+    })();
+    (function setDefaultOption() {
+      var options = todo.editor.main.querySelectorAll("option");
+      var defaultOption = Array.from(options).find((option) => {
+        return option.value.toString() === todo.project.toString();
+      });
+      defaultOption.setAttribute("selected", "selected");
+    })();
+    todo.appendEditor();
+  }
 
-    todoSection.appendChild(todoTitle);
-    todoSection.appendChild(todoDay);
-    todoSection.appendChild(todoActions);
+  function appendContent() {
+    this.editor.main.remove();
+    this.ctn.appendChild(this.content.main);
+  }
 
-    var todoList = document.querySelector("#todo-list");
-    todoList.appendChild(todoSection);
+  function appendEditor() {
+    this.content.main.remove();
+    this.ctn.appendChild(this.editor.main);
+  }
 
-    return todoSection;
-  })();
   return {
-    id: this.id++,
+    ctn: function createCtn() {
+      var todoItem = document.createElement("li");
+      todoItem.dataset.todo = this.id;
+      todoItem.classList.add("todo-ctn");
+
+      return todoItem;
+    }.call(this),
     project,
     title,
     day,
     priority,
     notes,
-    ctn,
-    pushToProject(pj) {
-      pj.todoList.push(this);
+    content: function createContent() {
+      var todoId = this.id;
+      var todoContent = document.createElement("div");
+      todoContent.classList.add("todo-content");
+
+      var todoCheckbox = document.createElement("span");
+      var todoCheckboxCtn = (function createFinishedCheckbox() {
+        var todoCheckboxCtn = document.createElement("button");
+        todoCheckboxCtn.setAttribute("type", "button");
+        var todoCheckboxInput = document.createElement("input");
+        todoCheckboxInput.setAttribute("type", "checkbox");
+        switch (priority) {
+          case "1":
+            todoCheckbox.classList.add("priority-1");
+            todoCheckbox.style.borderColor = "rgb(209, 69, 59)";
+            break;
+          case "2":
+            todoCheckbox.classList.add("priority-2");
+            todoCheckbox.style.borderColor = "rgb(235, 137, 9)";
+            break;
+          case "3":
+            todoCheckbox.classList.add("priority-3");
+            todoCheckbox.style.borderColor = "rgb(36, 111, 224)";
+            break;
+          case "4":
+            todoCheckbox.classList.add("priority-4");
+            todoCheckbox.style.border = "1px solid rgba(32,32,32,0.6)";
+            break;
+        }
+        todoCheckbox.classList.add("checkbox");
+        todoCheckboxCtn.classList.add("todo-checkbox", "btn");
+        todoCheckboxCtn.appendChild(todoCheckboxInput);
+        todoCheckboxCtn.appendChild(todoCheckbox);
+        todoContent.appendChild(todoCheckboxCtn);
+        return todoCheckboxCtn;
+      })();
+
+      var todoRhCtn = document.createElement("div");
+      todoRhCtn.classList.add("todo-rh-ctn");
+
+      var todoTitle = document.createElement("p");
+      (function createTitle() {
+        todoTitle.classList.add("todo-title");
+        todoTitle.textContent = title;
+        todoRhCtn.appendChild(todoTitle);
+      })();
+
+      var todoDetails = document.createElement("div");
+      todoDetails.classList.add("todo-details");
+      todoRhCtn.appendChild(todoDetails);
+
+      var todoDayInput = document.createElement("input");
+      (function createDayBtn() {
+        var todoDayBtn = document.createElement("button");
+        todoDayBtn.setAttribute("type", "button");
+        todoDayBtn.classList.add("todo-day", "btn");
+        todoDayInput.setAttribute("type", "date");
+        todoDayInput.dataset.todo = todoId;
+        todoDayInput.value = day;
+        todoDayBtn.appendChild(todoDayInput);
+        todoDetails.appendChild(todoDayBtn);
+      })();
+      todoDayInput.addEventListener("change", changeTodoDay);
+      function changeTodoDay() {
+        var todo = getTodo(todoDayInput.dataset.todo);
+        todo.day = todoDayInput.value;
+      }
+
+      var todoComments = document.createElement("button");
+      var todoCommentsCount = document.createElement("span");
+      (function createCommentsBtn() {
+        todoComments.setAttribute("type", "button");
+        todoComments.classList.add("btn", "notes-btn", "icon-btn");
+        if (!notes.text[0]) todoComments.classList.add("inactive");
+        var todoCommentsIcon = document.createElement("i");
+        todoCommentsIcon.classList.add("flaticon", "flaticon-comment");
+        todoCommentsCount.textContent = 1;
+        todoCommentsCount.classList.add("notes-btn-count");
+        todoComments.appendChild(todoCommentsIcon);
+        todoComments.appendChild(todoCommentsCount);
+        todoDetails.appendChild(todoComments);
+        todoComments.addEventListener("click", onTodoComment);
+      })();
+
+      (function createActions() {
+        var todoActions = document.createElement("div");
+        todoActions.classList.add("todo-actions");
+        var editBtn = createBtn.apply(this, ["edit", "pen"]);
+        var notesBtn = createBtn.apply(this, ["notes", "comment"]);
+        var moreBtn = createBtn.apply(this, ["more", "more-1"]);
+        function createBtn(name, icon) {
+          var btn = document.createElement("button");
+          btn.setAttribute("type", "button");
+          btn.dataset.todo = this.id;
+          btn.classList.add(`${name}-btn`, "btn", "icon-btn");
+          var btnIcon = document.createElement("i");
+          btnIcon.classList.add("flaticon", `flaticon-${icon}`);
+          btn.appendChild(btnIcon);
+          todoActions.appendChild(btn);
+          return btn;
+        }
+        todoRhCtn.appendChild(todoActions);
+
+        (function addEventListeners() {
+          editBtn.addEventListener("click", onTodoEditor);
+          notesBtn.addEventListener("click", onTodoComment);
+        })();
+      }.call(this));
+
+      todoContent.appendChild(todoCheckboxCtn);
+      todoContent.appendChild(todoRhCtn);
+      return {
+        main: todoContent,
+        refresh() {
+          var todo = getTodo(todoId);
+          todoTitle.textContent = todo.title;
+          todoDayInput.value = todo.day;
+          console.log(todo.priority);
+          switch (todo.priority) {
+            case "1":
+              todoCheckbox.classList.add("priority-1");
+              todoCheckbox.style.borderColor = "rgb(209, 69, 59)";
+              break;
+            case "2":
+              todoCheckbox.classList.add("priority-2");
+              todoCheckbox.style.borderColor = "rgb(235, 137, 9)";
+              break;
+            case "3":
+              todoCheckbox.classList.add("priority-3");
+              todoCheckbox.style.borderColor = "rgb(36, 111, 224)";
+              break;
+            case "4":
+              todoCheckbox.classList.add("priority-4");
+              todoCheckbox.style.border = "1px solid rgba(32,32,32,0.6)";
+              break;
+          }
+        },
+        updateCommentCounter() {
+          var count = notes.text.length;
+          todoCommentsCount.textContent = count;
+          helpers.show(todoComments);
+        },
+      };
+    }.call(this),
+    editor: function createEditor() {
+      var editor = document.createElement("form");
+      editor.classList.add("todo-editor");
+
+      var editorArea = document.createElement("div");
+      editorArea.classList.add("editor-area");
+
+      var titleInput = document.createElement("input");
+      titleInput.setAttribute("type", "text");
+      titleInput.value = title;
+
+      var extraDetails = document.createElement("div");
+      extraDetails.classList.add("editor-extra-details");
+
+      var lhCtn = document.createElement("div");
+      lhCtn.classList.add("lh-ctn");
+
+      var dayInput = document.createElement("input");
+      (function createDayBtn() {
+        var dayBtn = document.createElement("button");
+        dayBtn.setAttribute("type", "button");
+        dayBtn.classList.add("todo-day", "btn");
+        dayInput.setAttribute("type", "date");
+        dayInput.value = day;
+        dayBtn.appendChild(dayInput);
+        lhCtn.appendChild(dayBtn);
+      })();
+
+      var pjInput = document.createElement("select");
+      (function createPjBtn() {
+        var pjBtn = document.createElement("button");
+        pjBtn.setAttribute("type", "button");
+        pjBtn.classList.add("btn", "editor-pj-btn");
+
+        var icon = document.createElement("i");
+        icon.classList.add("flaticon", "flaticon-folder");
+
+        var noneOption = document.createElement("option");
+        noneOption.value = "None";
+        noneOption.textContent = "None";
+        pjInput.appendChild(noneOption);
+
+        pjBtn.appendChild(icon);
+        pjBtn.appendChild(pjInput);
+        lhCtn.appendChild(pjBtn);
+      })();
+
+      var rhCtn = document.createElement("div");
+      rhCtn.classList.add("rh-ctn");
+
+      var priorityBtn = document.createElement("button");
+      const priorityDropdown = (() => {
+        var modal = todoForm.popupModal.cloneNode(true);
+        modal.removeAttribute("id");
+        modal.querySelector("#comment-popup").remove();
+        var dropdown = modal.querySelector(".popup-popup");
+        dropdown.dataset.btn = `editor-${this.id}`;
+        dropdown.classList.add("priority-popup");
+        dropdown.removeAttribute("id");
+        var listItems = dropdown.querySelectorAll("li");
+
+        function onSelectPriority(e) {
+          removeActive();
+          var btn = e.target.closest(".btn");
+          btn.dataset.selected = "true";
+          btn.classList.add("active");
+          changeBtnColor();
+
+          function removeActive() {
+            listItems.forEach((btn) => {
+              if (btn.classList.contains("active")) {
+                btn.classList.remove("active");
+                btn.dataset.selected = "false";
+              }
+            });
+          }
+
+          function changeBtnColor() {
+            var priorityFlag = btn.querySelector(".flaticon");
+            var flagColor = priorityFlag.style.color;
+            var flagIcon = priorityBtn.querySelector("i");
+            btn.dataset.value != 4
+              ? flagIcon.classList.add("flaticon-flag-1")
+              : flagIcon.classList.remove("flaticon-flag-1");
+            flagIcon.style.color = flagColor;
+          }
+        }
+
+        modal.addEventListener("click", () => {
+          dropdown.classList.remove("active");
+          helpers.hide(modal);
+        });
+        dropdown.addEventListener("click", (e) => {
+          e.stopPropagation();
+        });
+        listItems.forEach((item) =>
+          item.addEventListener("click", (e) => onSelectPriority(e))
+        );
+
+        return {
+          modal,
+          dropdown,
+          listItems,
+          show() {
+            helpers.show(modal);
+            helpers.show(dropdown);
+            dropdown.classList.add("active");
+          },
+        };
+      }).call(this);
+
+      (function createPriorityBtn() {
+        priorityBtn.dataset.id = `editor-${this.id}`;
+        priorityBtn.setAttribute("type", "button");
+        priorityBtn.classList.add("btn", "icon-btn");
+        var icon = document.createElement("i");
+        priority === "4"
+          ? icon.classList.add("flaticon", "flaticon-flag")
+          : icon.classList.add("flaticon", "flaticon-flag-1");
+        var priorityLevel;
+        switch (priority) {
+          case "1":
+            priorityLevel = "rgb(209, 69, 59)";
+            break;
+          case "2":
+            priorityLevel = "rgb(235, 137, 9)";
+            break;
+          case "3":
+            priorityLevel = "rgb(36, 111, 224)";
+            break;
+        }
+        icon.style.color = priorityLevel;
+        priorityBtn.appendChild(icon);
+
+        function onPriorityBtn() {
+          priorityDropdown.show();
+          var todo = helpers.findTodoFrom(priorityBtn, listOfTodos);
+          todo.placePopup(priorityBtn, priorityDropdown.dropdown);
+          (function setDefaultPriority() {
+            var defaultPriority = priorityDropdown.dropdown.querySelector(
+              `[data-value="${priority}"]`
+            );
+            defaultPriority.classList.add("active");
+          })();
+        }
+
+        priorityBtn.addEventListener("click", onPriorityBtn);
+        rhCtn.appendChild(priorityBtn);
+      }.call(this));
+
+      var editorActions = document.createElement("div");
+      editorActions.classList.add("editor-actions");
+
+      (function createSaveBtn() {
+        var btn = document.createElement("button");
+        btn.setAttribute("type", "button");
+        btn.classList.add("btn", "act-btn", "save-btn");
+        var thisTodo = this.id;
+        btn.dataset.todo = thisTodo;
+        btn.textContent = "Save";
+
+        btn.addEventListener("click", () => {
+          var todo = getTodo(thisTodo);
+          todo.saveEdits();
+          todo.content.refresh();
+        });
+
+        editorActions.appendChild(btn);
+      }.call(this));
+      (function createCancelBtn() {
+        var btn = document.createElement("button");
+        btn.setAttribute("type", "button");
+        btn.classList.add("btn", "act-btn", "cancel-btn");
+        var thisTodo = this.id;
+        btn.dataset.todo = thisTodo;
+        btn.textContent = "Cancel";
+
+        function cancelEdit() {
+          var todo = getTodo(thisTodo);
+          todo.appendContent();
+        }
+
+        btn.addEventListener("click", cancelEdit);
+        editorActions.appendChild(btn);
+      }.call(this));
+
+      extraDetails.appendChild(lhCtn);
+      extraDetails.appendChild(rhCtn);
+
+      editorArea.appendChild(titleInput);
+      editorArea.appendChild(extraDetails);
+
+      editor.appendChild(editorArea);
+      editor.appendChild(editorActions);
+      editor.appendChild(priorityDropdown.modal);
+
+      return {
+        main: editor,
+        titleInput: titleInput,
+        dayInput: dayInput,
+        pjInput: pjInput,
+        priorityInput: () => {
+          return priorityDropdown.dropdown.querySelector(".active");
+        },
+      };
+    }.call(this),
+    id: this.id++,
+    appendContent,
+    appendEditor,
+    pushToList() {
+      listOfTodos.push(this);
     },
-    del() {},
+    pushToProject() {
+      var project = helpers.findItem(listOfPjs, this.project);
+      project.todoList.push(this.id);
+    },
+    del() {
+      var index = helpers.findItem(listOfTodos, this.id);
+      listOfTodos.splice(index, 1);
+      var pjIndex = helpers.findItem(this.project.todoList, this.id);
+      this.project.todoList.splice(pjIndex, 1);
+    },
     editTitle(str) {
       this.title = str;
       return this;
     },
-    editDesc(str) {
-      this.description = str;
+    editNotes(str) {
+      this.notes = this.notes.concat(str);
       return this;
     },
     editDay(date) {
       this.day = date;
       return this;
     },
-    editPriorirty(str) {
-      this.priority = str;
+    editPriorirty(level) {
+      this.priority = level;
       return this;
+    },
+    editProject(id) {
+      this.project = id;
+    },
+    saveEdits() {
+      this.editTitle(this.editor.titleInput.value)
+        .editDay(this.editor.dayInput.value)
+        .editProject(this.editor.pjInput.value)
+        .editPriorirty(this.editor.priorityInput().dataset.value)
+        .appendContent();
+    },
+    placePopup(btn, active) {
+      var btnPos = btn.getBoundingClientRect();
+
+      var btnCenter = findBtnCenter();
+      var btnBottom = btn.getBoundingClientRect().bottom;
+      var popupCenter = findPopupCenter();
+      active.style.left = `${btnCenter - popupCenter}px`;
+      active.style.top = `${btnBottom + 8}px`;
+      removePopupOverflow(active);
+
+      function removePopupOverflow(active) {
+        var browserWidth = document.documentElement.clientWidth;
+        var popupCtn = active.querySelector(".popup-ctn");
+        var newPos = active.getBoundingClientRect();
+        if (newPos.right > browserWidth) {
+          popupCtn.style.right = `${newPos.right - browserWidth}px`;
+        }
+        var posAfter = popupCtn.getBoundingClientRect();
+      }
+
+      function findBtnCenter() {
+        var btnWidth = btn.offsetWidth;
+        var center = btnPos.left + btnWidth / 2;
+        return center;
+      }
+
+      function findPopupCenter() {
+        var popupWidth = active.offsetWidth;
+        var center = popupWidth / 2;
+        return center;
+      }
     },
   };
 };
+var todoFact = new todoFactory();

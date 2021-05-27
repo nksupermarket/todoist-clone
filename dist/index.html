@@ -7,14 +7,28 @@
     <link rel="stylesheet" type="text/css" href="style.css" />
     <link rel="stylesheet" type="text/css" href="font/flaticon.css" />
     <script type="module" src="../src/dom.js"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
     <title>Document</title>
   </head>
   <body>
     <div id="header">
-      <input type="text" id="searchbar" />
-      <div id="icons">
-        <button class="new-todo-btn btn">
+      <div class="header-ctn">
+        <div class="lh-header-ctn">
+          <button type="button" class="btn" id="menu-btn">
+            <i class="flaticon flaticon-menu"></i>
+          </button>
+          <div id="searchbar">
+            <i class="flaticon flaticon-search-interface-symbol"></i
+            ><input type="text" name="searchbar" />
+          </div>
+        </div>
+        <button class="new-todo-btn btn act-btn">
           <i class="flaticon flaticon-plus"></i>
+          New Task
         </button>
       </div>
     </div>
@@ -28,7 +42,7 @@
           <div id="pj-menu">
             <div class="title-ctn">
               <p class="small-title">Projects</p>
-              <button id="new-pj-btn" class="btn">
+              <button id="new-pj-btn" class="icon-btn btn" type="button">
                 <i class="flaticon flaticon-plus"></i>
               </button>
             </div>
@@ -42,11 +56,16 @@
                 />
               </div>
               <div class="btn-ctn">
-                <input type="button" value="Add" class="btn" id="add-pj-btn" />
+                <input
+                  type="button"
+                  value="Add"
+                  class="act-btn btn"
+                  id="add-pj-btn"
+                />
                 <input
                   type="button"
                   value="Cancel"
-                  class="btn"
+                  class="btn act-btn"
                   id="cancel-pj-btn"
                 />
               </div>
@@ -55,56 +74,156 @@
         </div>
       </div>
       <main id="content">
-        <h2 class="content-title">Title</h2>
-        <div id="todo-list">
-          <section class="todo-ctn">
+        <header class="view-header view-content">
+          <div class="view-header-content">
+            <h2 class="content-title">Title</h2>
+          </div>
+        </header>
+        <ul id="todo-list" class="view-content">
+          <li class="todo-ctn">
             <p class="todo-title">todo title</p>
             <p class="todo-day">todo day</p>
             <div class="todo-actions">
-              <button class="edit-btn btn">
+              <button class="edit-btn icon-btn btn">
                 <i class="flaticon flaticon-pen"></i>
               </button>
-              <button class="notes-btn btn">
+              <button class="notes-btn icon-btn btn">
                 <i class="flaticon flaticon-comment"></i>
               </button>
-              <button class="more-btn btn">
+              <button class="more-btn icon-btn btn">
                 <i class="flaticon flaticon-more-1"></i>
               </button>
             </div>
-          </section>
-        </div>
+          </li>
+        </ul>
       </main>
     </div>
-    <form id="new-todo-form" class="popup inactive">
-      <input type="text" name="todo-title" placeholder="Title" />
-      <div id="schedule-ctn-form">
-        <label for="todo-day">Schedule</label>
-        <input type="date" name="todo-day" value="Schedule" />
+    <div class="modal modal-full inactive">
+      <form id="new-todo-form" class="popup">
+        <header>
+          <h3 class="popup-title">Add Task</h3>
+          <button class="btn close-btn" type="button">
+            <i class="flaticon flaticon-cancel"></i>
+          </button>
+        </header>
+        <div class="todo-inputs-ctn">
+          <input type="text" name="todo-title" placeholder="Title" />
+          <div class="required-details">
+            <button type="button" class="btn" id="schedule-ctn-form">
+              <input type="date" name="todo-day" />
+            </button>
+            <button type="button" class="btn" id="pj-ctn-form">
+              <i class="flaticon flaticon-folder"></i>
+              <select name="todo-pj">
+                <option value="None">None</option>
+              </select>
+            </button>
+          </div>
+          <div class="icons-ctn">
+            <button
+              class="priority-btn icon-btn btn"
+              type="button"
+              data-id="priority-form"
+            >
+              <i class="flaticon flaticon-flag"></i>
+            </button>
+            <button
+              class="comment-btn icon-btn btn"
+              type="button"
+              data-id="comment-form"
+            >
+              <i class="flaticon flaticon-comment"></i>
+            </button>
+          </div>
+        </div>
+        <input
+          type="button"
+          value="Add"
+          class="act-btn btn deactive"
+          id="add-todo-btn"
+        />
+      </form>
+    </div>
+    <div class="modal inactive" id="popup-modal">
+      <div id="comment-popup" class="popup-popup inactive">
+        <div class="popup popup-ctn">
+          <header>
+            <h4>Quick add comment</h4>
+            <button class="btn close-btn" type="button">
+              <i class="flaticon flaticon-cancel"></i>
+            </button>
+          </header>
+          <textarea
+            id="comment-input"
+            placeholder="Write a comment"
+            ;
+          ></textarea>
+        </div>
       </div>
-      <div id="pj-ctn-form">
-        <label for="todo-pj">Project</label>
-        <select name="todo-pj">
-          <option value="None">None</option>
-        </select>
+      <div class="inactive popup-popup priority-popup" id="priority-popup">
+        <div class="popup popup-ctn">
+          <ul id="priority-popup-btns">
+            <li class="btn" data-value="1" data-selected="false">
+              <div>
+                <i
+                  class="flaticon flaticon-flag-1"
+                  style="color: rgb(209, 69, 59)"
+                ></i>
+                Priority 1
+              </div>
+              <i class="flaticon flaticon-check"></i>
+            </li>
+            <li class="btn" data-value="2" data-selected="false">
+              <div>
+                <i
+                  class="flaticon flaticon-flag-1"
+                  style="color: rgb(235, 137, 9)"
+                ></i>
+                Priority 2
+              </div>
+              <i class="flaticon flaticon-check"></i>
+            </li>
+            <li class="btn" data-value="3" data-selected="false">
+              <div>
+                <i
+                  class="flaticon flaticon-flag-1"
+                  style="color: rgb(36, 111, 224)"
+                ></i>
+                Priority 3
+              </div>
+              <i class="flaticon flaticon-check"></i>
+            </li>
+            <li class="btn active" data-value="4" data-selected="true">
+              <div><i class="flaticon flaticon-flag"></i> Priority 4</div>
+              <i class="flaticon flaticon-check"></i>
+            </li>
+          </ul>
+        </div>
       </div>
-      <div id="priority-ctn-form">
-        <input type="radio" name="todo-priority" value="Urgent" />
-        <label for=""></label>
-        <input type="radio" name="todo-priority" value="Urgent" />
-        <label for=""></label>
-        <input type="radio" name="todo-priority" value="Urgent" />
-        <label for=""></label>
+    </div>
+    <div class="modal modal-full comment-modal inactive">
+      <div id="add-comment">
+        <div class="item-detail-header">
+          <div class="detail-ctn">
+            <h3 class="project-title">project</h3>
+            <h4 class="todo-title">todo</h4>
+          </div>
+          <button type="button" class="btn close-btn">
+            <i class="flaticon flaticon-cancel"></i>
+          </button>
+        </div>
+        <div class="comment-list"></div>
+        <form class="comment-editor">
+          <textarea
+            placeholder="Write a comment"
+            style="height: 57px"
+            ;
+          ></textarea>
+          <button class="add-comment-btn btn act-btn" type="button">
+            Add Comment
+          </button>
+        </form>
       </div>
-      <input type="button" value="Cancel" class="btn" id="cancel-todo-btn" />
-      <input type="button" value="Add" class="btn" id="add-todo-btn" />
-      <div class="btn" id="expand-btn">
-        <i class="flaticon flaticon-arrow-down-sign-to-navigate"></i
-        ><span id="expand-btn-text">Expand to add notes</span>
-      </div>
-      <section id="notes-ctn-form">
-        <label for="todo-notes">Notes</label>
-        <input type="text" name="todo-notes" />
-      </section>
-    </form>
+    </div>
   </body>
 </html>
