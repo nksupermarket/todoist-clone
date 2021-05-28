@@ -1,4 +1,5 @@
 import { listOfPjs, listOfTodos, pjFact } from "./projects.js";
+import { today } from "./today.js";
 import { helpers } from "./helpers.js";
 
 export { menu, content };
@@ -8,19 +9,31 @@ const content = (() => {
   var contentTitle = content.querySelector(".content-title");
   var todoList = content.querySelector("#todo-list");
 
+  function removeTodos() {
+    var visibleTodos = todoList.querySelectorAll(".todo-ctn");
+    visibleTodos.forEach((ctn) => ctn.remove());
+  }
+
   return {
     contentTitle,
     todoList,
     display(pjId) {
+      removeTodos();
       var pj = helpers.findItem(listOfPjs, pjId);
       todoList.dataset.project = pjId;
       contentTitle.textContent = pj.title;
-      var visibleTodos = todoList.querySelectorAll(".todo-ctn");
-      visibleTodos.forEach((ctn) => ctn.remove());
-      pj.todoList.forEach((id) => {
-        var todo = helpers.findItem(listOfTodos, id);
+      pj.todoList.forEach((todo) => {
         helpers.show(todo.ctn);
         todoList.appendChild(todo.ctn);
+      });
+    },
+    displayToday() {
+      removeTodos();
+      contentTitle.textContent = "Today";
+      var todoList = today.getTodayTodos(listOfTodos);
+      todoList.forEach((todo) => {
+        helpers.show(todo.ctn);
+        this.todoList.appendChild(todo.ctn);
       });
     },
     refresh() {
@@ -61,7 +74,9 @@ const menu = (() => {
     addBtn,
     cancelBtn,
     pjListItems,
-    onToday() {},
+    onToday() {
+      content.displayToday();
+    },
     onUpcoming() {},
     onNewPj() {
       helpers.show(form);

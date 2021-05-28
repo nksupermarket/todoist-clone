@@ -464,7 +464,7 @@ todoFactory.prototype.createTodo = function (
     },
     pushToProject() {
       var project = helpers.findItem(listOfPjs, this.project);
-      project.todoList.push(this.id);
+      project.todoList.push(this);
     },
     del() {
       var index = helpers.findItem(listOfTodos, this.id);
@@ -490,6 +490,7 @@ todoFactory.prototype.createTodo = function (
     },
     editProject(id) {
       this.project = id;
+      return this;
     },
     saveEdits() {
       this.editTitle(this.editor.titleInput.value)

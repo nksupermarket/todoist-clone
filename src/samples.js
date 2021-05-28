@@ -7,7 +7,7 @@ const samples = (() => {
       for (var i = 0; i < quantity; i++) {
         var project = getRandomProject();
         var title = `sample todo ${i}`;
-        var day = getRandomDay();
+        var day = "2021-05-27";
         var priority = getRandomPriority();
         var notes = { text: [], date: [] };
 
@@ -15,7 +15,6 @@ const samples = (() => {
         newTodo.pushToList();
         newTodo.pushToProject();
         newTodo.appendContent();
-
         function getRandomProject() {
           var randomIndex = Math.floor(Math.random() * listOfPjs.length);
           return listOfPjs[randomIndex].id;
@@ -29,7 +28,7 @@ const samples = (() => {
               Math.random() * (yearEnd.getTime() - yearBegin.getTime())
           );
 
-          var randomDayMonth = randomDay.getMonth();
+          var randomDayMonth = randomDay.getMonth() + 1;
           if (randomDayMonth.toString().length != 2)
             randomDayMonth = `0${randomDayMonth}`;
           var randomDayDay = randomDay.getDate();

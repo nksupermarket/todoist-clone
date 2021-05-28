@@ -70,7 +70,6 @@ todoForm.commentCloseBtn.addEventListener("click", todoForm.hidePopups);
 window.onresize = function movePopups() {
   var active = findActivePopup();
   if (!active) return;
-  console.log(active);
   var btn = document.querySelector(`[data-id = "${active.dataset.btn}"]`);
   btn.dataset.id.includes("editor")
     ? helpers.findTodoFrom(btn, listOfTodos).placePopup(btn, active)
