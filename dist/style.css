@@ -152,7 +152,7 @@ select {
   font-size: 1.4rem;
   width: 100%;
   background-color: var(--header-bg);
-  height: 5rem;
+  height: 4.4rem;
   display: grid;
   align-items: center;
 }
@@ -173,6 +173,8 @@ select {
   display: flex;
 }
 #searchbar {
+  height: 80%;
+  align-self: center;
   color: var(--content-bg);
   background-color: hsla(0, 0%, 100%, 0.2);
   border-radius: 0.5rem;
@@ -183,7 +185,9 @@ select {
 }
 #searchbar .flaticon {
   font-size: 1.2rem;
-  transform: translateY(1.2rem);
+  align-self: center;
+}
+#searchbar input {
 }
 #header .new-todo-btn {
   height: 80%;
@@ -356,9 +360,9 @@ select {
   display: flex;
 }
 #menu {
-  padding: 0 1.6rem 0 5rem;
+  box-sizing: border-box;
+  padding: 3rem 0 0 3.5rem;
   min-height: calc(100vh - 5rem);
-  grid-area: menu;
   background-color: var(--menu-bg);
 }
 #menu-ctn {
@@ -421,6 +425,60 @@ select {
 .view-header-content {
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--content-accent);
+  word-break: break-word;
+}
+.view-header-content h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 2.5rem;
+}
+.view-header-content h1 small {
+  color: grey;
+  margin-left: 0.6rem;
+  font-size: 1.2rem;
+  font-weight: 400;
+}
+#upcoming-ctn header {
+  margin-bottom: 0;
+}
+#upcoming-ctn .view-header {
+  padding-top: 2.4rem;
+}
+section .view-content {
+  margin-bottom: 0;
+}
+.section-header {
+  padding-bottom: 0;
+}
+.section-header h2 {
+  padding: 0.6rem 3rem 0.5rem 0;
+  line-height: 2rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+.empty {
+  color: grey;
+}
+.new-todo-btn {
+  color: grey;
+  font-size: 1.4rem;
+  white-space: nowrap;
+  font-weight: 400;
+}
+.new-todo-btn .flaticon {
+  color: var(--header-bg);
+  font-size: 1.3rem;
+  margin-right: 1rem;
+}
+.new-todo-btn:hover {
+  color: var(--header-bg);
+  text-decoration: underline;
+}
+.todo-list .new-todo-btn {
+  padding: 0.8rem 0;
 }
 .todo-list {
   padding-left: 55px;
@@ -523,6 +581,12 @@ select {
   font-size: 1.2rem;
   grid-area: day;
   display: inline-flex;
+  width: 62%;
+  border: none;
+  color: grey;
+}
+.todo-day input {
+  padding-right: 0;
 }
 .notes-btn-count {
   margin-left: 0.5rem;

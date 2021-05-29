@@ -12,14 +12,16 @@ const content = (() => {
     ctn.id = "today-ctn";
 
     var header = createCtnHeader();
-    var headerContent = createHeaderContent();
+    var headerContent = createHeaderContent("h1");
     header.appendChild(headerContent.ctn);
-    headerContent.title.textContent = "Today";
+    var todayStr = new Date().toString().slice(0, 10);
+    headerContent.title.innerHTML = `<span>Today</span><small>${todayStr}</small>`;
 
     var todoList = document.createElement("ul");
     todoList.classList.add("todo-list", "view-content");
 
     var btn = createNewTodoBtn();
+    todoList.appendChild(btn);
 
     ctn.appendChild(header);
     ctn.appendChild(todoList);
@@ -35,7 +37,7 @@ const content = (() => {
     var ctn = document.createElement("div");
     ctn.id = "upcoming-ctn";
     var header = createCtnHeader();
-    var headerContent = createHeaderContent();
+    var headerContent = createHeaderContent("h1");
     header.appendChild(headerContent.ctn);
     headerContent.title.textContent = "Upcoming";
 
@@ -52,7 +54,8 @@ const content = (() => {
         var section = document.createElement("section");
 
         var header = createCtnHeader();
-        var headerContent = createHeaderContent();
+        var headerContent = createHeaderContent("h2");
+        headerContent.ctn.classList.add("section-header");
 
         var title = headerContent.title;
 
@@ -61,11 +64,11 @@ const content = (() => {
         var todoList = document.createElement("ul");
         todoList.classList.add("todo-list");
 
-        var addTodoBtn = createNewTodoBtn();
+        var todoBtn = createNewTodoBtn();
+        todoList.appendChild(todoBtn);
 
         section.appendChild(header);
         section.appendChild(todoList);
-        section.appendChild(addTodoBtn);
 
         listHolder.appendChild(section);
 
@@ -83,11 +86,14 @@ const content = (() => {
     var ctn = document.createElement("div");
     ctn.id = "pj-ctn";
     var header = createCtnHeader();
-    var headerContent = createHeaderContent();
+    var headerContent = createHeaderContent("h1");
     header.appendChild(headerContent.ctn);
     var title = headerContent.title;
     var todoList = document.createElement("ul");
     todoList.classList.add("todo-list");
+
+    var todoBtn = createNewTodoBtn();
+    todoList.appendChild(todoBtn);
 
     ctn.appendChild(header);
     ctn.appendChild(todoList);
@@ -101,7 +107,7 @@ const content = (() => {
 
   function createNewTodoBtn() {
     var btn = document.createElement("button");
-    btn.classList.add("btn", "add-todo-btn");
+    btn.classList.add("btn", "new-todo-btn");
 
     var icon = document.createElement("i");
     icon.classList.add("flaticon", "flaticon-plus");
@@ -121,11 +127,11 @@ const content = (() => {
     header.classList.add("view-header", "view-content");
     return header;
   }
-  function createHeaderContent() {
+  function createHeaderContent(titleTag) {
     var ctn = document.createElement("div");
     ctn.classList.add("view-header-content");
 
-    var title = document.createElement("h2");
+    var title = document.createElement(titleTag);
     title.classList.add("content-title");
 
     ctn.appendChild(title);
@@ -141,20 +147,20 @@ const content = (() => {
     pjCtn.ctn.remove();
   }
   function removeTodos(ctn) {
-    var todoCtns = ctn.querySelectorAll("todo-ctn");
+    var todoCtns = ctn.querySelectorAll(".todo-ctn");
     if (!todoCtns[0]) return;
     todoCtns.forEach((todo) => todo.remove());
   }
   return {
     display(pjId) {
-      removeTodos(pjCtn.ctn);
+      removeTodos(pjCtn.todoList);
       removeCtns();
       var pj = helpers.findItem(listOfPjs, pjId);
       pjCtn.todoList.dataset.project = pjId;
       pjCtn.title.textContent = pj.title;
       pj.todoList.forEach((todo) => {
         helpers.show(todo.ctn);
-        pjCtn.todoList.appendChild(todo.ctn);
+        pjCtn.todoList.prepend(todo.ctn);
       });
       main.appendChild(pjCtn.ctn);
     },
@@ -164,9 +170,8 @@ const content = (() => {
       var todayList = today.getTodayTodos(listOfTodos);
       var todoList = todayCtn.todoList;
       todayList.forEach((todo) => {
-        todoList.appendChild(todo.ctn);
+        todoList.prepend(todo.ctn);
       });
-      todoList.appendChild(todayCtn.btn);
       main.appendChild(todayCtn.ctn);
     },
     displayUpcoming() {
@@ -203,8 +208,10 @@ const content = (() => {
             if (day.toString().length === 1) day = "0".concat(day.toString());
             var dayStr = `${year}-${month}-${day}`;
             var todos = listOfTodos.filter((item) => item.day == dayStr);
+            if (!todos[0])
+              return upcomingCtn.sections[i].title.classList.add("empty");
             todos.forEach((todo) =>
-              upcomingCtn.sections[i].todoList.appendChild(todo.ctn)
+              upcomingCtn.sections[i].todoList.prepend(todo.ctn)
             );
           }
         }

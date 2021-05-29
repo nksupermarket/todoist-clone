@@ -69,6 +69,7 @@ todoFactory.prototype.createTodo = function (
     }
   }
   function onTodoEditor() {
+    closeOtherEditors();
     var todo = getTodo(this.dataset.todo);
     (function addPjOptions() {
       var select = todo.editor.main.querySelector("select");
@@ -82,6 +83,18 @@ todoFactory.prototype.createTodo = function (
       defaultOption.setAttribute("selected", "selected");
     })();
     todo.appendEditor();
+
+    function closeOtherEditors() {
+      var openEditor = document.querySelector(".todo-editor");
+      if (!openEditor) return;
+      var openTodo = helpers.findItem(listOfTodos, openEditor.dataset.todo);
+      console.log(openEditor);
+      console.log(openTodo);
+
+      openTodo.saveEdits();
+      openTodo.content.refresh();
+      openTodo.appendContent();
+    }
   }
 
   function appendContent() {
@@ -164,6 +177,7 @@ todoFactory.prototype.createTodo = function (
         todoDayBtn.setAttribute("type", "button");
         todoDayBtn.classList.add("todo-day", "btn");
         todoDayInput.setAttribute("type", "date");
+        todoDayInput.setAttribute("required", "required");
         todoDayInput.dataset.todo = todoId;
         todoDayInput.value = day;
         todoDayBtn.appendChild(todoDayInput);
@@ -253,6 +267,7 @@ todoFactory.prototype.createTodo = function (
     editor: function createEditor() {
       var editor = document.createElement("form");
       editor.classList.add("todo-editor");
+      editor.dataset.todo = this.id;
 
       var editorArea = document.createElement("div");
       editorArea.classList.add("editor-area");
