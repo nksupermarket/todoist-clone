@@ -125,7 +125,6 @@ const todoForm = (() => {
         notes.text[0] = commentTextarea.value;
         notes.date[0] = today.getToday();
       })();
-      console.log(dateInput.value);
       var newTodo = todoFact.createTodo(
         pjInput.value,
         titleInput.value,
@@ -136,8 +135,6 @@ const todoForm = (() => {
       newTodo.pushToList();
       newTodo.appendContent();
       if (pjInput.value != "None") newTodo.pushToProject();
-
-      console.log(newTodo);
 
       hideForm();
     },

@@ -422,7 +422,7 @@ select {
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--content-accent);
 }
-#todo-list {
+.todo-list {
   padding-left: 55px;
   padding-right: 55px;
 }
