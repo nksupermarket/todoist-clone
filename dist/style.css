@@ -489,7 +489,13 @@ section .view-content {
   flex-direction: row;
   align-content: center;
   border-bottom: 1px solid var(--content-accent);
-  padding: 1rem 0;
+  padding: 0.5rem 0;
+}
+.todo-content button {
+  color: grey;
+}
+.todo-content button:hover {
+  color: var(--main-text);
 }
 .todo-rh-ctn {
   width: 100%;
@@ -567,6 +573,7 @@ section .view-content {
 .todo-title {
   grid-area: title;
   margin: 0;
+  align-self: center;
 }
 .todo-details {
   grid-area: details;
@@ -581,12 +588,13 @@ section .view-content {
   font-size: 1.2rem;
   grid-area: day;
   display: inline-flex;
-  width: 62%;
+  width: 64px;
   border: none;
-  color: grey;
 }
 .todo-day input {
   padding-right: 0;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 .notes-btn-count {
   margin-left: 0.5rem;
