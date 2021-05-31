@@ -124,6 +124,7 @@ todoFactory.prototype.createTodo = function (
       var todoId = this.id;
       var todoContent = document.createElement("div");
       todoContent.classList.add("todo-content");
+      todoContent.dataset.todo = this.id;
 
       var todoCheckbox = document.createElement("span");
       var todoCheckboxCtn = (function createFinishedCheckbox() {

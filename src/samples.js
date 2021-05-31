@@ -7,7 +7,7 @@ const samples = (() => {
       for (var i = 0; i < quantity; i++) {
         var project = getRandomProject();
         var title = `sample todo ${i}`;
-        var day = "2021-05-28";
+        var day = getRandomDay();
         var priority = getRandomPriority();
         var notes = { text: [], date: [] };
 

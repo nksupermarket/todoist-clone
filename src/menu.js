@@ -89,17 +89,30 @@ const content = (() => {
     var headerContent = createHeaderContent("h1");
     header.appendChild(headerContent.ctn);
     var title = headerContent.title;
+    var actionCtn = createActionCtn();
+    headerContent.ctn.appendChild(actionCtn.ctn);
     var todoList = document.createElement("ul");
     todoList.classList.add("todo-list");
 
     var todoBtn = createNewTodoBtn();
     todoList.appendChild(todoBtn);
 
+    actionCtn.sortBtn.addEventListener("click", function () {
+      var pjId = actionCtn.sortBtn.dataset.project;
+      var pjTodoList = helpers.findItem(listOfPjs, pjId).todoList;
+      actionCtn.sort("", pjTodoList);
+      pjTodoList.forEach((todo) => todo.ctn.remove());
+      pjTodoList.forEach((todo) => todoList.appendChild(todo.ctn));
+      todoBtn.remove();
+      todoList.appendChild(todoBtn);
+    });
+
     ctn.appendChild(header);
     ctn.appendChild(todoList);
 
     return {
       ctn,
+      header,
       title,
       todoList,
     };
@@ -140,6 +153,54 @@ const content = (() => {
       title: title,
     };
   }
+  function createActionCtn() {
+    var ctn = document.createElement("div");
+    ctn.classList.add("pj-icon-ctn");
+
+    var sortBtn = createBtn("flaticon-sort", "sort-btn", "Sort");
+    var commentBtn = createBtn("flaticon-comment", "comment-btn", "Comments");
+    var deleteBtn = createBtn("flaticon-trash", "delete-btn", "Delete");
+
+    ctn.appendChild(sortBtn);
+    ctn.appendChild(commentBtn);
+    ctn.appendChild(deleteBtn);
+
+    return {
+      ctn,
+      sortBtn,
+      commentBtn,
+      deleteBtn,
+      sort(method, list) {
+        // switch (method) {
+        //   case "due date":
+        list.sort(function (a, b) {
+          var aDate = new Date(a.day);
+          var bDate = new Date(b.day);
+
+          if (aDate > bDate) return 1;
+          if (aDate < bDate) return -1;
+          if (aDate === bDate) return 0;
+        });
+        // }
+      },
+    };
+
+    function createBtn(iconName, className, str) {
+      var btn = document.createElement("button");
+      btn.classList.add("btn", "icon-btn", className);
+
+      var icon = document.createElement("i");
+      icon.classList.add("flaticon", iconName);
+      btn.prepend(icon);
+
+      var text = document.createElement("span");
+      text.classList.add("btn-text");
+      text.textContent = str;
+      btn.appendChild(text);
+
+      return btn;
+    }
+  }
 
   function removeCtns() {
     todayCtn.ctn.remove();
@@ -157,6 +218,8 @@ const content = (() => {
       removeCtns();
       var pj = helpers.findItem(listOfPjs, pjId);
       pjCtn.todoList.dataset.project = pjId;
+      var pjCtnBtns = pjCtn.header.querySelectorAll("button");
+      pjCtnBtns.forEach((btn) => (btn.dataset.project = pjId));
       pjCtn.title.textContent = pj.title;
       pj.todoList.forEach((todo) => {
         helpers.show(todo.ctn);
@@ -191,11 +254,11 @@ const content = (() => {
               .slice(0, 10);
             console.log(i);
             if (i === 0)
-              upcomingCtn.sections[i].title.textContent = "Today - ".concat(
+              upcomingCtn.sections[i].title.textContent = "Today — ".concat(
                 upcomingCtn.sections[i].title.textContent
               );
             if (i === 1)
-              upcomingCtn.sections[i].title.textContent = "Tomorrow - ".concat(
+              upcomingCtn.sections[i].title.textContent = "Tomorrow — ".concat(
                 upcomingCtn.sections[i].title.textContent
               );
           }

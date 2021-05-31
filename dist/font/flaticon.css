@@ -1,10 +1,10 @@
 @font-face {
     font-family: "flaticon";
-    src: url("./flaticon.ttf?b7f0cd9815d76578329f36518a034a90") format("truetype"),
-url("./flaticon.woff?b7f0cd9815d76578329f36518a034a90") format("woff"),
-url("./flaticon.woff2?b7f0cd9815d76578329f36518a034a90") format("woff2"),
-url("./flaticon.eot?b7f0cd9815d76578329f36518a034a90#iefix") format("embedded-opentype"),
-url("./flaticon.svg?b7f0cd9815d76578329f36518a034a90#flaticon") format("svg");
+    src: url("./flaticon.ttf?b125e960bf5635ffda12cf6a4715be05") format("truetype"),
+url("./flaticon.woff?b125e960bf5635ffda12cf6a4715be05") format("woff"),
+url("./flaticon.woff2?b125e960bf5635ffda12cf6a4715be05") format("woff2"),
+url("./flaticon.eot?b125e960bf5635ffda12cf6a4715be05#iefix") format("embedded-opentype"),
+url("./flaticon.svg?b125e960bf5635ffda12cf6a4715be05#flaticon") format("svg");
 }
 
 i[class^="flaticon-"]:before, i[class*=" flaticon-"]:before {
@@ -18,45 +18,48 @@ i[class^="flaticon-"]:before, i[class*=" flaticon-"]:before {
     -moz-osx-font-smoothing: grayscale;
 }
 
-.flaticon-pen:before {
+.flaticon-more:before {
     content: "\f101";
 }
-.flaticon-more:before {
+.flaticon-comment:before {
     content: "\f102";
 }
-.flaticon-comment:before {
+.flaticon-more-1:before {
     content: "\f103";
 }
-.flaticon-more-1:before {
+.flaticon-plus:before {
     content: "\f104";
 }
-.flaticon-plus:before {
+.flaticon-cancel:before {
     content: "\f105";
 }
-.flaticon-cancel:before {
+.flaticon-flag:before {
     content: "\f106";
 }
-.flaticon-flag:before {
+.flaticon-menu:before {
     content: "\f107";
 }
-.flaticon-menu:before {
+.flaticon-search-interface-symbol:before {
     content: "\f108";
 }
-.flaticon-search-interface-symbol:before {
+.flaticon-flag-1:before {
     content: "\f109";
 }
-.flaticon-flag-1:before {
+.flaticon-folder:before {
     content: "\f10a";
 }
-.flaticon-folder:before {
+.flaticon-check:before {
     content: "\f10b";
 }
-.flaticon-check:before {
+.flaticon-comment-1:before {
     content: "\f10c";
 }
-.flaticon-comment-1:before {
+.flaticon-calendar:before {
     content: "\f10d";
 }
-.flaticon-calendar:before {
+.flaticon-trash:before {
     content: "\f10e";
+}
+.flaticon-sort:before {
+    content: "\f10f";
 }

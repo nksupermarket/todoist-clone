@@ -441,7 +441,7 @@ select {
 #upcoming-ctn header {
   margin-bottom: 0;
 }
-#upcoming-ctn .view-header {
+#upcoming-ctn section .view-header {
   padding-top: 2.4rem;
 }
 section .view-content {
@@ -461,6 +461,17 @@ section .view-content {
 }
 .empty {
   color: grey;
+}
+#today-ctn .view-header-content,
+#pj-ctn .view-header-content {
+  display: flex;
+  justify-content: space-between;
+}
+.pj-icon-ctn button {
+  color: grey;
+}
+.pj-icon-ctn button:hover {
+  color: var(--main-text);
 }
 .new-todo-btn {
   color: grey;
@@ -536,7 +547,7 @@ section .view-content {
 }
 .todo-checkbox:hover > .checkbox::before {
   font-family: flaticon;
-  content: "\f10c";
+  content: "\f10b";
   font-size: 1rem;
   height: 1rem;
   width: 1rem;
@@ -550,25 +561,25 @@ section .view-content {
   background-color: rgba(209, 69, 59, 0.1);
 }
 .todo-checkbox:hover > .priority-1::before {
-  color: rgb(209, 69, 59);
+  color: rgb(209, 69, 59) !important;
 }
 .todo-checkbox:hover > .priority-2 {
   background-color: rgba(235, 137, 9, 0.1);
 }
 .todo-checkbox:hover > .priority-2::before {
-  color: rgb(235, 137, 9);
+  color: rgb(235, 137, 9) !important;
 }
 .todo-checkbox:hover > .priority-3 {
   background-color: rgba(36, 111, 224, 0.1);
 }
 .todo-checkbox:hover > .priority-3::before {
-  color: rgb(36, 111, 224);
+  color: rgb(36, 111, 224) !important;
 }
 .todo-checkbox:hover > .priority-4 {
   background-color: rgba(32, 32, 32, 0.08);
 }
-.todo-checkbox:hover > .priority-1::before {
-  color: rgba(32, 32, 32, 0.6);
+.todo-checkbox:hover > .priority-4::before {
+  color: rgba(32, 32, 32, 0.6) !important;
 }
 .todo-title {
   grid-area: title;
@@ -588,10 +599,12 @@ section .view-content {
   font-size: 1.2rem;
   grid-area: day;
   display: inline-flex;
+}
+.todo-content .todo-day {
   width: 64px;
   border: none;
 }
-.todo-day input {
+.todo-content .todo-day input {
   padding-right: 0;
   padding-top: 0;
   padding-bottom: 0;
@@ -683,4 +696,12 @@ section .view-content {
   padding: 0.6rem 1.2rem;
   background-color: var(--header-bg);
   color: var(--content-bg);
+}
+
+@media screen and (max-width: 1070px) {
+  .btn-text {
+    opacity: 0;
+    position: absolute;
+    pointer-events: none;
+  }
 }
