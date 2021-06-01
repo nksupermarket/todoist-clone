@@ -2,6 +2,7 @@ export { pjFact, todoFact, listOfPjs, listOfTodos };
 import { helpers } from "./helpers.js";
 import { commentModal } from "./comments.js";
 import { todoForm } from "./todoForm.js";
+import { popups } from "./popups.js";
 
 let listOfPjs = [];
 let listOfTodos = [];
@@ -216,6 +217,7 @@ todoFactory.prototype.createTodo = function (
           var btn = document.createElement("button");
           btn.setAttribute("type", "button");
           btn.dataset.todo = this.id;
+          btn.dataset.btn = `${name}-${todoId}`;
           btn.classList.add(`${name}-btn`, "btn", "icon-btn");
           var btnIcon = document.createElement("i");
           btnIcon.classList.add("flaticon", `flaticon-${icon}`);
@@ -317,68 +319,68 @@ todoFactory.prototype.createTodo = function (
       rhCtn.classList.add("rh-ctn");
 
       var priorityBtn = document.createElement("button");
-      const priorityDropdown = (() => {
-        var modal = todoForm.popupModal.cloneNode(true);
-        modal.removeAttribute("id");
-        modal.querySelector("#comment-popup").remove();
-        var dropdown = modal.querySelector(".popup-popup");
-        dropdown.dataset.btn = `editor-${this.id}`;
-        dropdown.classList.add("priority-popup");
-        dropdown.removeAttribute("id");
-        var listItems = dropdown.querySelectorAll("li");
+      // const priorityDropdown = (() => {
+      //   var modal = todoForm.popupModal.cloneNode(true);
+      //   modal.removeAttribute("id");
+      //   modal.querySelector("#comment-popup").remove();
+      //   var dropdown = modal.querySelector(".popup-popup");
+      //   dropdown.dataset.btn = `editor-${this.id}`;
+      //   dropdown.classList.add("priority-popup");
+      //   dropdown.removeAttribute("id");
+      //   var listItems = dropdown.querySelectorAll("li");
 
-        function onSelectPriority(e) {
-          removeActive();
-          var btn = e.target.closest(".btn");
-          btn.dataset.selected = "true";
-          btn.classList.add("active");
-          changeBtnColor();
+      //   function onSelectPriority(e) {
+      //     removeActive();
+      //     var btn = e.target.closest(".btn");
+      //     btn.dataset.selected = "true";
+      //     btn.classList.add("active");
+      //     changeBtnColor();
 
-          function removeActive() {
-            listItems.forEach((btn) => {
-              if (btn.classList.contains("active")) {
-                btn.classList.remove("active");
-                btn.dataset.selected = "false";
-              }
-            });
-          }
+      //     function removeActive() {
+      //       listItems.forEach((btn) => {
+      //         if (btn.classList.contains("active")) {
+      //           btn.classList.remove("active");
+      //           btn.dataset.selected = "false";
+      //         }
+      //       });
+      //     }
 
-          function changeBtnColor() {
-            var priorityFlag = btn.querySelector(".flaticon");
-            var flagColor = priorityFlag.style.color;
-            var flagIcon = priorityBtn.querySelector("i");
-            btn.dataset.value != 4
-              ? flagIcon.classList.add("flaticon-flag-1")
-              : flagIcon.classList.remove("flaticon-flag-1");
-            flagIcon.style.color = flagColor;
-          }
-        }
+      //     function changeBtnColor() {
+      //       var priorityFlag = btn.querySelector(".flaticon");
+      //       var flagColor = priorityFlag.style.color;
+      //       var flagIcon = priorityBtn.querySelector("i");
+      //       btn.dataset.value != 4
+      //         ? flagIcon.classList.add("flaticon-flag-1")
+      //         : flagIcon.classList.remove("flaticon-flag-1");
+      //       flagIcon.style.color = flagColor;
+      //     }
+      //   }
 
-        modal.addEventListener("click", () => {
-          dropdown.classList.remove("active");
-          helpers.hide(modal);
-        });
-        dropdown.addEventListener("click", (e) => {
-          e.stopPropagation();
-        });
-        listItems.forEach((item) =>
-          item.addEventListener("click", (e) => onSelectPriority(e))
-        );
+      //   modal.addEventListener("click", () => {
+      //     dropdown.classList.remove("active");
+      //     helpers.hide(modal);
+      //   });
+      //   dropdown.addEventListener("click", (e) => {
+      //     e.stopPropagation();
+      //   });
+      //   listItems.forEach((item) =>
+      //     item.addEventListener("click", (e) => onSelectPriority(e))
+      //   );
 
-        return {
-          modal,
-          dropdown,
-          listItems,
-          show() {
-            helpers.show(modal);
-            helpers.show(dropdown);
-            dropdown.classList.add("active");
-          },
-        };
-      }).call(this);
+      //   return {
+      //     modal,
+      //     dropdown,
+      //     listItems,
+      //     show() {
+      //       helpers.show(modal);
+      //       helpers.show(dropdown);
+      //       dropdown.classList.add("active");
+      //     },
+      //   };
+      // }).call(this);
 
       (function createPriorityBtn() {
-        priorityBtn.dataset.id = `editor-${this.id}`;
+        priorityBtn.dataset.id = `priority-${this.id}`;
         priorityBtn.setAttribute("type", "button");
         priorityBtn.classList.add("btn", "icon-btn");
         var icon = document.createElement("i");
@@ -401,14 +403,11 @@ todoFactory.prototype.createTodo = function (
         priorityBtn.appendChild(icon);
 
         function onPriorityBtn() {
-          priorityDropdown.show();
-          var todo = helpers.findTodoFrom(priorityBtn, listOfTodos);
-          todo.placePopup(priorityBtn, priorityDropdown.dropdown);
+          popups.priority.show();
+          popups.priority.setDataBtn(`priority-${todoId}`);
+          popups.position(popups.priority.ctn, priorityBtn);
           (function setDefaultPriority() {
-            var defaultPriority = priorityDropdown.dropdown.querySelector(
-              `[data-value="${priority}"]`
-            );
-            defaultPriority.classList.add("active");
+            popups.priority.setActive(priority);
           })();
         }
 
@@ -460,7 +459,7 @@ todoFactory.prototype.createTodo = function (
 
       editor.appendChild(editorArea);
       editor.appendChild(editorActions);
-      editor.appendChild(priorityDropdown.modal);
+      // editor.appendChild(priorityDropdown.modal);
 
       return {
         main: editor,
@@ -515,38 +514,38 @@ todoFactory.prototype.createTodo = function (
         .editPriorirty(this.editor.priorityInput().dataset.value)
         .appendContent();
     },
-    placePopup(btn, active) {
-      var btnPos = btn.getBoundingClientRect();
+    // placePopup(btn, active) {
+    //   var btnPos = btn.getBoundingClientRect();
 
-      var btnCenter = findBtnCenter();
-      var btnBottom = btn.getBoundingClientRect().bottom;
-      var popupCenter = findPopupCenter();
-      active.style.left = `${btnCenter - popupCenter}px`;
-      active.style.top = `${btnBottom + 8}px`;
-      removePopupOverflow(active);
+    //   var btnCenter = findBtnCenter();
+    //   var btnBottom = btn.getBoundingClientRect().bottom;
+    //   var popupCenter = findPopupCenter();
+    //   active.style.left = `${btnCenter - popupCenter}px`;
+    //   active.style.top = `${btnBottom + 8}px`;
+    //   removePopupOverflow(active);
 
-      function removePopupOverflow(active) {
-        var browserWidth = document.documentElement.clientWidth;
-        var popupCtn = active.querySelector(".popup-ctn");
-        var newPos = active.getBoundingClientRect();
-        if (newPos.right > browserWidth) {
-          popupCtn.style.right = `${newPos.right - browserWidth}px`;
-        }
-        var posAfter = popupCtn.getBoundingClientRect();
-      }
+    //   function removePopupOverflow(active) {
+    //     var browserWidth = document.documentElement.clientWidth;
+    //     var popupCtn = active.querySelector(".popup-ctn");
+    //     var newPos = active.getBoundingClientRect();
+    //     if (newPos.right > browserWidth) {
+    //       popupCtn.style.right = `${newPos.right - browserWidth}px`;
+    //     }
+    //     var posAfter = popupCtn.getBoundingClientRect();
+    //   }
 
-      function findBtnCenter() {
-        var btnWidth = btn.offsetWidth;
-        var center = btnPos.left + btnWidth / 2;
-        return center;
-      }
+    //   function findBtnCenter() {
+    //     var btnWidth = btn.offsetWidth;
+    //     var center = btnPos.left + btnWidth / 2;
+    //     return center;
+    //   }
 
-      function findPopupCenter() {
-        var popupWidth = active.offsetWidth;
-        var center = popupWidth / 2;
-        return center;
-      }
-    },
+    //   function findPopupCenter() {
+    //     var popupWidth = active.offsetWidth;
+    //     var center = popupWidth / 2;
+    //     return center;
+    //   }
+    // }
   };
 };
 var todoFact = new todoFactory();

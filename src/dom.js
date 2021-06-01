@@ -5,6 +5,7 @@ import { commentModal } from "./comments.js";
 import { menu, content } from "./menu.js";
 import { todoForm } from "./todoForm.js";
 import { samples } from "./samples.js";
+import { popups } from "./popups.js";
 
 var pjWork = pjFact.createProject("Work");
 var pjHome = pjFact.createProject("Home");
@@ -50,37 +51,38 @@ todoForm.addBtn.addEventListener("click", () => {
 todoForm.form.addEventListener("click", function (e) {
   e.stopPropagation();
 });
-todoForm.popupModal.addEventListener("click", todoForm.hidePopups);
-todoForm.priorityPopup.addEventListener("click", function (e) {
+popups.modal.addEventListener("click", popups.hide);
+popups.priority.ctn.addEventListener("click", function (e) {
   e.stopPropagation();
 });
-todoForm.commentPopup.addEventListener("click", function (e) {
+popups.comment.ctn.addEventListener("click", function (e) {
   e.stopPropagation();
 });
-todoForm.formModal.addEventListener("click", todoForm.hideForm);
-todoForm.cancelBtn.addEventListener("click", todoForm.hideForm);
+todoForm.formModal.addEventListener("click", todoForm.hide);
+todoForm.cancelBtn.addEventListener("click", todoForm.hide);
 todoForm.commentBtn.addEventListener("click", () =>
-  todoForm.onIconBtn(todoForm.commentPopup, todoForm.commentBtn)
+  todoForm.onIconBtn(popups.comment, todoForm.commentBtn)
 );
 todoForm.priorityBtn.addEventListener("click", () =>
-  todoForm.onIconBtn(todoForm.priorityPopup, todoForm.priorityBtn)
+  todoForm.onIconBtn(popups.priority, todoForm.priorityBtn)
 );
-todoForm.commentTextarea.oninput = todoForm.changeCommentBtn;
-todoForm.commentCloseBtn.addEventListener("click", todoForm.hidePopups);
+popups.comment.textarea.oninput = todoForm.changeCommentBtn;
+popups.comment.closeBtn.addEventListener("click", popups.hide);
 window.onresize = function movePopups() {
-  var active = findActivePopup();
-  if (!active) return;
-  var btn = document.querySelector(`[data-id = "${active.dataset.btn}"]`);
-  btn.dataset.id.includes("editor")
-    ? helpers.findTodoFrom(btn, listOfTodos).placePopup(btn, active)
-    : todoForm.placePopup(active, btn);
+  var activePopup = findActivePopup();
+  if (!activePopup) return;
+  var btn = document.querySelector(`[data-id = "${activePopup.dataset.btn}"]`);
+  popups.position(activePopup, btn);
+  // btn.dataset.id.includes("editor")
+  //   ? helpers.findTodoFrom(btn, listOfTodos).placePopup(btn, active)
+  //   : todoForm.placePopup(active, btn);
   function findActivePopup() {
-    return document.querySelector(".active .popup-popup");
+    return document.querySelector(".active.popup-popup");
   }
 };
-todoForm.prioritySelectorBtns.forEach((btn) =>
+popups.priority.btns.forEach((btn) =>
   btn.addEventListener("click", function (e) {
-    todoForm.onSelectPriority(e);
+    popups.priority.onSelect(e);
   })
 );
 todoForm.titleInput.oninput = todoForm.activateAddBtn;

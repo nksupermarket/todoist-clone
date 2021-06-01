@@ -2,11 +2,11 @@ $flaticon-font: "flaticon";
 
 @font-face {
     font-family: $flaticon-font;
-    src: url("./flaticon.ttf?b125e960bf5635ffda12cf6a4715be05") format("truetype"),
-url("./flaticon.woff?b125e960bf5635ffda12cf6a4715be05") format("woff"),
-url("./flaticon.woff2?b125e960bf5635ffda12cf6a4715be05") format("woff2"),
-url("./flaticon.eot?b125e960bf5635ffda12cf6a4715be05#iefix") format("embedded-opentype"),
-url("./flaticon.svg?b125e960bf5635ffda12cf6a4715be05#flaticon") format("svg");
+    src: url("./flaticon.ttf?661e8402b121f645c559734611310fab") format("truetype"),
+url("./flaticon.woff?661e8402b121f645c559734611310fab") format("woff"),
+url("./flaticon.woff2?661e8402b121f645c559734611310fab") format("woff2"),
+url("./flaticon.eot?661e8402b121f645c559734611310fab#iefix") format("embedded-opentype"),
+url("./flaticon.svg?661e8402b121f645c559734611310fab#flaticon") format("svg");
 }
 
 i[class^="flaticon-"]:before, i[class*=" flaticon-"]:before {
@@ -36,6 +36,7 @@ $flaticon-map: (
     "calendar": "\f10d",
     "trash": "\f10e",
     "sort": "\f10f",
+    "pen": "\f110",
 );
 
 .flaticon-more:before {
@@ -82,4 +83,7 @@ $flaticon-map: (
 }
 .flaticon-sort:before {
     content: map-get($flaticon-map, "sort");
+}
+.flaticon-pen:before {
+    content: map-get($flaticon-map, "pen");
 }

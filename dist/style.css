@@ -547,7 +547,7 @@ section .view-content {
 }
 .todo-checkbox:hover > .checkbox::before {
   font-family: flaticon;
-  content: "\f10b";
+  content: "\f10b1";
   font-size: 1rem;
   height: 1rem;
   width: 1rem;
