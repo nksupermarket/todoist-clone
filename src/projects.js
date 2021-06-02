@@ -58,7 +58,7 @@ todoFactory.prototype.createTodo = function (
     var todo = helpers.findItem(listOfTodos, id);
     return todo;
   }
-  function onTodoComment() {
+  function onComment() {
     helpers.show(commentModal.modal);
     var pj = helpers.findItem(listOfPjs, project);
     commentModal.attachTodoId(todoId);
@@ -69,7 +69,7 @@ todoFactory.prototype.createTodo = function (
       commentModal.fillCommentList(notes.text[i], notes.date[i]);
     }
   }
-  function onTodoEditor() {
+  function onEdit() {
     closeOtherEditors();
     var todo = getTodo(this.dataset.todo);
     (function addPjOptions() {
@@ -169,42 +169,42 @@ todoFactory.prototype.createTodo = function (
         todoRhCtn.appendChild(todoTitle);
       })();
 
-      var todoDetails = document.createElement("div");
-      todoDetails.classList.add("todo-details");
-      todoRhCtn.appendChild(todoDetails);
+      var details = document.createElement("div");
+      details.classList.add("todo-details");
+      rhCtn.appendChild(todoDetails);
 
-      var todoDayInput = document.createElement("input");
+      var dayInput = document.createElement("input");
       (function createDayBtn() {
-        var todoDayBtn = document.createElement("button");
-        todoDayBtn.setAttribute("type", "button");
-        todoDayBtn.classList.add("todo-day", "btn");
-        todoDayInput.setAttribute("type", "date");
-        todoDayInput.setAttribute("required", "required");
-        todoDayInput.dataset.todo = todoId;
-        todoDayInput.value = day;
-        todoDayBtn.appendChild(todoDayInput);
-        todoDetails.appendChild(todoDayBtn);
+        var dayBtn = document.createElement("button");
+        dayBtn.setAttribute("type", "button");
+        dayBtn.classList.add("todo-day", "btn");
+        dayInput.setAttribute("type", "date");
+        dayInput.setAttribute("required", "required");
+        dayBtn.dataset.todo = todoId;
+        dayInput.value = day;
+        dayBtn.appendChild(dayInput);
+        details.appendChild(dayBtn);
       })();
-      todoDayInput.addEventListener("change", changeTodoDay);
-      function changeTodoDay() {
-        var todo = getTodo(todoDayInput.dataset.todo);
-        todo.day = todoDayInput.value;
-      }
+      // dayInput.addEventListener("change", changeTodoDay);
+      // function changeTodoDay() {
+      //   var todo = getTodo(todoDayInput.dataset.todo);
+      //   todo.day = todoDayInput.value;
+      // }
 
-      var todoComments = document.createElement("button");
-      var todoCommentsCount = document.createElement("span");
+      var comments = document.createElement("button");
+      var commentsCount = document.createElement("span");
       (function createCommentsBtn() {
-        todoComments.setAttribute("type", "button");
-        todoComments.classList.add("btn", "notes-btn", "icon-btn");
-        if (!notes.text[0]) todoComments.classList.add("inactive");
-        var todoCommentsIcon = document.createElement("i");
-        todoCommentsIcon.classList.add("flaticon", "flaticon-comment");
-        todoCommentsCount.textContent = 1;
-        todoCommentsCount.classList.add("notes-btn-count");
-        todoComments.appendChild(todoCommentsIcon);
-        todoComments.appendChild(todoCommentsCount);
-        todoDetails.appendChild(todoComments);
-        todoComments.addEventListener("click", onTodoComment);
+        comments.setAttribute("type", "button");
+        comments.classList.add("btn", "notes-btn", "icon-btn");
+        if (!notes.text[0]) comments.classList.add("inactive");
+        var commentsIcon = document.createElement("i");
+        commentsIcon.classList.add("flaticon", "flaticon-comment");
+        commentsCount.textContent = 1;
+        commentsCount.classList.add("notes-btn-count");
+        comments.appendChild(commentsIcon);
+        comments.appendChild(commentsCount);
+        details.appendChild(comments);
+        comments.addEventListener("click", onComment);
       })();
 
       (function createActions() {
@@ -217,7 +217,7 @@ todoFactory.prototype.createTodo = function (
           var btn = document.createElement("button");
           btn.setAttribute("type", "button");
           btn.dataset.todo = this.id;
-          btn.dataset.btn = `${name}-${todoId}`;
+          btn.dataset.id = `${name}-${todoId}`;
           btn.classList.add(`${name}-btn`, "btn", "icon-btn");
           var btnIcon = document.createElement("i");
           btnIcon.classList.add("flaticon", `flaticon-${icon}`);
@@ -228,8 +228,8 @@ todoFactory.prototype.createTodo = function (
         todoRhCtn.appendChild(todoActions);
 
         (function addEventListeners() {
-          editBtn.addEventListener("click", onTodoEditor);
-          notesBtn.addEventListener("click", onTodoComment);
+          editBtn.addEventListener("click", onEdit);
+          notesBtn.addEventListener("click", onComment);
         })();
       }.call(this));
 

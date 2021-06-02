@@ -71,13 +71,19 @@ popups.comment.closeBtn.addEventListener("click", popups.hide);
 window.onresize = function movePopups() {
   var activePopup = findActivePopup();
   if (!activePopup) return;
-  var btn = document.querySelector(`[data-id = "${activePopup.dataset.btn}"]`);
-  popups.position(activePopup, btn);
+  var btn = document.querySelector(
+    `[data-id = "${activePopup.ctn.dataset.btn}"]`
+  );
+  activePopup.position(btn);
   // btn.dataset.id.includes("editor")
   //   ? helpers.findTodoFrom(btn, listOfTodos).placePopup(btn, active)
   //   : todoForm.placePopup(active, btn);
   function findActivePopup() {
-    return document.querySelector(".active.popup-popup");
+    var ctn = document.querySelector(".active.popup-popup");
+    var activePopup = Object.keys(popups).find(
+      (key) => popups[key].ctn === ctn
+    );
+    return popups[activePopup];
   }
 };
 popups.priority.btns.forEach((btn) =>
@@ -86,3 +92,73 @@ popups.priority.btns.forEach((btn) =>
   })
 );
 todoForm.titleInput.oninput = todoForm.activateAddBtn;
+content.pjCtn.sortBtn.addEventListener("click", function onSort() {
+  popups.sort.setDataBtn(content.pjCtn.sortBtn.dataset.id);
+  popups.sort.show();
+  popups.position(popups.sort.ctn, content.pjCtn.sortBtn);
+});
+
+function onSelectPriorityLevel(e) {
+  this.removeActive();
+  var btn = e.target.closest(".btn");
+  var icon = btn.querySelector(".flaticon");
+  btn.dataset.selected = "true";
+  btn.classList.add("active");
+  if (todoForm.formModal.classList.contains("inactive")) return;
+  todoForm.changeFlagIcon(icon.style.color, btn.dataset.value);
+}
+
+function addTodoCtnEvents(ctn) {
+  var dayInput = ctn.querySelector(".todo-day");
+  dayInput.addEventListener("change", changeTodoDay);
+  function changeTodoDay() {
+    var todo = helpers.findItem(listOfTodos, dayInput.dataset.todo);
+    todo.day = dayInput.value;
+  }
+
+  var commentsBtn = ctn.querySelectorAll(".notes-btn");
+  commentsBtn.addEventListener("click", showCommentForm);
+  function showCommentForm() {
+    helpers.show(commentModal.modal);
+    var todo = helpers.findItem(listOfTodos, ctn.dataset.todo);
+    var pj = helpers.findItem(listOfPjs, todo.project);
+    commentModal.attachTodoId(todo.id);
+    commentModal.changePjTitle(pj.title);
+    commentModal.changeTodoTitle(todo.title);
+    if (!todo.notes) return;
+    for (var i = 0; i < todo.notes.text.length; i++) {
+      commentModal.fillCommentList(todo.notes.text[i], todo.notes.date[i]);
+    }
+  }
+
+  var editBtn = ctn.querySelector(".edit-btn");
+  editBtn.querySelector("click", showEditor);
+  function showEditor() {
+    closeOtherEditors();
+    var todo = getTodo(this.dataset.todo);
+    (function addPjOptions() {
+      var select = todo.editor.main.querySelector("select");
+      listOfPjs.forEach((pj) => pj.addToForm(select));
+    })();
+    (function setDefaultOption() {
+      var options = todo.editor.main.querySelectorAll("option");
+      var defaultOption = Array.from(options).find((option) => {
+        return option.value.toString() === todo.project.toString();
+      });
+      defaultOption.setAttribute("selected", "selected");
+    })();
+    todo.appendEditor();
+
+    function closeOtherEditors() {
+      var openEditor = document.querySelector(".todo-editor");
+      if (!openEditor) return;
+      var openTodo = helpers.findItem(listOfTodos, openEditor.dataset.todo);
+      console.log(openEditor);
+      console.log(openTodo);
+
+      openTodo.saveEdits();
+      openTodo.content.refresh();
+      openTodo.appendContent();
+    }
+  }
+}

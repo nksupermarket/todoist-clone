@@ -117,7 +117,7 @@ const todoForm = (() => {
     onIconBtn(popup, btn) {
       popup.setDataBtn(btn.dataset.id);
       popup.show();
-      popups.position(popup.ctn, btn);
+      popup.position(btn);
     },
     changeCommentBtn() {
       popups.comment.textarea.value

@@ -148,6 +148,13 @@ select {
 .popup-ctn {
   box-sizing: border-box;
 }
+.dropdown-select {
+  box-shadow: 0 0.1rem 0.8rem 0 rgba(0, 0, 0, 0.08);
+}
+.dropdown-select ul {
+  position: relative;
+  z-index: 99;
+}
 #header {
   font-size: 1.4rem;
   width: 100%;
@@ -314,8 +321,6 @@ select {
 }
 #priority-popup-btns {
   width: 275px;
-  position: relative;
-  z-index: 99;
 }
 .priority-popup li {
   padding: 0.5em 1em;
@@ -327,7 +332,7 @@ select {
   color: var(--header-bg);
   opacity: 0;
 }
-.priority-popup li:hover {
+.dropdown-select li:hover {
   background-color: var(--menu-accent);
 }
 .priority-popup .active {
@@ -348,6 +353,13 @@ select {
   width: 275px;
   padding: 0.5rem;
   padding-bottom: 0;
+}
+#sort-popup {
+  width: 200px;
+}
+#sort-popup li {
+  line-height: 2.4rem;
+  padding: 0.4rem 1rem;
 }
 #add-todo-btn {
   margin-bottom: 0;
@@ -484,7 +496,7 @@ section .view-content {
   font-size: 1.3rem;
   margin-right: 1rem;
 }
-.new-todo-btn:hover {
+main .new-todo-btn:hover {
   color: var(--header-bg);
   text-decoration: underline;
 }
@@ -667,7 +679,7 @@ section .view-content {
   background-color: var(--content-bg);
   width: 100%;
   max-width: 650px;
-  height: calc(100vh - 5rem);
+  height: calc(100vh - 4.4rem);
   display: flex;
   flex-direction: column;
   border-radius: 1rem;

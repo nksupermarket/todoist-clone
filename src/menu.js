@@ -7,6 +7,15 @@ export { menu, content };
 const content = (() => {
   var main = document.getElementById("content");
 
+  function createCtn(name) {
+    var ctn = document.createElement("div");
+    ctn.id = `${name}-ctn`;
+
+    var header = createCtnHeader();
+    var headerContent = createHeaderContent("h1");
+    header.appendChild(headerContent.ctn);
+  }
+
   const todayCtn = (() => {
     var ctn = document.createElement("div");
     ctn.id = "today-ctn";
@@ -91,6 +100,9 @@ const content = (() => {
     var title = headerContent.title;
     var actionCtn = createActionCtn();
     headerContent.ctn.appendChild(actionCtn.ctn);
+    var sortBtn = actionCtn.sortBtn;
+    var commentBtn = actionCtn.commentBtn;
+    var deleteBtn = actionCtn.deleteBtn;
     var todoList = document.createElement("ul");
     todoList.classList.add("todo-list");
 
@@ -113,6 +125,9 @@ const content = (() => {
     return {
       ctn,
       header,
+      sortBtn,
+      commentBtn,
+      deleteBtn,
       title,
       todoList,
     };
@@ -213,6 +228,9 @@ const content = (() => {
     todoCtns.forEach((todo) => todo.remove());
   }
   return {
+    pjCtn,
+    todayCtn,
+    upcomingCtn,
     display(pjId) {
       removeTodos(pjCtn.todoList);
       removeCtns();
