@@ -25,7 +25,7 @@ const init = (() => {
   listOfTodos.forEach((todo) => addTodoCtnEvents(todo));
   (function displayPjs() {
     listOfPjs.forEach((pj) => {
-      pj.addToMenu().addEventListener("click", (e) => menu.onPjItem(e));
+      pj.addToMenu().addEventListener("click", (e) => showPj(e));
     });
   })();
 })();
@@ -124,11 +124,58 @@ popups.priority.btns.forEach((btn) =>
   })
 );
 todoForm.titleInput.oninput = todoForm.activateAddBtn;
-content.pjCtn.sortBtn.addEventListener("click", function onSort() {
+content.pjCtn.sortBtn.addEventListener("click", function showSortPopup() {
   popups.sort.setDataBtn(content.pjCtn.sortBtn.dataset.id);
   popups.sort.show();
   popups.sort.position(content.pjCtn.sortBtn);
 });
+popups.sort.dateBtn.addEventListener("click", () => onSort("date"));
+popups.sort.priorityBtn.addEventListener("click", () => onSort("priority"));
+popups.sort.alphabetBtn.addEventListener("click", () => onSort("alphabet"));
+content.pjCtn.sortedBtn.addEventListener("click", () => onSort("reverse"));
+function onSort(method) {
+  var activeCtn = content.findActiveCtn();
+  helpers.show(activeCtn.sortedBtn);
+
+  switch (method) {
+    case "date":
+      activeCtn.sortedBtnText.textContent = "Sorted by due date";
+      activeCtn.sortedBtnIcon.setAttribute(
+        "class",
+        "flaticon flaticon-down-arrow-1"
+      );
+      activeCtn.sortDate();
+      break;
+    case "priority":
+      activeCtn.sortedBtnText.textContent = "Sorted by priority";
+      activeCtn.sortedBtnIcon.setAttribute(
+        "class",
+        "flaticon flaticon-down-arrow-1"
+      );
+      activeCtn.sortPriority();
+      break;
+    case "alphabet":
+      activeCtn.sortedBtnText.textContent = "Sorted alphabetically";
+      activeCtn.sortedBtnIcon.setAttribute(
+        "class",
+        "flaticon flaticon-down-arrow-1"
+      );
+      activeCtn.sortAlphabetically();
+      break;
+    case "reverse":
+      activeCtn.sortedBtnIcon.classList.contains("flaticon-up-arrow")
+        ? activeCtn.sortedBtnIcon.setAttribute(
+            "class",
+            "flaticon flaticon-down-arrow-1"
+          )
+        : activeCtn.sortedBtnIcon.setAttribute(
+            "class",
+            "flaticon flaticon-up-arrow"
+          );
+      activeCtn.sortReverse();
+  }
+  activeCtn.refresh();
+}
 
 function showTodoForm() {
   helpers.show(todoForm.modal);

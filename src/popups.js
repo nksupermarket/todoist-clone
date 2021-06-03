@@ -83,6 +83,9 @@ const popups = (() => {
   };
 
   const sort = createPopup("sort");
+  sort.dateBtn = sort.ctn.querySelector("#sort-date-btn");
+  sort.priorityBtn = sort.ctn.querySelector("#sort-priority-btn");
+  sort.alphabetBtn = sort.ctn.querySelector("#sort-alphabet-btn");
 
   return {
     modal,

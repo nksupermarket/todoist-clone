@@ -7,6 +7,42 @@ const content = (() => {
   var main = document.getElementById("content");
 
   const ctnMethods = {
+    sortDate() {
+      this.todoArray.sort(dueDateAscending);
+      function dueDateAscending(a, b) {
+        var aDate = new Date(a.day);
+        var bDate = new Date(b.day);
+
+        if (aDate > bDate) return 1;
+        if (aDate < bDate) return -1;
+        return 0;
+      }
+    },
+    sortPriority() {
+      this.todoArray.sort(priorityDescending);
+      function priorityDescending(a, b) {
+        if (a.priority > b.priority) return 1;
+        if (a.priority < b.priority) return -1;
+        return 0;
+      }
+    },
+    sortAlphabetically() {
+      this.todoArray.sort(alphabetAsc);
+      function alphabetAsc(a, b) {
+        if (a.title > b.title) return 1;
+        if (a.title < b.title) return -1;
+        return 0;
+      }
+    },
+    sortReverse() {
+      this.todoArray.reverse();
+    },
+    refresh() {
+      this.todoArray.forEach((todo) => todo.ctn.remove());
+      this.todoArray.forEach((todo) => this.todoList.appendChild(todo.ctn));
+      this.todoBtn.remove();
+      this.todoList.appendChild(this.todoBtn);
+    },
     createHeader() {
       var header = document.createElement("header");
       header.classList.add("view-header", "view-content");
@@ -43,7 +79,7 @@ const content = (() => {
     },
     createActionCtn() {
       var ctn = document.createElement("div");
-      ctn.classList.add("pj-icon-ctn");
+      ctn.classList.add("action-ctn");
       return ctn;
     },
     createIconBtn(iconName, className, str) {
@@ -79,6 +115,8 @@ const content = (() => {
     ctn.title = ctn.headerContent.title;
 
     ctn.main.appendChild(ctn.header);
+
+    ctn.todoArray = [];
 
     return ctn;
   }
@@ -127,6 +165,10 @@ const content = (() => {
   const pjCtn = createCtn("pj");
   pjCtn.actionCtn = pjCtn.createActionCtn();
   pjCtn.headerContent.ctn.appendChild(pjCtn.actionCtn);
+  pjCtn.sortedBtn = pjCtn.createIconBtn("flaticon", "sorted-btn", "");
+  pjCtn.sortedBtn.classList.add("inactive");
+  pjCtn.sortedBtnIcon = pjCtn.sortedBtn.querySelector(".flaticon");
+  pjCtn.sortedBtnText = pjCtn.sortedBtn.querySelector(".btn-text");
   pjCtn.sortBtn = pjCtn.createIconBtn("flaticon-sort", "sort-btn", "Sort");
   pjCtn.commentBtn = pjCtn.createIconBtn(
     "flaticon-comment",
@@ -138,6 +180,7 @@ const content = (() => {
     "delete-btn",
     "Delete"
   );
+  pjCtn.actionCtn.appendChild(pjCtn.sortedBtn);
   pjCtn.actionCtn.appendChild(pjCtn.sortBtn);
   pjCtn.actionCtn.appendChild(pjCtn.commentBtn);
   pjCtn.actionCtn.appendChild(pjCtn.deleteBtn);
@@ -157,31 +200,33 @@ const content = (() => {
     todoCtns.forEach((todo) => todo.remove());
   }
   return {
+    main,
     pjCtn,
     todayCtn,
-    // upcomingCtn,
+    upcomingCtn,
     display(pjId) {
       removeTodos(pjCtn.todoList);
       removeCtns();
       var pj = helpers.findItem(listOfPjs, pjId);
       pjCtn.todoList.dataset.project = pjId;
       var pjCtnBtns = pjCtn.header.querySelectorAll("button");
-      pjCtnBtns.forEach((btn) => (btn.dataset.project = pjId));
+      pjCtnBtns.forEach((btn) => (btn.dataset.ctn = `pjCtn-${pjId}`));
       pjCtn.title.textContent = pj.title;
       pj.todoList.forEach((todo) => {
         helpers.show(todo.ctn);
         pjCtn.todoList.prepend(todo.ctn);
       });
+      pjCtn.todoArray = pj.todoList;
       main.appendChild(pjCtn.main);
     },
     displayToday() {
       removeCtns();
       removeTodos(todayCtn.main);
       var todayList = today.getTodayTodos(listOfTodos);
-      var todoList = todayCtn.todoList;
       todayList.forEach((todo) => {
-        todoList.prepend(todo.ctn);
+        todayCtn.todoList.prepend(todo.ctn);
       });
+      todayCtn.todoArray = todayList;
       main.appendChild(todayCtn.main);
     },
     displayUpcoming() {
@@ -230,6 +275,12 @@ const content = (() => {
     refresh() {
       var pjId = todoList.dataset.project;
       this.display(pjId);
+    },
+    findActiveCtn() {
+      var ctns = [todayCtn, pjCtn, upcomingCtn];
+
+      var activeCtn = ctns.find((ctn) => this.main.contains(ctn.main));
+      return activeCtn;
     },
   };
 })();
