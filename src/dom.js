@@ -21,6 +21,7 @@ pjCode.pushToList();
 
 const init = (() => {
   samples.generate(30);
+  listOfTodos.forEach((todo) => addTodoCtnEvents(todo));
   (function displayPjs() {
     listOfPjs.forEach((pj) => {
       pj.addToMenu().addEventListener("click", (e) => menu.onPjItem(e));
@@ -40,12 +41,11 @@ commentModal.form.addEventListener("click", (e) => {
 commentModal.modal.addEventListener("click", commentModal.close);
 commentModal.closeBtn.addEventListener("click", commentModal.close);
 
-// window.onload = todoForm.displayPjOptions;
 todoForm.newTodoBtns.forEach((btn) =>
-  btn.addEventListener("click", todoForm.onShowForm)
+  btn.addEventListener("click", showTodoForm)
 );
 todoForm.addBtn.addEventListener("click", () => {
-  todoForm.onAddTodo();
+  onAddTodo();
   content.refresh();
 });
 todoForm.form.addEventListener("click", function (e) {
@@ -58,15 +58,23 @@ popups.priority.ctn.addEventListener("click", function (e) {
 popups.comment.ctn.addEventListener("click", function (e) {
   e.stopPropagation();
 });
-todoForm.formModal.addEventListener("click", todoForm.hide);
+todoForm.modal.addEventListener("click", () => {
+  todoForm.hide();
+  popups.hide();
+  popups.comment.reset();
+});
 todoForm.cancelBtn.addEventListener("click", todoForm.hide);
 todoForm.commentBtn.addEventListener("click", () =>
-  todoForm.onIconBtn(popups.comment, todoForm.commentBtn)
+  onFormIconBtn(popups.comment, todoForm.commentBtn)
 );
 todoForm.priorityBtn.addEventListener("click", () =>
-  todoForm.onIconBtn(popups.priority, todoForm.priorityBtn)
+  onFormIconBtn(popups.priority, todoForm.priorityBtn)
 );
-popups.comment.textarea.oninput = todoForm.changeCommentBtn;
+popups.comment.textarea.oninput = () => {
+  popups.comment.textarea.value
+    ? todoForm.changeCommentBtn("not empty")
+    : todoForm.changeCommentBtn("empty");
+};
 popups.comment.closeBtn.addEventListener("click", popups.hide);
 window.onresize = function movePopups() {
   var activePopup = findActivePopup();
@@ -75,9 +83,7 @@ window.onresize = function movePopups() {
     `[data-id = "${activePopup.ctn.dataset.btn}"]`
   );
   activePopup.position(btn);
-  // btn.dataset.id.includes("editor")
-  //   ? helpers.findTodoFrom(btn, listOfTodos).placePopup(btn, active)
-  //   : todoForm.placePopup(active, btn);
+
   function findActivePopup() {
     var ctn = document.querySelector(".active.popup-popup");
     var activePopup = Object.keys(popups).find(
@@ -98,6 +104,48 @@ content.pjCtn.sortBtn.addEventListener("click", function onSort() {
   popups.position(popups.sort.ctn, content.pjCtn.sortBtn);
 });
 
+function showTodoForm() {
+  helpers.show(todoForm.modal);
+  popups.priority.reset();
+  (function removeOptions() {
+    var options = todoForm.pjInput.querySelectorAll("option");
+    options.forEach((option) => {
+      if ((option.textContent = "None")) return;
+      option.remove();
+    });
+  })();
+  listOfPjs.forEach((pj) => pj.addToForm(todoForm.pjInput));
+  todoForm.setDefaultDate();
+}
+
+function onFormIconBtn(popup, btn) {
+  popup.setDataBtn(btn.dataset.id);
+  popup.show();
+  popup.position(btn);
+}
+
+function onAddTodo() {
+  var priority = popups.priority.ctn.querySelector(".active").dataset.value;
+  var notes = { text: [], date: [] };
+  (function addNotes() {
+    if (!popups.comment.textarea.value) return;
+    notes.text[0] = popups.comment.textarea.value;
+    notes.date[0] = today.getToday();
+  })();
+  var newTodo = todoFact.createTodo(
+    todoForm.pjInput.value,
+    todoForm.titleInput.value,
+    todoForm.dateInput.value,
+    priority,
+    notes
+  );
+  addTodoCtnEvents(newTodo);
+  newTodo.pushToList();
+  newTodo.appendContent();
+  if (pjInput.value != "None") newTodo.pushToProject();
+
+  todoForm.hide();
+}
 function onSelectPriorityLevel(e) {
   this.removeActive();
   var btn = e.target.closest(".btn");
@@ -107,20 +155,17 @@ function onSelectPriorityLevel(e) {
   if (todoForm.formModal.classList.contains("inactive")) return;
   todoForm.changeFlagIcon(icon.style.color, btn.dataset.value);
 }
-
-function addTodoCtnEvents(ctn) {
-  var dayInput = ctn.querySelector(".todo-day");
+function addTodoCtnEvents(todo) {
+  var dayInput = todo.content.main.querySelector(".day-btn");
   dayInput.addEventListener("change", changeTodoDay);
   function changeTodoDay() {
-    var todo = helpers.findItem(listOfTodos, dayInput.dataset.todo);
     todo.day = dayInput.value;
   }
 
-  var commentsBtn = ctn.querySelectorAll(".notes-btn");
-  commentsBtn.addEventListener("click", showCommentForm);
+  var commentsBtn = todo.content.main.querySelectorAll(".notes-btn");
+  commentsBtn.forEach((btn) => btn.addEventListener("click", showCommentForm));
   function showCommentForm() {
     helpers.show(commentModal.modal);
-    var todo = helpers.findItem(listOfTodos, ctn.dataset.todo);
     var pj = helpers.findItem(listOfPjs, todo.project);
     commentModal.attachTodoId(todo.id);
     commentModal.changePjTitle(pj.title);
@@ -131,11 +176,10 @@ function addTodoCtnEvents(ctn) {
     }
   }
 
-  var editBtn = ctn.querySelector(".edit-btn");
-  editBtn.querySelector("click", showEditor);
+  var editBtn = todo.content.main.querySelector(".edit-btn");
+  editBtn.addEventListener("click", showEditor);
   function showEditor() {
     closeOtherEditors();
-    var todo = getTodo(this.dataset.todo);
     (function addPjOptions() {
       var select = todo.editor.main.querySelector("select");
       listOfPjs.forEach((pj) => pj.addToForm(select));
@@ -153,12 +197,30 @@ function addTodoCtnEvents(ctn) {
       var openEditor = document.querySelector(".todo-editor");
       if (!openEditor) return;
       var openTodo = helpers.findItem(listOfTodos, openEditor.dataset.todo);
-      console.log(openEditor);
-      console.log(openTodo);
 
       openTodo.saveEdits();
       openTodo.content.refresh();
       openTodo.appendContent();
     }
   }
+
+  var priorityBtn = todo.editor.main.querySelector(".priority-btn");
+  priorityBtn.addEventListener("click", showPriorityPopup);
+  function showPriorityPopup() {
+    popups.priority.show();
+    popups.priority.setDataBtn(`priority-${todo.id}`);
+    popups.priority.position(priorityBtn);
+    (function setDefaultPriority() {
+      popups.priority.setActive(todo.priority);
+    })();
+  }
+
+  var saveBtn = todo.editor.main.querySelector(".save-btn");
+  saveBtn.addEventListener("click", () => {
+    todo.saveEdits();
+    todo.content.refresh();
+  });
+
+  var cancelBtn = todo.editor.main.querySelector(".cancel-btn");
+  cancelBtn.addEventListener("click", () => todo.appendContent());
 }

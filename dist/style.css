@@ -246,7 +246,7 @@ select {
 .editor-area .lh-ctn button,
 .todo-inputs-ctn,
 .required-details button,
-.todo-day {
+.day-btn {
   border: 1px solid var(--form-accent);
   border-radius: 0.5rem;
 }
@@ -261,7 +261,7 @@ select {
 }
 .editor-area button:hover,
 .required-details button:hover,
-.todo-day:hover {
+.day-btn:hover {
   background: var(--menu-accent);
 }
 .editor-area .lh-ctn button:first-child,
@@ -607,16 +607,16 @@ main .new-todo-btn:hover {
 .todo-details button {
   margin-left: 1rem;
 }
-.todo-day {
+.day-btn {
   font-size: 1.2rem;
   grid-area: day;
   display: inline-flex;
 }
-.todo-content .todo-day {
+.todo-content .day-btn {
   width: 64px;
   border: none;
 }
-.todo-content .todo-day input {
+.todo-content .day-btn input {
   padding-right: 0;
   padding-top: 0;
   padding-bottom: 0;
@@ -653,7 +653,7 @@ main .new-todo-btn:hover {
   justify-content: space-between;
   padding-bottom: 1rem;
 }
-.editor-area .todo-day {
+.editor-area .day-btn {
   padding: 0;
   margin-left: 0;
 }

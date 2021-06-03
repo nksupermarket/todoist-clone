@@ -7,15 +7,6 @@ export { menu, content };
 const content = (() => {
   var main = document.getElementById("content");
 
-  function createCtn(name) {
-    var ctn = document.createElement("div");
-    ctn.id = `${name}-ctn`;
-
-    var header = createCtnHeader();
-    var headerContent = createHeaderContent("h1");
-    header.appendChild(headerContent.ctn);
-  }
-
   const todayCtn = (() => {
     var ctn = document.createElement("div");
     ctn.id = "today-ctn";

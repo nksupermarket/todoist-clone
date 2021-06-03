@@ -1,7 +1,5 @@
 export { pjFact, todoFact, listOfPjs, listOfTodos };
 import { helpers } from "./helpers.js";
-import { commentModal } from "./comments.js";
-import { todoForm } from "./todoForm.js";
 import { popups } from "./popups.js";
 
 let listOfPjs = [];
@@ -58,45 +56,6 @@ todoFactory.prototype.createTodo = function (
     var todo = helpers.findItem(listOfTodos, id);
     return todo;
   }
-  function onComment() {
-    helpers.show(commentModal.modal);
-    var pj = helpers.findItem(listOfPjs, project);
-    commentModal.attachTodoId(todoId);
-    commentModal.changePjTitle(pj.title);
-    commentModal.changeTodoTitle(title);
-    if (!notes) return;
-    for (var i = 0; i < notes.text.length; i++) {
-      commentModal.fillCommentList(notes.text[i], notes.date[i]);
-    }
-  }
-  function onEdit() {
-    closeOtherEditors();
-    var todo = getTodo(this.dataset.todo);
-    (function addPjOptions() {
-      var select = todo.editor.main.querySelector("select");
-      listOfPjs.forEach((pj) => pj.addToForm(select));
-    })();
-    (function setDefaultOption() {
-      var options = todo.editor.main.querySelectorAll("option");
-      var defaultOption = Array.from(options).find((option) => {
-        return option.value.toString() === todo.project.toString();
-      });
-      defaultOption.setAttribute("selected", "selected");
-    })();
-    todo.appendEditor();
-
-    function closeOtherEditors() {
-      var openEditor = document.querySelector(".todo-editor");
-      if (!openEditor) return;
-      var openTodo = helpers.findItem(listOfTodos, openEditor.dataset.todo);
-      console.log(openEditor);
-      console.log(openTodo);
-
-      openTodo.saveEdits();
-      openTodo.content.refresh();
-      openTodo.appendContent();
-    }
-  }
 
   function appendContent() {
     this.editor.main.remove();
@@ -123,100 +82,97 @@ todoFactory.prototype.createTodo = function (
     notes,
     content: function createContent() {
       var todoId = this.id;
-      var todoContent = document.createElement("div");
-      todoContent.classList.add("todo-content");
-      todoContent.dataset.todo = this.id;
+      var content = document.createElement("div");
+      content.classList.add("todo-content");
+      content.dataset.todo = this.id;
 
-      var todoCheckbox = document.createElement("span");
-      var todoCheckboxCtn = (function createFinishedCheckbox() {
-        var todoCheckboxCtn = document.createElement("button");
-        todoCheckboxCtn.setAttribute("type", "button");
-        var todoCheckboxInput = document.createElement("input");
-        todoCheckboxInput.setAttribute("type", "checkbox");
+      var checkbox = document.createElement("span");
+      var checkboxCtn = (function createFinishedCheckbox() {
+        var checkboxCtn = document.createElement("button");
+        checkboxCtn.setAttribute("type", "button");
+        var checkboxInput = document.createElement("input");
+        checkboxInput.setAttribute("type", "checkbox");
         switch (priority) {
           case "1":
-            todoCheckbox.classList.add("priority-1");
-            todoCheckbox.style.borderColor = "rgb(209, 69, 59)";
+            checkbox.classList.add("priority-1");
+            checkbox.style.borderColor = "rgb(209, 69, 59)";
             break;
           case "2":
-            todoCheckbox.classList.add("priority-2");
-            todoCheckbox.style.borderColor = "rgb(235, 137, 9)";
+            checkbox.classList.add("priority-2");
+            checkbox.style.borderColor = "rgb(235, 137, 9)";
             break;
           case "3":
-            todoCheckbox.classList.add("priority-3");
-            todoCheckbox.style.borderColor = "rgb(36, 111, 224)";
+            checkbox.classList.add("priority-3");
+            checkbox.style.borderColor = "rgb(36, 111, 224)";
             break;
           case "4":
-            todoCheckbox.classList.add("priority-4");
-            todoCheckbox.style.border = "1px solid rgba(32,32,32,0.6)";
+            checkbox.classList.add("priority-4");
+            checkbox.style.border = "1px solid rgba(32,32,32,0.6)";
             break;
         }
-        todoCheckbox.classList.add("checkbox");
-        todoCheckboxCtn.classList.add("todo-checkbox", "btn");
-        todoCheckboxCtn.appendChild(todoCheckboxInput);
-        todoCheckboxCtn.appendChild(todoCheckbox);
-        todoContent.appendChild(todoCheckboxCtn);
-        return todoCheckboxCtn;
+        checkbox.classList.add("checkbox");
+        checkboxCtn.classList.add("todo-checkbox", "btn");
+        checkboxCtn.appendChild(checkboxInput);
+        checkboxCtn.appendChild(checkbox);
+        content.appendChild(checkboxCtn);
+        return checkboxCtn;
       })();
 
-      var todoRhCtn = document.createElement("div");
-      todoRhCtn.classList.add("todo-rh-ctn");
+      var rhCtn = document.createElement("div");
+      rhCtn.classList.add("todo-rh-ctn");
 
-      var todoTitle = document.createElement("p");
+      var titleCtn = document.createElement("p");
       (function createTitle() {
-        todoTitle.classList.add("todo-title");
-        todoTitle.textContent = title;
-        todoRhCtn.appendChild(todoTitle);
+        titleCtn.classList.add("todo-title");
+        titleCtn.textContent = title;
+        rhCtn.appendChild(titleCtn);
       })();
 
       var details = document.createElement("div");
       details.classList.add("todo-details");
-      rhCtn.appendChild(todoDetails);
+      rhCtn.appendChild(details);
 
+      function createBtn(name) {
+        var btn = document.createElement("button");
+        btn.setAttribute("type", "button");
+        btn.classList.add("btn", `${name}-btn`);
+        btn.dataset.id = `${name}-${todoId}`;
+        return btn;
+      }
       var dayInput = document.createElement("input");
       (function createDayBtn() {
-        var dayBtn = document.createElement("button");
-        dayBtn.setAttribute("type", "button");
-        dayBtn.classList.add("todo-day", "btn");
+        var dayBtn = createBtn("day");
         dayInput.setAttribute("type", "date");
         dayInput.setAttribute("required", "required");
-        dayBtn.dataset.todo = todoId;
         dayInput.value = day;
         dayBtn.appendChild(dayInput);
         details.appendChild(dayBtn);
       })();
-      // dayInput.addEventListener("change", changeTodoDay);
-      // function changeTodoDay() {
-      //   var todo = getTodo(todoDayInput.dataset.todo);
-      //   todo.day = todoDayInput.value;
-      // }
 
-      var comments = document.createElement("button");
+      var commentsBtn = createBtn("notes");
       var commentsCount = document.createElement("span");
       (function createCommentsBtn() {
-        comments.setAttribute("type", "button");
-        comments.classList.add("btn", "notes-btn", "icon-btn");
-        if (!notes.text[0]) comments.classList.add("inactive");
+        commentsBtn.classList.add("icon-btn");
+        if (!notes.text[0]) commentsBtn.classList.add("inactive");
         var commentsIcon = document.createElement("i");
         commentsIcon.classList.add("flaticon", "flaticon-comment");
         commentsCount.textContent = 1;
         commentsCount.classList.add("notes-btn-count");
-        comments.appendChild(commentsIcon);
-        comments.appendChild(commentsCount);
-        details.appendChild(comments);
-        comments.addEventListener("click", onComment);
+        commentsBtn.appendChild(commentsIcon);
+        commentsBtn.appendChild(commentsCount);
+        details.appendChild(commentsBtn);
       })();
 
       (function createActions() {
         var todoActions = document.createElement("div");
         todoActions.classList.add("todo-actions");
-        var editBtn = createBtn.apply(this, ["edit", "pen"]);
-        var notesBtn = createBtn.apply(this, ["notes", "comment"]);
-        var moreBtn = createBtn.apply(this, ["more", "more-1"]);
-        function createBtn(name, icon) {
+        createIconBtn("edit", "pen");
+        createIconBtn("notes", "comment");
+        createIconBtn("more", "more-1");
+        function createIconBtn(name, icon) {
           var btn = document.createElement("button");
           btn.setAttribute("type", "button");
-          btn.dataset.todo = this.id;
+          btn.dataset.todo = todoId;
           btn.dataset.id = `${name}-${todoId}`;
           btn.classList.add(`${name}-btn`, "btn", "icon-btn");
           var btnIcon = document.createElement("i");
@@ -225,38 +181,33 @@ todoFactory.prototype.createTodo = function (
           todoActions.appendChild(btn);
           return btn;
         }
-        todoRhCtn.appendChild(todoActions);
+        rhCtn.appendChild(todoActions);
+      })();
 
-        (function addEventListeners() {
-          editBtn.addEventListener("click", onEdit);
-          notesBtn.addEventListener("click", onComment);
-        })();
-      }.call(this));
-
-      todoContent.appendChild(todoCheckboxCtn);
-      todoContent.appendChild(todoRhCtn);
+      content.appendChild(checkboxCtn);
+      content.appendChild(rhCtn);
       return {
-        main: todoContent,
+        main: content,
         refresh() {
           var todo = getTodo(todoId);
-          todoTitle.textContent = todo.title;
-          todoDayInput.value = todo.day;
+          titleCtn.textContent = todo.title;
+          dayInput.value = todo.day;
           switch (todo.priority) {
             case "1":
-              todoCheckbox.classList.add("priority-1");
-              todoCheckbox.style.borderColor = "rgb(209, 69, 59)";
+              checkbox.classList.add("priority-1");
+              checkbox.style.borderColor = "rgb(209, 69, 59)";
               break;
             case "2":
-              todoCheckbox.classList.add("priority-2");
-              todoCheckbox.style.borderColor = "rgb(235, 137, 9)";
+              checkbox.classList.add("priority-2");
+              checkbox.style.borderColor = "rgb(235, 137, 9)";
               break;
             case "3":
-              todoCheckbox.classList.add("priority-3");
-              todoCheckbox.style.borderColor = "rgb(36, 111, 224)";
+              checkbox.classList.add("priority-3");
+              checkbox.style.borderColor = "rgb(36, 111, 224)";
               break;
             case "4":
-              todoCheckbox.classList.add("priority-4");
-              todoCheckbox.style.border = "1px solid rgba(32,32,32,0.6)";
+              checkbox.classList.add("priority-4");
+              checkbox.style.border = "1px solid rgba(32,32,32,0.6)";
               break;
           }
         },
@@ -268,6 +219,8 @@ todoFactory.prototype.createTodo = function (
       };
     }.call(this),
     editor: function createEditor() {
+      var todoId = this.id;
+
       var editor = document.createElement("form");
       editor.classList.add("todo-editor");
       editor.dataset.todo = this.id;
@@ -289,7 +242,7 @@ todoFactory.prototype.createTodo = function (
       (function createDayBtn() {
         var dayBtn = document.createElement("button");
         dayBtn.setAttribute("type", "button");
-        dayBtn.classList.add("todo-day", "btn");
+        dayBtn.classList.add("day-btn", "btn");
         dayInput.setAttribute("type", "date");
         dayInput.value = day;
         dayBtn.appendChild(dayInput);
@@ -319,70 +272,11 @@ todoFactory.prototype.createTodo = function (
       rhCtn.classList.add("rh-ctn");
 
       var priorityBtn = document.createElement("button");
-      // const priorityDropdown = (() => {
-      //   var modal = todoForm.popupModal.cloneNode(true);
-      //   modal.removeAttribute("id");
-      //   modal.querySelector("#comment-popup").remove();
-      //   var dropdown = modal.querySelector(".popup-popup");
-      //   dropdown.dataset.btn = `editor-${this.id}`;
-      //   dropdown.classList.add("priority-popup");
-      //   dropdown.removeAttribute("id");
-      //   var listItems = dropdown.querySelectorAll("li");
-
-      //   function onSelectPriority(e) {
-      //     removeActive();
-      //     var btn = e.target.closest(".btn");
-      //     btn.dataset.selected = "true";
-      //     btn.classList.add("active");
-      //     changeBtnColor();
-
-      //     function removeActive() {
-      //       listItems.forEach((btn) => {
-      //         if (btn.classList.contains("active")) {
-      //           btn.classList.remove("active");
-      //           btn.dataset.selected = "false";
-      //         }
-      //       });
-      //     }
-
-      //     function changeBtnColor() {
-      //       var priorityFlag = btn.querySelector(".flaticon");
-      //       var flagColor = priorityFlag.style.color;
-      //       var flagIcon = priorityBtn.querySelector("i");
-      //       btn.dataset.value != 4
-      //         ? flagIcon.classList.add("flaticon-flag-1")
-      //         : flagIcon.classList.remove("flaticon-flag-1");
-      //       flagIcon.style.color = flagColor;
-      //     }
-      //   }
-
-      //   modal.addEventListener("click", () => {
-      //     dropdown.classList.remove("active");
-      //     helpers.hide(modal);
-      //   });
-      //   dropdown.addEventListener("click", (e) => {
-      //     e.stopPropagation();
-      //   });
-      //   listItems.forEach((item) =>
-      //     item.addEventListener("click", (e) => onSelectPriority(e))
-      //   );
-
-      //   return {
-      //     modal,
-      //     dropdown,
-      //     listItems,
-      //     show() {
-      //       helpers.show(modal);
-      //       helpers.show(dropdown);
-      //       dropdown.classList.add("active");
-      //     },
-      //   };
-      // }).call(this);
 
       (function createPriorityBtn() {
-        priorityBtn.dataset.id = `priority-${this.id}`;
+        priorityBtn.dataset.id = `priority-${todoId}`;
         priorityBtn.setAttribute("type", "button");
-        priorityBtn.classList.add("btn", "icon-btn");
+        priorityBtn.classList.add("btn", "icon-btn", "priority-btn");
         var icon = document.createElement("i");
         priority === "4"
           ? icon.classList.add("flaticon", "flaticon-flag")
@@ -402,18 +296,8 @@ todoFactory.prototype.createTodo = function (
         icon.style.color = priorityLevel;
         priorityBtn.appendChild(icon);
 
-        function onPriorityBtn() {
-          popups.priority.show();
-          popups.priority.setDataBtn(`priority-${todoId}`);
-          popups.position(popups.priority.ctn, priorityBtn);
-          (function setDefaultPriority() {
-            popups.priority.setActive(priority);
-          })();
-        }
-
-        priorityBtn.addEventListener("click", onPriorityBtn);
         rhCtn.appendChild(priorityBtn);
-      }.call(this));
+      })();
 
       var editorActions = document.createElement("div");
       editorActions.classList.add("editor-actions");
@@ -422,34 +306,20 @@ todoFactory.prototype.createTodo = function (
         var btn = document.createElement("button");
         btn.setAttribute("type", "button");
         btn.classList.add("btn", "act-btn", "save-btn");
-        var thisTodo = this.id;
-        btn.dataset.todo = thisTodo;
+        btn.dataset.todo = todoId;
         btn.textContent = "Save";
 
-        btn.addEventListener("click", () => {
-          var todo = getTodo(thisTodo);
-          todo.saveEdits();
-          todo.content.refresh();
-        });
-
         editorActions.appendChild(btn);
-      }.call(this));
+      })();
       (function createCancelBtn() {
         var btn = document.createElement("button");
         btn.setAttribute("type", "button");
         btn.classList.add("btn", "act-btn", "cancel-btn");
-        var thisTodo = this.id;
-        btn.dataset.todo = thisTodo;
+        btn.dataset.todo = todoId;
         btn.textContent = "Cancel";
 
-        function cancelEdit() {
-          var todo = getTodo(thisTodo);
-          todo.appendContent();
-        }
-
-        btn.addEventListener("click", cancelEdit);
         editorActions.appendChild(btn);
-      }.call(this));
+      })();
 
       extraDetails.appendChild(lhCtn);
       extraDetails.appendChild(rhCtn);
@@ -459,7 +329,6 @@ todoFactory.prototype.createTodo = function (
 
       editor.appendChild(editorArea);
       editor.appendChild(editorActions);
-      // editor.appendChild(priorityDropdown.modal);
 
       return {
         main: editor,
@@ -467,7 +336,7 @@ todoFactory.prototype.createTodo = function (
         dayInput: dayInput,
         pjInput: pjInput,
         priorityInput: () => {
-          return priorityDropdown.dropdown.querySelector(".active");
+          return popups.priority.ctn.querySelector(".active");
         },
       };
     }.call(this),
@@ -514,38 +383,6 @@ todoFactory.prototype.createTodo = function (
         .editPriorirty(this.editor.priorityInput().dataset.value)
         .appendContent();
     },
-    // placePopup(btn, active) {
-    //   var btnPos = btn.getBoundingClientRect();
-
-    //   var btnCenter = findBtnCenter();
-    //   var btnBottom = btn.getBoundingClientRect().bottom;
-    //   var popupCenter = findPopupCenter();
-    //   active.style.left = `${btnCenter - popupCenter}px`;
-    //   active.style.top = `${btnBottom + 8}px`;
-    //   removePopupOverflow(active);
-
-    //   function removePopupOverflow(active) {
-    //     var browserWidth = document.documentElement.clientWidth;
-    //     var popupCtn = active.querySelector(".popup-ctn");
-    //     var newPos = active.getBoundingClientRect();
-    //     if (newPos.right > browserWidth) {
-    //       popupCtn.style.right = `${newPos.right - browserWidth}px`;
-    //     }
-    //     var posAfter = popupCtn.getBoundingClientRect();
-    //   }
-
-    //   function findBtnCenter() {
-    //     var btnWidth = btn.offsetWidth;
-    //     var center = btnPos.left + btnWidth / 2;
-    //     return center;
-    //   }
-
-    //   function findPopupCenter() {
-    //     var popupWidth = active.offsetWidth;
-    //     var center = popupWidth / 2;
-    //     return center;
-    //   }
-    // }
   };
 };
 var todoFact = new todoFactory();

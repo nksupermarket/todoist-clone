@@ -66,7 +66,7 @@ const popups = (() => {
   };
   priority.setActive = function (priorityLevel) {
     this.removeActive();
-    var btn = ctn.querySelector(`[data-value="${priorityLevel}"]`);
+    var btn = this.ctn.querySelector(`[data-value="${priorityLevel}"]`);
     btn.classList.add("active");
   };
   priority.reset = function () {
