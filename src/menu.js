@@ -7,80 +7,132 @@ export { menu, content };
 const content = (() => {
   var main = document.getElementById("content");
 
-  const todayCtn = (() => {
-    var ctn = document.createElement("div");
-    ctn.id = "today-ctn";
+  const ctnMethods = {
+    createHeader() {
+      var header = document.createElement("header");
+      header.classList.add("view-header", "view-content");
+      return header;
+    },
+    createHeaderContent(titleTag) {
+      var ctn = document.createElement("div");
+      ctn.classList.add("view-header-content");
 
-    var header = createCtnHeader();
-    var headerContent = createHeaderContent("h1");
-    header.appendChild(headerContent.ctn);
-    var todayStr = new Date().toString().slice(0, 10);
-    headerContent.title.innerHTML = `<span>Today</span><small>${todayStr}</small>`;
+      var title = document.createElement(titleTag);
+      title.classList.add("content-title");
 
-    var todoList = document.createElement("ul");
-    todoList.classList.add("todo-list", "view-content");
+      ctn.appendChild(title);
+      return {
+        ctn: ctn,
+        title: title,
+      };
+    },
+    createNewTodoBtn() {
+      var btn = document.createElement("button");
+      btn.classList.add("btn", "new-todo-btn");
 
-    var btn = createNewTodoBtn();
-    todoList.appendChild(btn);
+      var icon = document.createElement("i");
+      icon.classList.add("flaticon", "flaticon-plus");
 
-    ctn.appendChild(header);
-    ctn.appendChild(todoList);
+      var text = document.createElement("span");
+      text.classList.add("add-todo-btn-text");
+      text.textContent = "Add todo";
 
-    return {
-      ctn,
-      todoList,
-      btn,
-    };
-  })();
+      btn.appendChild(icon);
+      btn.appendChild(text);
 
-  const upcomingCtn = (() => {
-    var ctn = document.createElement("div");
-    ctn.id = "upcoming-ctn";
-    var header = createCtnHeader();
-    var headerContent = createHeaderContent("h1");
-    header.appendChild(headerContent.ctn);
-    headerContent.title.textContent = "Upcoming";
+      return btn;
+    },
+    createActionCtn() {
+      var ctn = document.createElement("div");
+      ctn.classList.add("pj-icon-ctn");
+      return ctn;
+    },
+    createIconBtn(iconName, className, str) {
+      var btn = document.createElement("button");
+      btn.classList.add("btn", "icon-btn", className);
 
-    var listHolder = document.createElement("div");
+      var icon = document.createElement("i");
+      icon.classList.add("flaticon", iconName);
+      btn.prepend(icon);
 
-    var sections = [];
-    generateSections(8);
+      var text = document.createElement("span");
+      text.classList.add("btn-text");
+      text.textContent = str;
+      btn.appendChild(text);
 
-    ctn.appendChild(header);
-    ctn.appendChild(listHolder);
+      return btn;
+    },
+    createTodoList() {
+      var todoList = document.createElement("ul");
+      todoList.classList.add("todo-list", "view-content");
+      return todoList;
+    },
+  };
 
-    function generateSections(number) {
-      for (var i = 1; i < number; i++) {
-        var section = document.createElement("section");
+  // var sortBtn = createBtn("flaticon-sort", "sort-btn", "Sort");
+  // var commentBtn = createBtn("flaticon-comment", "comment-btn", "Comments");
+  // var deleteBtn = createBtn("flaticon-trash", "delete-btn", "Delete");
 
-        var header = createCtnHeader();
-        var headerContent = createHeaderContent("h2");
-        headerContent.ctn.classList.add("section-header");
+  // ctn.appendChild(sortBtn);
+  // ctn.appendChild(commentBtn);
+  // ctn.appendChild(deleteBtn);
 
-        var title = headerContent.title;
+  function createCtn(name) {
+    var ctn = Object.create(ctnMethods);
+    ctn.main = document.createElement("div");
+    ctn.main.id = `${name}-ctn`;
 
-        header.appendChild(headerContent.ctn);
+    ctn.header = ctn.createHeader();
+    ctn.headerContent = ctn.createHeaderContent("h1");
+    ctn.header.appendChild(ctn.headerContent.ctn);
+    ctn.title = ctn.headerContent.title;
 
-        var todoList = document.createElement("ul");
-        todoList.classList.add("todo-list");
+    ctn.main.appendChild(ctn.header);
 
-        var todoBtn = createNewTodoBtn();
-        todoList.appendChild(todoBtn);
+    return ctn;
+  }
 
-        section.appendChild(header);
-        section.appendChild(todoList);
+  const todayCtn = createCtn("today");
+  var todayStr = new Date().toString().slice(0, 10);
+  todayCtn.title.innerHTML = `<span>Today</span><small>${todayStr}</small>`;
+  var btn = todayCtn.createNewTodoBtn();
+  todayCtn.todoList = todayCtn.createTodoList();
+  todayCtn.todoList.appendChild(btn);
+  todayCtn.main.appendChild(todayCtn.todoList);
 
-        listHolder.appendChild(section);
+  const upcomingCtn = createCtn("upcoming");
+  upcomingCtn.title.textContent = "Upcoming";
+  upcomingCtn.listHolder = document.createElement("div");
+  upcomingCtn.sections = [];
+  upcomingCtn.generateSections = (number) => {
+    for (var i = 1; i < number; i++) {
+      var section = document.createElement("section");
 
-        sections.push({ section, title, todoList });
-      }
+      var header = upcomingCtn.createHeader();
+      var headerContent = upcomingCtn.createHeaderContent("h2");
+      headerContent.ctn.classList.add("section-header");
+
+      var title = headerContent.title;
+
+      header.appendChild(headerContent.ctn);
+
+      var todoList = document.createElement("ul");
+      todoList.classList.add("todo-list");
+
+      var todoBtn = upcomingCtn.createNewTodoBtn();
+      todoList.appendChild(todoBtn);
+
+      section.appendChild(header);
+      section.appendChild(todoList);
+
+      upcomingCtn.listHolder.appendChild(section);
+
+      upcomingCtn.sections.push({ section, title, todoList });
     }
-
-    return {
-      ctn,
-      sections,
-    };
-  })();
+  };
+  upcomingCtn.generateSections(8);
+  upcomingCtn.main.appendChild(header);
+  upcomingCtn.main.appendChild(upcomingCtn.listHolder);
 
   const pjCtn = (() => {
     var ctn = document.createElement("div");
@@ -123,90 +175,6 @@ const content = (() => {
       todoList,
     };
   })();
-
-  function createNewTodoBtn() {
-    var btn = document.createElement("button");
-    btn.classList.add("btn", "new-todo-btn");
-
-    var icon = document.createElement("i");
-    icon.classList.add("flaticon", "flaticon-plus");
-
-    var text = document.createElement("span");
-    text.classList.add("add-todo-btn-text");
-    text.textContent = "Add todo";
-
-    btn.appendChild(icon);
-    btn.appendChild(text);
-
-    return btn;
-  }
-
-  function createCtnHeader() {
-    var header = document.createElement("header");
-    header.classList.add("view-header", "view-content");
-    return header;
-  }
-  function createHeaderContent(titleTag) {
-    var ctn = document.createElement("div");
-    ctn.classList.add("view-header-content");
-
-    var title = document.createElement(titleTag);
-    title.classList.add("content-title");
-
-    ctn.appendChild(title);
-    return {
-      ctn: ctn,
-      title: title,
-    };
-  }
-  function createActionCtn() {
-    var ctn = document.createElement("div");
-    ctn.classList.add("pj-icon-ctn");
-
-    var sortBtn = createBtn("flaticon-sort", "sort-btn", "Sort");
-    var commentBtn = createBtn("flaticon-comment", "comment-btn", "Comments");
-    var deleteBtn = createBtn("flaticon-trash", "delete-btn", "Delete");
-
-    ctn.appendChild(sortBtn);
-    ctn.appendChild(commentBtn);
-    ctn.appendChild(deleteBtn);
-
-    return {
-      ctn,
-      sortBtn,
-      commentBtn,
-      deleteBtn,
-      sort(method, list) {
-        // switch (method) {
-        //   case "due date":
-        list.sort(function (a, b) {
-          var aDate = new Date(a.day);
-          var bDate = new Date(b.day);
-
-          if (aDate > bDate) return 1;
-          if (aDate < bDate) return -1;
-          if (aDate === bDate) return 0;
-        });
-        // }
-      },
-    };
-
-    function createBtn(iconName, className, str) {
-      var btn = document.createElement("button");
-      btn.classList.add("btn", "icon-btn", className);
-
-      var icon = document.createElement("i");
-      icon.classList.add("flaticon", iconName);
-      btn.prepend(icon);
-
-      var text = document.createElement("span");
-      text.classList.add("btn-text");
-      text.textContent = str;
-      btn.appendChild(text);
-
-      return btn;
-    }
-  }
 
   function removeCtns() {
     todayCtn.ctn.remove();
