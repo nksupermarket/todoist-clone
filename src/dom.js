@@ -2,7 +2,8 @@ import { helpers } from "./helpers.js";
 import { listOfPjs, pjFact, listOfTodos, todoFact } from "./projects.js";
 import { today } from "./today.js";
 import { commentModal } from "./comments.js";
-import { menu, content } from "./menu.js";
+import { menu } from "./menu.js";
+import { content } from "./content.js";
 import { todoForm } from "./todoForm.js";
 import { samples } from "./samples.js";
 import { popups } from "./popups.js";
@@ -29,11 +30,36 @@ const init = (() => {
   })();
 })();
 
-menu.today.addEventListener("click", menu.onToday);
-menu.upcoming.addEventListener("click", menu.onUpcoming);
-menu.newBtn.addEventListener("click", menu.onNewPj);
-menu.addBtn.addEventListener("click", menu.onAddPj);
-menu.cancelBtn.addEventListener("click", menu.hideForm);
+menu.today.addEventListener("click", showToday);
+menu.upcoming.addEventListener("click", showUpcoming);
+menu.newBtn.addEventListener("click", showPjForm);
+menu.addBtn.addEventListener("click", onAddPj);
+menu.cancelBtn.addEventListener("click", hidePjForm);
+
+function showPjForm() {
+  helpers.show(menu.form);
+}
+function hidePjForm() {
+  helpers.hide(menu.form);
+  menu.form.reset();
+}
+function onAddPj() {
+  if (!menu.titleInput.value) return helpers.inputError("empty");
+  var newPj = pjFact.createProject(menu.titleInput.value);
+  newPj.pushToList();
+  newPj.addToMenu().addEventListener("click", (e) => showPj(e));
+  hidePjForm();
+}
+function showToday() {
+  content.displayToday();
+}
+function showUpcoming() {
+  content.displayUpcoming();
+}
+function showPj(e) {
+  var pjId = e.target.dataset.project;
+  content.display(pjId);
+}
 
 commentModal.form.addEventListener("click", (e) => {
   e.stopPropagation();
@@ -101,7 +127,7 @@ todoForm.titleInput.oninput = todoForm.activateAddBtn;
 content.pjCtn.sortBtn.addEventListener("click", function onSort() {
   popups.sort.setDataBtn(content.pjCtn.sortBtn.dataset.id);
   popups.sort.show();
-  popups.position(popups.sort.ctn, content.pjCtn.sortBtn);
+  popups.sort.position(content.pjCtn.sortBtn);
 });
 
 function showTodoForm() {
