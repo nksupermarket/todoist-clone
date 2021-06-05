@@ -1,12 +1,129 @@
 export { content };
-import { listOfPjs, listOfTodos } from "./projects.js";
-import { today } from "./today.js";
 import { helpers } from "./helpers.js";
 
 const content = (() => {
   var main = document.getElementById("content");
+  var todoForm = (function createTodoForm() {
+    var ctn = document.createElement("form");
+    ctn.classList.add("todo-editor", "new-todo-form");
+
+    var editorArea = document.createElement("div");
+    editorArea.classList.add("editor-area");
+
+    var titleInput = document.createElement("input");
+    titleInput.setAttribute("type", "text");
+
+    var extraDetails = document.createElement("div");
+    extraDetails.classList.add("editor-extra-details");
+
+    var lhCtn = document.createElement("div");
+    lhCtn.classList.add("lh-ctn");
+
+    var dateInput = document.createElement("input");
+    (function createDayBtn() {
+      var dayBtn = document.createElement("button");
+      dayBtn.setAttribute("type", "button");
+      dayBtn.classList.add("day-btn", "btn");
+      dateInput.setAttribute("type", "date");
+      dayBtn.appendChild(dateInput);
+      lhCtn.appendChild(dayBtn);
+    })();
+
+    var pjInput = document.createElement("select");
+    (function createPjBtn() {
+      var pjBtn = document.createElement("button");
+      pjBtn.setAttribute("type", "button");
+      pjBtn.classList.add("btn", "editor-pj-btn");
+
+      var icon = document.createElement("i");
+      icon.classList.add("flaticon", "flaticon-folder");
+
+      var noneOption = document.createElement("option");
+      noneOption.value = "None";
+      noneOption.textContent = "None";
+      pjInput.appendChild(noneOption);
+
+      pjBtn.appendChild(icon);
+      pjBtn.appendChild(pjInput);
+      lhCtn.appendChild(pjBtn);
+    })();
+
+    var rhCtn = document.createElement("div");
+    rhCtn.classList.add("rh-ctn");
+
+    var priorityBtn = (function createPriorityBtn() {
+      var btn = document.createElement("button");
+      btn.dataset.id = `content-form`;
+      btn.setAttribute("type", "button");
+      btn.classList.add("btn", "icon-btn", "priority-btn");
+      var icon = document.createElement("i");
+      icon.classList.add("flaticon", "flaticon-flag");
+      btn.appendChild(icon);
+
+      rhCtn.appendChild(btn);
+      return btn;
+    })();
+    var commentBtn = (function createCommentBtn() {
+      var btn = document.createElement("button");
+      btn.dataset.id = `content-form`;
+      btn.setAttribute("type", "button");
+      btn.classList.add("btn", "icon-btn", "comment-btn");
+      var icon = document.createElement("i");
+      icon.classList.add("flaticon", "flaticon-comment");
+      btn.appendChild(icon);
+
+      rhCtn.appendChild(btn);
+      return btn;
+    })();
+
+    var editorActions = document.createElement("div");
+    editorActions.classList.add("editor-actions");
+
+    var addBtn = (function createAddBtn() {
+      var btn = document.createElement("button");
+      btn.setAttribute("type", "button");
+      btn.classList.add("btn", "act-btn", "add-todo-btn");
+      btn.textContent = "Add";
+
+      editorActions.appendChild(btn);
+      return btn;
+    })();
+    var cancelBtn = (function createCancelBtn() {
+      var btn = document.createElement("button");
+      btn.setAttribute("type", "button");
+      btn.classList.add("btn", "act-btn", "cancel-btn");
+      btn.textContent = "Cancel";
+
+      editorActions.appendChild(btn);
+      return btn;
+    })();
+
+    extraDetails.appendChild(lhCtn);
+    extraDetails.appendChild(rhCtn);
+
+    editorArea.appendChild(titleInput);
+    editorArea.appendChild(extraDetails);
+
+    ctn.appendChild(editorArea);
+    ctn.appendChild(editorActions);
+
+    return {
+      ctn,
+      titleInput,
+      dateInput,
+      pjInput,
+      priorityBtn,
+      commentBtn,
+      addBtn,
+      cancelBtn,
+    };
+  })();
 
   const ctnMethods = {
+    hideSortedBtn() {
+      if (!this.sortedBtn) return;
+      helpers.hide(this.sortedBtn);
+    },
     sortDate() {
       this.todoArray.sort(dueDateAscending);
       function dueDateAscending(a, b) {
@@ -124,9 +241,9 @@ const content = (() => {
   const todayCtn = createCtn("today");
   var todayStr = new Date().toString().slice(0, 10);
   todayCtn.title.innerHTML = `<span>Today</span><small>${todayStr}</small>`;
-  var btn = todayCtn.createNewTodoBtn();
+  todayCtn.todoBtn = todayCtn.createNewTodoBtn();
   todayCtn.todoList = todayCtn.createTodoList();
-  todayCtn.todoList.appendChild(btn);
+  todayCtn.todoList.appendChild(todayCtn.todoBtn);
   todayCtn.main.appendChild(todayCtn.todoList);
 
   const upcomingCtn = createCtn("upcoming");
@@ -135,7 +252,7 @@ const content = (() => {
   upcomingCtn.sections = [];
   upcomingCtn.generateSections = (number) => {
     for (var i = 1; i < number; i++) {
-      var section = document.createElement("section");
+      var ctn = document.createElement("section");
 
       var header = upcomingCtn.createHeader();
       var headerContent = upcomingCtn.createHeaderContent("h2");
@@ -151,12 +268,12 @@ const content = (() => {
       var todoBtn = upcomingCtn.createNewTodoBtn();
       todoList.appendChild(todoBtn);
 
-      section.appendChild(header);
-      section.appendChild(todoList);
+      ctn.appendChild(header);
+      ctn.appendChild(todoList);
 
-      upcomingCtn.listHolder.appendChild(section);
+      upcomingCtn.listHolder.appendChild(ctn);
 
-      upcomingCtn.sections.push({ section, title, todoList });
+      upcomingCtn.sections.push({ ctn, title, todoList, todoBtn });
     }
   };
   upcomingCtn.generateSections(8);
@@ -189,98 +306,27 @@ const content = (() => {
   pjCtn.todoList.appendChild(pjCtn.todoBtn);
   pjCtn.main.appendChild(pjCtn.todoList);
 
-  function removeCtns() {
-    todayCtn.main.remove();
-    upcomingCtn.main.remove();
-    pjCtn.main.remove();
-  }
-  function removeTodos(ctn) {
-    var todoCtns = ctn.querySelectorAll(".todo-ctn");
-    if (!todoCtns[0]) return;
-    todoCtns.forEach((todo) => todo.remove());
-  }
   return {
     main,
+    todoForm,
     pjCtn,
     todayCtn,
     upcomingCtn,
-    display(pjId) {
-      removeTodos(pjCtn.todoList);
-      removeCtns();
-      var pj = helpers.findItem(listOfPjs, pjId);
-      pjCtn.todoList.dataset.project = pjId;
-      var pjCtnBtns = pjCtn.header.querySelectorAll("button");
-      pjCtnBtns.forEach((btn) => (btn.dataset.ctn = `pjCtn-${pjId}`));
-      pjCtn.title.textContent = pj.title;
-      pj.todoList.forEach((todo) => {
-        helpers.show(todo.ctn);
-        pjCtn.todoList.prepend(todo.ctn);
-      });
-      pjCtn.todoArray = pj.todoList;
-      main.appendChild(pjCtn.main);
-    },
-    displayToday() {
-      removeCtns();
-      removeTodos(todayCtn.main);
-      var todayList = today.getTodayTodos(listOfTodos);
-      todayList.forEach((todo) => {
-        todayCtn.todoList.prepend(todo.ctn);
-      });
-      todayCtn.todoArray = todayList;
-      main.appendChild(todayCtn.main);
-    },
-    displayUpcoming() {
-      removeCtns();
-      removeTodos(upcomingCtn.main);
-      fillSections();
-      function fillSections() {
-        var dateObj = new Date();
-        for (var i = 0; i < upcomingCtn.sections.length; i++) {
-          dateObj.setDate(dateObj.getDate() + i);
-          setTitle(i);
-          setTodoList(i);
-
-          function setTitle(i) {
-            upcomingCtn.sections[i].title.textContent = dateObj
-              .toString()
-              .slice(0, 10);
-            if (i === 0)
-              upcomingCtn.sections[i].title.textContent = "Today — ".concat(
-                upcomingCtn.sections[i].title.textContent
-              );
-            if (i === 1)
-              upcomingCtn.sections[i].title.textContent = "Tomorrow — ".concat(
-                upcomingCtn.sections[i].title.textContent
-              );
-          }
-          function setTodoList(i) {
-            var year = dateObj.getFullYear();
-            var month = dateObj.getMonth() + 1;
-            var day = dateObj.getDate();
-            if (month.toString().length === 1)
-              month = "0".concat(month.toString());
-            if (day.toString().length === 1) day = "0".concat(day.toString());
-            var dayStr = `${year}-${month}-${day}`;
-            var todos = listOfTodos.filter((item) => item.day == dayStr);
-            if (!todos[0])
-              return upcomingCtn.sections[i].title.classList.add("empty");
-            todos.forEach((todo) =>
-              upcomingCtn.sections[i].todoList.prepend(todo.ctn)
-            );
-          }
-        }
-      }
-      main.appendChild(upcomingCtn.main);
-    },
-    refresh() {
-      var pjId = todoList.dataset.project;
-      this.display(pjId);
-    },
     findActiveCtn() {
       var ctns = [todayCtn, pjCtn, upcomingCtn];
-
       var activeCtn = ctns.find((ctn) => this.main.contains(ctn.main));
       return activeCtn;
+    },
+    removeActiveCtn() {
+      var activeCtn = this.findActiveCtn();
+      if (!activeCtn) return;
+      activeCtn.main.remove();
+      activeCtn.hideSortedBtn();
+    },
+    removeTodos(ctn) {
+      var todoCtns = ctn.querySelectorAll(".todo-ctn");
+      if (!todoCtns[0]) return;
+      todoCtns.forEach((todo) => todo.remove());
     },
   };
 })();

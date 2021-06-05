@@ -41,8 +41,7 @@ const todoForm = (() => {
       form.reset();
     },
     setDefaultDate() {
-      var todayDate = today.getToday();
-      dateInput.value = todayDate;
+      dateInput.value = today.getToday();
     },
     changeCommentBtn(status) {
       status === "empty"

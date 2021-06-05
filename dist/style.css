@@ -664,6 +664,7 @@ main .new-todo-btn:hover {
 .editor-actions {
   padding-top: 1rem;
 }
+.add-todo-btn,
 .save-btn {
   background-color: var(--header-bg);
   color: var(--content-bg);
