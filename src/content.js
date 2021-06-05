@@ -1,5 +1,6 @@
 export { content };
 import { helpers } from "./helpers.js";
+import { listOfTodos } from "./projects.js";
 
 const content = (() => {
   var main = document.getElementById("content");
@@ -278,6 +279,16 @@ const content = (() => {
   };
   upcomingCtn.generateSections(8);
   upcomingCtn.main.appendChild(upcomingCtn.listHolder);
+  upcomingCtn.refresh = function () {
+    this.sections.forEach((section) => {
+      var todos = listOfTodos.filter(
+        (item) => item.day == section.todoList.dataset.dateStr
+      );
+      if (!todos[0]) return section.title.classList.add("empty");
+      todos.forEach((todo) => section.todoList.prepend(todo.ctn));
+      section.todoList.appendChild(section.todoBtn);
+    });
+  };
 
   const pjCtn = createCtn("pj");
   pjCtn.actionCtn = pjCtn.createActionCtn();

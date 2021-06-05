@@ -66,7 +66,7 @@ const menuEvents = {
       function fillSections() {
         var dateObj = new Date();
         for (var i = 0; i < content.upcomingCtn.sections.length; i++) {
-          dateObj.setDate(dateObj.getDate() + i);
+          i === 0 ? null : dateObj.setDate(dateObj.getDate() + 1);
           setTitle(i);
           setTodoList(i);
 
@@ -93,6 +93,7 @@ const menuEvents = {
               month = "0".concat(month.toString());
             if (day.toString().length === 1) day = "0".concat(day.toString());
             var dayStr = `${year}-${month}-${day}`;
+            content.upcomingCtn.sections[i].todoList.dataset.dateStr = dayStr;
             var todos = listOfTodos.filter((item) => item.day == dayStr);
             if (!todos[0])
               return content.upcomingCtn.sections[i].title.classList.add(
@@ -311,11 +312,11 @@ const contentEvents = {
   closeForm() {
     var activeCtn = content.findActiveCtn();
     if (!activeCtn) return;
+    content.todoForm.ctn.remove();
     if (activeCtn === content.upcomingCtn)
       return content.upcomingCtn.sections.forEach((section) =>
         section.todoList.appendChild(section.todoBtn)
       );
-    content.todoForm.ctn.remove();
     activeCtn.todoList.appendChild(activeCtn.todoBtn);
   },
   setDefaultPj() {
