@@ -80,6 +80,65 @@
           </div>
         </header>
         <ul class="todo-list view-content"></ul> -->
+        <form class="todo-editor inactive">
+          <div class="editor-area">
+            <input class="title-input" type="text" />
+            <div class="editor-extra-details">
+              <div class="lh-ctn">
+                <button class="day-btn btn" type="button">
+                  <input type="date" />
+                </button>
+                <button class="btn editor-pj-btn" type="button">
+                  <i class="flaticon flaticon-folder"></i>
+                  <select>
+                    <option value="None">None</option>
+                  </select>
+                </button>
+              </div>
+              <div class="rh-ctn">
+                <button class="btn icon-btn priority-btn" type="button">
+                  <i class="flaticon"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="editor-actions">
+            <button class="btn act-btn save-btn" type="button">Save</button>
+            <button class="btn act-btn cancel-btn" type="button">Cancel</button>
+          </div>
+        </form>
+        <form class="todo-editor new-todo-form inactive">
+          <div class="editor-area">
+            <input type="text" class="title-input" />
+            <div class="editor-extra-details">
+              <div class="lh-ctn">
+                <button class="day-btn btn" type="button">
+                  <input type="date" />
+                </button>
+                <button class="btn editor-pj-btn" type="button">
+                  <i class="flaticon flaticon-folder"></i>
+                  <select>
+                    <option value="None">None</option>
+                  </select>
+                </button>
+              </div>
+              <div class="rh-ctn">
+                <button class="btn icon-btn priority-btn" type="button">
+                  <i class="flaticon flaticon-flag"></i>
+                </button>
+                <button class="btn icon-btn comment-btn" type="button">
+                  <i class="flaticon flaticon-comment"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="editor-actions">
+            <button class="btn act-btn add-todo-btn deactive" type="button">
+              Add
+            </button>
+            <button class="btn act-btn cancel-btn" type="button">Cancel</button>
+          </div>
+        </form>
       </main>
     </div>
     <div class="modal modal-full inactive">

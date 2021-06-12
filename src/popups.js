@@ -3,7 +3,8 @@ export { popups };
 import { helpers } from "./helpers.js";
 
 const popups = (() => {
-  var modal = document.getElementById("popup-modal");
+  const modal = document.getElementById("popup-modal");
+  let list = [];
 
   const popupMethods = {
     show() {
@@ -69,6 +70,10 @@ const popups = (() => {
     var btn = this.ctn.querySelector(`[data-value="${priorityLevel}"]`);
     btn.classList.add("active");
   };
+  priority.removeActive = function () {
+    var active = this.ctn.querySelector(".active");
+    active.classList.remove("active");
+  };
   priority.reset = function () {
     this.btns.forEach((btn) => btn.classList.remove("active"));
     var priority4 = this.ctn.querySelector(`[data-value="4"]`);
@@ -99,6 +104,11 @@ const popups = (() => {
         popup.classList.remove("active");
         helpers.hide(popup);
       });
+    },
+    findActivePopup() {
+      return this.comment.ctn.classList.contains("active")
+        ? this.comment
+        : this.priority;
     },
   };
 })();

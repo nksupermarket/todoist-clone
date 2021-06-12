@@ -4,123 +4,13 @@ import { listOfTodos } from "./projects.js";
 
 const content = (() => {
   var main = document.getElementById("content");
-  var todoForm = (function createTodoForm() {
-    var ctn = document.createElement("form");
-    ctn.classList.add("todo-editor", "new-todo-form");
-
-    var editorArea = document.createElement("div");
-    editorArea.classList.add("editor-area");
-
-    var titleInput = document.createElement("input");
-    titleInput.setAttribute("type", "text");
-
-    var extraDetails = document.createElement("div");
-    extraDetails.classList.add("editor-extra-details");
-
-    var lhCtn = document.createElement("div");
-    lhCtn.classList.add("lh-ctn");
-
-    var dateInput = document.createElement("input");
-    (function createDayBtn() {
-      var dayBtn = document.createElement("button");
-      dayBtn.setAttribute("type", "button");
-      dayBtn.classList.add("day-btn", "btn");
-      dateInput.setAttribute("type", "date");
-      dayBtn.appendChild(dateInput);
-      lhCtn.appendChild(dayBtn);
-    })();
-
-    var pjInput = document.createElement("select");
-    (function createPjBtn() {
-      var pjBtn = document.createElement("button");
-      pjBtn.setAttribute("type", "button");
-      pjBtn.classList.add("btn", "editor-pj-btn");
-
-      var icon = document.createElement("i");
-      icon.classList.add("flaticon", "flaticon-folder");
-
-      var noneOption = document.createElement("option");
-      noneOption.value = "None";
-      noneOption.textContent = "None";
-      pjInput.appendChild(noneOption);
-
-      pjBtn.appendChild(icon);
-      pjBtn.appendChild(pjInput);
-      lhCtn.appendChild(pjBtn);
-    })();
-
-    var rhCtn = document.createElement("div");
-    rhCtn.classList.add("rh-ctn");
-
-    var priorityBtn = (function createPriorityBtn() {
-      var btn = document.createElement("button");
-      btn.dataset.id = `content-form`;
-      btn.setAttribute("type", "button");
-      btn.classList.add("btn", "icon-btn", "priority-btn");
-      var icon = document.createElement("i");
-      icon.classList.add("flaticon", "flaticon-flag");
-      btn.appendChild(icon);
-
-      rhCtn.appendChild(btn);
-      return btn;
-    })();
-    var commentBtn = (function createCommentBtn() {
-      var btn = document.createElement("button");
-      btn.dataset.id = `content-form`;
-      btn.setAttribute("type", "button");
-      btn.classList.add("btn", "icon-btn", "comment-btn");
-      var icon = document.createElement("i");
-      icon.classList.add("flaticon", "flaticon-comment");
-      btn.appendChild(icon);
-
-      rhCtn.appendChild(btn);
-      return btn;
-    })();
-
-    var editorActions = document.createElement("div");
-    editorActions.classList.add("editor-actions");
-
-    var addBtn = (function createAddBtn() {
-      var btn = document.createElement("button");
-      btn.setAttribute("type", "button");
-      btn.classList.add("btn", "act-btn", "add-todo-btn");
-      btn.textContent = "Add";
-
-      editorActions.appendChild(btn);
-      return btn;
-    })();
-    var cancelBtn = (function createCancelBtn() {
-      var btn = document.createElement("button");
-      btn.setAttribute("type", "button");
-      btn.classList.add("btn", "act-btn", "cancel-btn");
-      btn.textContent = "Cancel";
-
-      editorActions.appendChild(btn);
-      return btn;
-    })();
-
-    extraDetails.appendChild(lhCtn);
-    extraDetails.appendChild(rhCtn);
-
-    editorArea.appendChild(titleInput);
-    editorArea.appendChild(extraDetails);
-
-    ctn.appendChild(editorArea);
-    ctn.appendChild(editorActions);
-
-    return {
-      ctn,
-      titleInput,
-      dateInput,
-      pjInput,
-      priorityBtn,
-      commentBtn,
-      addBtn,
-      cancelBtn,
-    };
-  })();
 
   const ctnMethods = {
+    removeTodos() {
+      var todoCtns = this.main.querySelectorAll(".todo-ctn");
+      if (todoCtns.length === 0) return;
+      todoCtns.forEach((todo) => todo.remove());
+    },
     hideSortedBtn() {
       if (!this.sortedBtn) return;
       helpers.hide(this.sortedBtn);
@@ -225,6 +115,7 @@ const content = (() => {
   function createCtn(name) {
     var ctn = Object.create(ctnMethods);
     ctn.main = document.createElement("div");
+    ctn.main.classList.add("main-ctn");
     ctn.main.id = `${name}-ctn`;
 
     ctn.header = ctn.createHeader();
@@ -251,13 +142,14 @@ const content = (() => {
   upcomingCtn.title.textContent = "Upcoming";
   upcomingCtn.listHolder = document.createElement("div");
   upcomingCtn.sections = [];
-  upcomingCtn.generateSections = (number) => {
+  upcomingCtn.createSections = (number) => {
     for (var i = 1; i < number; i++) {
       var ctn = document.createElement("section");
 
       var header = upcomingCtn.createHeader();
+      header.setAttribute("class", "section-header section-content");
       var headerContent = upcomingCtn.createHeaderContent("h2");
-      headerContent.ctn.classList.add("section-header");
+      headerContent.ctn.setAttribute("class", "section-header-content");
 
       var title = headerContent.title;
 
@@ -277,7 +169,7 @@ const content = (() => {
       upcomingCtn.sections.push({ ctn, title, todoList, todoBtn });
     }
   };
-  upcomingCtn.generateSections(8);
+  upcomingCtn.createSections(8);
   upcomingCtn.main.appendChild(upcomingCtn.listHolder);
   upcomingCtn.refresh = function () {
     this.sections.forEach((section) => {
@@ -319,7 +211,6 @@ const content = (() => {
 
   return {
     main,
-    todoForm,
     pjCtn,
     todayCtn,
     upcomingCtn,
@@ -333,11 +224,7 @@ const content = (() => {
       if (!activeCtn) return;
       activeCtn.main.remove();
       activeCtn.hideSortedBtn();
-    },
-    removeTodos(ctn) {
-      var todoCtns = ctn.querySelectorAll(".todo-ctn");
-      if (!todoCtns[0]) return;
-      todoCtns.forEach((todo) => todo.remove());
+      return activeCtn;
     },
   };
 })();

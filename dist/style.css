@@ -13,8 +13,11 @@
 
 html {
   font-size: 10px;
+  height: 100%;
 }
 body {
+  height: 100%;
+  overflow: hidden;
   font-size: 1.4rem;
   display: flex;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
@@ -106,6 +109,7 @@ select {
   right: 0;
   top: 0;
   bottom: 0;
+  z-index: 99;
 }
 .modal-full {
   background-color: rgba(0, 0, 0, 0.5);
@@ -160,6 +164,7 @@ select {
   width: 100%;
   background-color: var(--header-bg);
   height: 4.4rem;
+  min-height: 4.4rem;
   display: grid;
   align-items: center;
 }
@@ -370,8 +375,10 @@ select {
 }
 #not-header {
   display: flex;
+  overflow: hidden;
 }
 #menu {
+  position: fixed;
   box-sizing: border-box;
   padding: 3rem 0 0 3.5rem;
   min-height: calc(100vh - 5rem);
@@ -420,20 +427,37 @@ select {
   background-color: var(--menu-accent);
 }
 #content {
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden auto;
+  margin-left: 300px;
   width: 100%;
   grid-area: content;
   background-color: var(--content-bg);
 }
+.main-ctn {
+  padding-bottom: 100px;
+}
+.section-content,
 .view-content {
   max-width: 800px;
   margin: 0 auto;
 }
+.section-header,
 .view-header {
+  background-color: var(--content-bg);
   padding-left: 55px;
   padding-right: 55px;
   padding-top: 36px;
   margin-bottom: 24px;
 }
+.view-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.section-header-content,
 .view-header-content {
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--content-accent);
@@ -459,10 +483,10 @@ select {
 section .view-content {
   margin-bottom: 0;
 }
-.section-header {
-  padding-bottom: 0;
+.section-header-content {
+  padding-bottom: 0.5rem;
 }
-.section-header h2 {
+.section-header-content h2 {
   padding: 0.6rem 3rem 0.5rem 0;
   line-height: 2rem;
   font-size: 1.4rem;

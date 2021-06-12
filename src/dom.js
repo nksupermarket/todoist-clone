@@ -8,27 +8,6 @@ import { todoForm } from "./todoForm.js";
 import { samples } from "./samples.js";
 import { popups } from "./popups.js";
 
-var pjWork = pjFact.createProject("Work");
-var pjHome = pjFact.createProject("Home");
-var pjCode = pjFact.createProject("Code");
-
-var fdlkaTodo = todoFact.createTodo(pjWork.id, "fdlka", "2021-06-01", "4", {
-  text: [],
-  date: [],
-});
-pjWork.pushToList();
-pjHome.pushToList();
-pjCode.pushToList();
-
-const init = (() => {
-  samples.generate(30);
-  listOfTodos.forEach((todo) => addTodoCtnEvents(todo));
-  (function displayPjs() {
-    listOfPjs.forEach((pj) => {
-      pj.addToMenu().addEventListener("click", (e) => menuEvents.showPj(e));
-    });
-  })();
-})();
 const menuEvents = {
   showPjForm() {
     helpers.show(menu.form);
@@ -47,8 +26,8 @@ const menuEvents = {
   showToday() {
     displayToday();
     function displayToday() {
-      content.removeActiveCtn();
-      content.removeTodos(content.todayCtn.main);
+      if (content.findActiveCtn() != undefined)
+        content.removeActiveCtn().removeTodos();
       var todayList = today.getTodayTodos(listOfTodos);
       todayList.forEach((todo) => {
         content.todayCtn.todoList.prepend(todo.ctn);
@@ -60,8 +39,7 @@ const menuEvents = {
   showUpcoming() {
     displayUpcoming();
     function displayUpcoming() {
-      content.removeActiveCtn();
-      content.removeTodos(content.upcomingCtn.main);
+      content.removeActiveCtn().removeTodos();
       fillSections();
       function fillSections() {
         var dateObj = new Date();
@@ -112,8 +90,7 @@ const menuEvents = {
     var pjId = e.target.dataset.project;
     (function closeOpenCtn() {
       contentEvents.closeForm();
-      content.removeTodos(content.pjCtn.todoList);
-      content.removeActiveCtn();
+      content.removeActiveCtn().removeTodos();
     })();
     (function setDatatset() {
       content.pjCtn.main.dataset.project = pjId;
@@ -148,11 +125,11 @@ commentModal.modal.addEventListener("click", commentModal.close);
 commentModal.closeBtn.addEventListener("click", commentModal.close);
 
 const todoPopupEvents = {
-  showForm() {
-    helpers.show(todoForm.modal);
+  show(form) {
+    helpers.show(form.ctn);
     popups.priority.reset();
-    todoPopupEvents.fillPjInput(todoForm);
-    todoForm.setDefaultDate();
+    todoPopupEvents.fillPjInput(form);
+    form.setDefaultDate();
   },
   fillPjInput(form) {
     var options = form.pjInput.querySelectorAll("option");
@@ -193,66 +170,158 @@ const todoPopupEvents = {
     var activeCtn = content.findActiveCtn();
     activeCtn.refresh();
   },
-  close() {
-    todoForm.hide();
+  close(form) {
+    form.hide();
     popups.hide();
     popups.comment.reset();
   },
+  onSelectPriorityLevel(e) {
+    var btn = e.target.closest(".btn");
+    popups.priority.setActive(btn.dataset.value);
+
+    (function () {
+      const icon = btn.querySelector("i");
+      const activeForm = todoForm.findActiveForm();
+      activeForm.changeFlagIcon(icon.style.color, btn.dataset.value);
+    })();
+  },
+  addTodoCtnEvents(todo) {
+    var dayInput = todo.content.main.querySelector(".day-btn");
+    dayInput.addEventListener("change", changeTodoDay);
+    function changeTodoDay() {
+      todo.day = dayInput.value;
+    }
+
+    var commentsBtn = todo.content.main.querySelectorAll(".notes-btn");
+    commentsBtn.forEach((btn) =>
+      btn.addEventListener("click", showCommentForm)
+    );
+    function showCommentForm() {
+      helpers.show(commentModal.modal);
+      var pj = helpers.findItem(listOfPjs, todo.project);
+      commentModal.attachTodoId(todo.id);
+      commentModal.changePjTitle(pj.title);
+      commentModal.changeTodoTitle(todo.title);
+      if (!todo.notes) return;
+      for (var i = 0; i < todo.notes.text.length; i++) {
+        commentModal.fillCommentList(todo.notes.text[i], todo.notes.date[i]);
+      }
+    }
+
+    var editBtn = todo.content.main.querySelector(".edit-btn");
+    editBtn.addEventListener("click", showEditor);
+    function showEditor() {
+      contentEvents.closeOpenEditors();
+      editorForm.setDataset(todo.id);
+      (function addPjOptions() {
+        todoPopupEvents.fillPjInput(editorForm);
+      })();
+      (function setDefaultOption() {
+        var options = editorForm.pjInput.querySelectorAll("option");
+        var defaultOption = Array.from(options).find((option) => {
+          return option.value.toString() === todo.project.toString();
+        });
+        defaultOption.setAttribute("selected", "selected");
+      })();
+      todo.appendEditor(editorForm);
+      helpers.show(editorForm.ctn);
+    }
+  },
 };
+const modalForm = todoForm.modalForm;
+const contentForm = todoForm.contentForm;
 todoForm.newTodoBtns.forEach((btn) =>
-  btn.addEventListener("click", todoPopupEvents.showForm)
+  btn.addEventListener("click", () => todoPopupEvents.show(modalForm))
 );
-todoForm.addBtn.addEventListener("click", () => {
-  () => todoPopupEvents.onAddTodo(todoForm);
+modalForm.titleInput.addEventListener("input", () => {
+  modalForm.activateAddBtn();
 });
-todoForm.form.addEventListener("click", function (e) {
+contentForm.titleInput.addEventListener("input", () => {
+  contentForm.activateAddBtn();
+});
+modalForm.addBtn.addEventListener("click", () => {
+  () => todoPopupEvents.onAddTodo(modalForm);
+});
+modalForm.form.addEventListener("click", function (e) {
   e.stopPropagation();
 });
 popups.modal.addEventListener("click", popups.hide);
-popups.priority.ctn.addEventListener("click", function (e) {
+const priorityPopup = popups.priority;
+priorityPopup.ctn.addEventListener("click", function (e) {
   e.stopPropagation();
 });
-popups.comment.ctn.addEventListener("click", function (e) {
+const commentPopup = popups.comment;
+commentPopup.ctn.addEventListener("click", function (e) {
   e.stopPropagation();
 });
-todoForm.modal.addEventListener("click", () => {
-  todoPopupEvents.close;
-});
-todoForm.cancelBtn.addEventListener("click", todoPopupEvents.close);
-todoForm.commentBtn.addEventListener("click", () =>
-  todoPopupEvents.onIconBtn(popups.comment, todoForm.commentBtn)
+modalForm.ctn.addEventListener("click", () => todoPopupEvents.close(modalForm));
+modalForm.cancelBtn.addEventListener("click", () =>
+  todoPopupEvents.close(modalForm)
 );
-todoForm.priorityBtn.addEventListener("click", () =>
-  todoPopupEvents.onIconBtn(popups.priority, todoForm.priorityBtn)
+modalForm.commentBtn.addEventListener("click", () =>
+  todoPopupEvents.onIconBtn(popups.comment, todoForm.modalForm.commentBtn)
 );
-popups.comment.textarea.oninput = () => {
-  popups.comment.textarea.value
-    ? todoForm.changeCommentBtn("not empty")
-    : todoForm.changeCommentBtn("empty");
+modalForm.priorityBtn.addEventListener("click", () =>
+  todoPopupEvents.onIconBtn(popups.priority, modalForm.priorityBtn)
+);
+commentPopup.textarea.oninput = () => {
+  commentPopup.textarea.value
+    ? todoForm.findActiveForm().changeCommentBtn("not empty")
+    : todoForm.findActiveForm().changeCommentBtn("empty");
 };
-popups.comment.closeBtn.addEventListener("click", popups.hide);
+commentPopup.closeBtn.addEventListener("click", popups.hide);
 window.onresize = function movePopups() {
-  var activePopup = findActivePopup();
+  var activePopup = popups.findActivePopup();
   if (!activePopup) return;
   var btn = document.querySelector(
     `[data-id = "${activePopup.ctn.dataset.btn}"]`
   );
   activePopup.position(btn);
-
-  function findActivePopup() {
-    var ctn = document.querySelector(".active.popup-popup");
-    var activePopup = Object.keys(popups).find(
-      (key) => popups[key].ctn === ctn
-    );
-    return popups[activePopup];
-  }
 };
-popups.priority.btns.forEach((btn) =>
+priorityPopup.btns.forEach((btn) =>
   btn.addEventListener("click", function (e) {
-    popups.priority.onSelect(e);
+    todoPopupEvents.onSelectPriorityLevel(e);
   })
 );
-todoForm.titleInput.oninput = todoForm.activateAddBtn;
+contentForm.addBtn.addEventListener("click", () =>
+  todoPopupEvents.onAddTodo(contentForm)
+);
+contentForm.cancelBtn.addEventListener("click", () =>
+  contentEvents.closeForm(content.pjCtn)
+);
+contentForm.priorityBtn.addEventListener("click", () => {
+  todoPopupEvents.onIconBtn(popups.priority, contentForm.priorityBtn);
+});
+contentForm.commentBtn.addEventListener("click", () =>
+  todoPopupEvents.onIconBtn(popups.comment, contentForm.commentBtn)
+);
+const editorForm = todoForm.editor;
+editorForm.priorityBtn.addEventListener("click", function showPriorityPopup() {
+  popups.priority.show();
+  popups.priority.setDataBtn(`${editorForm.priorityBtn.dataset.id}`);
+  popups.priority.position(editorForm.priorityBtn);
+  (function setDefaultPriority() {
+    var todo = helpers.findItem(listOfTodos, editorForm.ctn.dataset.id);
+    popups.priority.setActive(todo.priority);
+  })();
+});
+
+editorForm.saveBtn.addEventListener("click", () => {
+  var todo = helpers.findItem(listOfTodos, editorForm.ctn.dataset.id);
+  var prioritySelected = priorityPopup.ctn.querySelector(".active");
+  todo.saveEdits(editorForm, prioritySelected);
+  todo.content.refresh();
+  editorForm.ctn.remove();
+  helpers.hide(editorForm.ctn);
+  todo.appendContent();
+});
+
+editorForm.cancelBtn.addEventListener("click", () => {
+  editorForm.ctn.remove();
+  helpers.hide(editorForm.ctn);
+  var todo = helpers.findItem(listOfTodos, editorForm.ctn.dataset.id);
+  todo.appendContent();
+});
 
 const contentEvents = {
   showSortPopup() {
@@ -304,15 +373,17 @@ const contentEvents = {
     activeCtn.refresh();
   },
   showForm(ctn) {
-    todoPopupEvents.fillPjInput(content.todoForm);
-    content.todoForm.dateInput.value = today.getToday();
-    ctn.todoList.appendChild(content.todoForm.ctn);
+    contentEvents.closeOpenEditors();
+    todoPopupEvents.fillPjInput(contentForm);
+    contentForm.setDefaultDate();
+    ctn.todoList.appendChild(contentForm.ctn);
+    helpers.show(contentForm.ctn);
     ctn.todoBtn.remove();
   },
   closeForm() {
     var activeCtn = content.findActiveCtn();
     if (!activeCtn) return;
-    content.todoForm.ctn.remove();
+    helpers.hide(contentForm.ctn);
     if (activeCtn === content.upcomingCtn)
       return content.upcomingCtn.sections.forEach((section) =>
         section.todoList.appendChild(section.todoBtn)
@@ -323,8 +394,27 @@ const contentEvents = {
     var defaultPj = content.todoForm.pjInput.querySelector(
       `[value="${content.pjCtn.main.dataset.project}"]`
     );
+    console.log(defaultPj);
 
     defaultPj.setAttribute("selected", "selected");
+  },
+  closeOpenEditors() {
+    var openEditor = document.querySelector(".todo-editor:not(.inactive)");
+    if (!openEditor) return;
+    if (openEditor.classList.contains("new-todo-form")) {
+      var activeCtn = content.findActiveCtn();
+      contentEvents.closeForm(activeCtn);
+      return;
+    }
+    if (!openEditor.dataset.id) return;
+    var openTodo = helpers.findItem(listOfTodos, openEditor.dataset.id);
+    var prioritySelected = priorityPopup.ctn.querySelector(".active");
+    openTodo.saveEdits(editorForm, prioritySelected);
+    openTodo.content.refresh();
+    openTodo.appendContent();
+
+    editorForm.ctn.remove();
+    helpers.hide(editorForm.ctn);
   },
 };
 content.pjCtn.todoBtn.addEventListener("click", () => {
@@ -343,102 +433,38 @@ content.upcomingCtn.sections.forEach((section) => {
   });
 });
 content.pjCtn.sortBtn.addEventListener("click", contentEvents.showSortPopup);
-popups.sort.dateBtn.addEventListener("click", () => onSort("date"));
-popups.sort.priorityBtn.addEventListener("click", () => onSort("priority"));
-popups.sort.alphabetBtn.addEventListener("click", () => onSort("alphabet"));
-content.pjCtn.sortedBtn.addEventListener("click", () => onSort("reverse"));
-content.todoForm.addBtn.addEventListener("click", () =>
-  todoPopupEvents.onAddTodo(content.todoForm)
+popups.sort.dateBtn.addEventListener("click", () =>
+  contentEvents.onSort("date")
 );
-content.todoForm.cancelBtn.addEventListener("click", () =>
-  contentEvents.closeForm(content.pjCtn)
+popups.sort.priorityBtn.addEventListener("click", () =>
+  contentEvents.onSort("priority")
 );
-content.todoForm.priorityBtn.addEventListener("click", () => {
-  todoPopupEvents.onIconBtn(popups.priority, content.todoForm.priorityBtn);
+popups.sort.alphabetBtn.addEventListener("click", () =>
+  contentEvents.onSort("alphabet")
+);
+content.pjCtn.sortedBtn.addEventListener("click", () =>
+  contentEvents.onSort("reverse")
+);
+
+var pjWork = pjFact.createProject("Work");
+var pjHome = pjFact.createProject("Home");
+var pjCode = pjFact.createProject("Code");
+
+todoFact.createTodo(pjWork.id, "fdlka", "2021-06-01", "4", {
+  text: [],
+  date: [],
 });
-content.todoForm.commentBtn.addEventListener("click", () =>
-  todoPopupEvents.onIconBtn(popups.comment, content.todoForm.commentBtn)
-);
+pjWork.pushToList();
+pjHome.pushToList();
+pjCode.pushToList();
 
-function onSelectPriorityLevel(e) {
-  this.removeActive();
-  var btn = e.target.closest(".btn");
-  var icon = btn.querySelector(".flaticon");
-  btn.dataset.selected = "true";
-  btn.classList.add("active");
-  if (todoForm.formModal.classList.contains("inactive")) return;
-  todoForm.changeFlagIcon(icon.style.color, btn.dataset.value);
-}
-function addTodoCtnEvents(todo) {
-  var dayInput = todo.content.main.querySelector(".day-btn");
-  dayInput.addEventListener("change", changeTodoDay);
-  function changeTodoDay() {
-    todo.day = dayInput.value;
-  }
-
-  var commentsBtn = todo.content.main.querySelectorAll(".notes-btn");
-  commentsBtn.forEach((btn) => btn.addEventListener("click", showCommentForm));
-  function showCommentForm() {
-    helpers.show(commentModal.modal);
-    var pj = helpers.findItem(listOfPjs, todo.project);
-    commentModal.attachTodoId(todo.id);
-    commentModal.changePjTitle(pj.title);
-    commentModal.changeTodoTitle(todo.title);
-    if (!todo.notes) return;
-    for (var i = 0; i < todo.notes.text.length; i++) {
-      commentModal.fillCommentList(todo.notes.text[i], todo.notes.date[i]);
-    }
-  }
-
-  var editBtn = todo.content.main.querySelector(".edit-btn");
-  editBtn.addEventListener("click", showEditor);
-  function showEditor() {
-    closeOtherEditors();
-    (function addPjOptions() {
-      var select = todo.editor.main.querySelector("select");
-      listOfPjs.forEach((pj) => pj.addToForm(select));
-    })();
-    (function setDefaultOption() {
-      var options = todo.editor.main.querySelectorAll("option");
-      var defaultOption = Array.from(options).find((option) => {
-        return option.value.toString() === todo.project.toString();
-      });
-      defaultOption.setAttribute("selected", "selected");
-    })();
-    todo.appendEditor();
-
-    function closeOtherEditors() {
-      var openEditor = document.querySelector(".todo-editor");
-      if (!openEditor) return;
-      if (openEditor.classList.contains("new-todo-form")) {
-        var activeCtn = content.findActiveCtn();
-        return contentEvents.closeForm(activeCtn);
-      }
-      var openTodo = helpers.findItem(listOfTodos, openEditor.dataset.todo);
-
-      openTodo.saveEdits();
-      openTodo.content.refresh();
-      openTodo.appendContent();
-    }
-  }
-
-  var priorityBtn = todo.editor.main.querySelector(".priority-btn");
-  priorityBtn.addEventListener("click", showPriorityPopup);
-  function showPriorityPopup() {
-    popups.priority.show();
-    popups.priority.setDataBtn(`priority-${todo.id}`);
-    popups.priority.position(priorityBtn);
-    (function setDefaultPriority() {
-      popups.priority.setActive(todo.priority);
-    })();
-  }
-
-  var saveBtn = todo.editor.main.querySelector(".save-btn");
-  saveBtn.addEventListener("click", () => {
-    todo.saveEdits();
-    todo.content.refresh();
-  });
-
-  var cancelBtn = todo.editor.main.querySelector(".cancel-btn");
-  cancelBtn.addEventListener("click", () => todo.appendContent());
-}
+(function init() {
+  samples.generate(50);
+  listOfTodos.forEach((todo) => todoPopupEvents.addTodoCtnEvents(todo));
+  (function displayPjs() {
+    listOfPjs.forEach((pj) => {
+      pj.addToMenu().addEventListener("click", (e) => menuEvents.showPj(e));
+    });
+  })();
+  menuEvents.showToday();
+})();

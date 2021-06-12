@@ -21,11 +21,14 @@ const samples = (() => {
         }
         function getRandomDay() {
           var currentYear = new Date().getFullYear();
-          var yearBegin = new Date(currentYear, 0, 1);
-          var yearEnd = new Date(currentYear, 11, 31);
+          var today = new Date();
+          var todayDay = today.getDate();
+          today.setDate(todayDay - 1);
+          var nextWeek = new Date();
+          nextWeek.setDate(todayDay + 7);
           var randomDay = new Date(
-            yearBegin.getTime() +
-              Math.random() * (yearEnd.getTime() - yearBegin.getTime())
+            today.getTime() +
+              Math.random() * (nextWeek.getTime() - today.getTime())
           );
 
           var randomDayMonth = randomDay.getMonth() + 1;

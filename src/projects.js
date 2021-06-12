@@ -51,20 +51,34 @@ todoFactory.prototype.createTodo = function (
   priority,
   notes
 ) {
-  var todoId = this.id;
   function getTodo(id) {
     var todo = helpers.findItem(listOfTodos, id);
     return todo;
   }
 
   function appendContent() {
-    this.editor.main.remove();
     this.ctn.appendChild(this.content.main);
   }
 
-  function appendEditor() {
+  function appendEditor(editor) {
     this.content.main.remove();
-    this.ctn.appendChild(this.editor.main);
+    this.ctn.appendChild(editor.ctn);
+    editor.titleInput.value = this.title;
+    editor.dateInput.value = this.day;
+    this.priority === "4"
+      ? editor.priorityIcon.setAttribute("class", "flaticon flaticon-flag")
+      : editor.priorityIcon.setAttribute("class", "flaticon flaticon-flag-1");
+    switch (this.priority) {
+      case "1":
+        editor.priorityIcon.style.color = "rgb(209, 69, 59)";
+        break;
+      case "2":
+        editor.priorityIcon.style.color = "rgb(235, 137, 9)";
+        break;
+      case "3":
+        editor.priorityIcon.style.color = "rgb(36, 111, 224)";
+        break;
+    }
   }
 
   return {
@@ -192,6 +206,7 @@ todoFactory.prototype.createTodo = function (
           var todo = getTodo(todoId);
           titleCtn.textContent = todo.title;
           dayInput.value = todo.day;
+          console.log(todo.priority);
           switch (todo.priority) {
             case "1":
               checkbox.classList.add("priority-1");
@@ -215,128 +230,6 @@ todoFactory.prototype.createTodo = function (
           var count = notes.text.length;
           todoCommentsCount.textContent = count;
           helpers.show(todoComments);
-        },
-      };
-    }.call(this),
-    editor: function createEditor() {
-      var todoId = this.id;
-
-      var editor = document.createElement("form");
-      editor.classList.add("todo-editor");
-      editor.dataset.todo = this.id;
-
-      var editorArea = document.createElement("div");
-      editorArea.classList.add("editor-area");
-
-      var titleInput = document.createElement("input");
-      titleInput.setAttribute("type", "text");
-      titleInput.value = title;
-
-      var extraDetails = document.createElement("div");
-      extraDetails.classList.add("editor-extra-details");
-
-      var lhCtn = document.createElement("div");
-      lhCtn.classList.add("lh-ctn");
-
-      var dayInput = document.createElement("input");
-      (function createDayBtn() {
-        var dayBtn = document.createElement("button");
-        dayBtn.setAttribute("type", "button");
-        dayBtn.classList.add("day-btn", "btn");
-        dayInput.setAttribute("type", "date");
-        dayInput.value = day;
-        dayBtn.appendChild(dayInput);
-        lhCtn.appendChild(dayBtn);
-      })();
-
-      var pjInput = document.createElement("select");
-      (function createPjBtn() {
-        var pjBtn = document.createElement("button");
-        pjBtn.setAttribute("type", "button");
-        pjBtn.classList.add("btn", "editor-pj-btn");
-
-        var icon = document.createElement("i");
-        icon.classList.add("flaticon", "flaticon-folder");
-
-        var noneOption = document.createElement("option");
-        noneOption.value = "None";
-        noneOption.textContent = "None";
-        pjInput.appendChild(noneOption);
-
-        pjBtn.appendChild(icon);
-        pjBtn.appendChild(pjInput);
-        lhCtn.appendChild(pjBtn);
-      })();
-
-      var rhCtn = document.createElement("div");
-      rhCtn.classList.add("rh-ctn");
-
-      var priorityBtn = document.createElement("button");
-
-      (function createPriorityBtn() {
-        priorityBtn.dataset.id = `priority-${todoId}`;
-        priorityBtn.setAttribute("type", "button");
-        priorityBtn.classList.add("btn", "icon-btn", "priority-btn");
-        var icon = document.createElement("i");
-        priority === "4"
-          ? icon.classList.add("flaticon", "flaticon-flag")
-          : icon.classList.add("flaticon", "flaticon-flag-1");
-        var priorityLevel;
-        switch (priority) {
-          case "1":
-            priorityLevel = "rgb(209, 69, 59)";
-            break;
-          case "2":
-            priorityLevel = "rgb(235, 137, 9)";
-            break;
-          case "3":
-            priorityLevel = "rgb(36, 111, 224)";
-            break;
-        }
-        icon.style.color = priorityLevel;
-        priorityBtn.appendChild(icon);
-
-        rhCtn.appendChild(priorityBtn);
-      })();
-
-      var editorActions = document.createElement("div");
-      editorActions.classList.add("editor-actions");
-
-      (function createSaveBtn() {
-        var btn = document.createElement("button");
-        btn.setAttribute("type", "button");
-        btn.classList.add("btn", "act-btn", "save-btn");
-        btn.dataset.todo = todoId;
-        btn.textContent = "Save";
-
-        editorActions.appendChild(btn);
-      })();
-      (function createCancelBtn() {
-        var btn = document.createElement("button");
-        btn.setAttribute("type", "button");
-        btn.classList.add("btn", "act-btn", "cancel-btn");
-        btn.dataset.todo = todoId;
-        btn.textContent = "Cancel";
-
-        editorActions.appendChild(btn);
-      })();
-
-      extraDetails.appendChild(lhCtn);
-      extraDetails.appendChild(rhCtn);
-
-      editorArea.appendChild(titleInput);
-      editorArea.appendChild(extraDetails);
-
-      editor.appendChild(editorArea);
-      editor.appendChild(editorActions);
-
-      return {
-        main: editor,
-        titleInput: titleInput,
-        dayInput: dayInput,
-        pjInput: pjInput,
-        priorityInput: () => {
-          return popups.priority.ctn.querySelector(".active");
         },
       };
     }.call(this),
@@ -368,7 +261,7 @@ todoFactory.prototype.createTodo = function (
       this.day = date;
       return this;
     },
-    editPriorirty(level) {
+    editPriority(level) {
       this.priority = level;
       return this;
     },
@@ -376,12 +269,11 @@ todoFactory.prototype.createTodo = function (
       this.project = id;
       return this;
     },
-    saveEdits() {
-      this.editTitle(this.editor.titleInput.value)
-        .editDay(this.editor.dayInput.value)
-        .editProject(this.editor.pjInput.value)
-        .editPriorirty(this.editor.priorityInput().dataset.value)
-        .appendContent();
+    saveEdits(editor, prioritySelected) {
+      this.editTitle(editor.titleInput.value)
+        .editDay(editor.dateInput.value)
+        .editProject(editor.pjInput.value)
+        .editPriority(prioritySelected.dataset.value);
     },
   };
 };
