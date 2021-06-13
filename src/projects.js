@@ -1,6 +1,5 @@
 export { pjFact, todoFact, listOfPjs, listOfTodos };
 import { helpers } from "./helpers.js";
-import { popups } from "./popups.js";
 
 let listOfPjs = [];
 let listOfTodos = [];
@@ -9,11 +8,21 @@ function pjFactory() {
   this.id = 1;
 }
 pjFactory.prototype.createProject = function (title) {
-  var todoList = [];
+  let todoList = [];
+
   return {
     id: this.id++,
     title,
     todoList,
+    menuItem: function () {
+      var pjLink = document.createElement("li");
+      pjLink.classList.add("pj-list-item", "btn");
+      pjLink.textContent = title;
+      pjLink.dataset.project = this.id - 1;
+      var pjMenu = document.querySelector("#pj-list");
+      pjMenu.appendChild(pjLink);
+      return pjLink;
+    }.call(this),
     pushToList() {
       listOfPjs.push(this);
     },
@@ -24,16 +33,11 @@ pjFactory.prototype.createProject = function (title) {
 
       input.appendChild(pjOption);
     },
-    addToMenu() {
-      var pjLink = document.createElement("li");
-      pjLink.classList.add("pj-list-item", "btn");
-      pjLink.textContent = title;
-      pjLink.dataset.project = this.id;
-      var pjMenu = document.querySelector("#pj-list");
-      pjMenu.appendChild(pjLink);
-      return pjLink;
+    del() {
+      this.menuItem.remove();
+      const index = listOfPjs.findIndex((pj) => pj.id === this.id);
+      listOfPjs.splice(index, 1);
     },
-    del() {},
     editTitle(str) {
       this.title = str;
     },
@@ -56,32 +60,12 @@ todoFactory.prototype.createTodo = function (
     return todo;
   }
 
-  function appendContent() {
-    this.ctn.appendChild(this.content.main);
-  }
-
-  function appendEditor(editor) {
-    this.content.main.remove();
-    this.ctn.appendChild(editor.ctn);
-    editor.titleInput.value = this.title;
-    editor.dateInput.value = this.day;
-    this.priority === "4"
-      ? editor.priorityIcon.setAttribute("class", "flaticon flaticon-flag")
-      : editor.priorityIcon.setAttribute("class", "flaticon flaticon-flag-1");
-    switch (this.priority) {
-      case "1":
-        editor.priorityIcon.style.color = "rgb(209, 69, 59)";
-        break;
-      case "2":
-        editor.priorityIcon.style.color = "rgb(235, 137, 9)";
-        break;
-      case "3":
-        editor.priorityIcon.style.color = "rgb(36, 111, 224)";
-        break;
-    }
-  }
-
   return {
+    project,
+    title,
+    day,
+    priority,
+    notes,
     ctn: function createCtn() {
       var todoItem = document.createElement("li");
       todoItem.dataset.todo = this.id;
@@ -89,11 +73,6 @@ todoFactory.prototype.createTodo = function (
 
       return todoItem;
     }.call(this),
-    project,
-    title,
-    day,
-    priority,
-    notes,
     content: function createContent() {
       var todoId = this.id;
       var content = document.createElement("div");
@@ -108,19 +87,19 @@ todoFactory.prototype.createTodo = function (
         checkboxInput.setAttribute("type", "checkbox");
         switch (priority) {
           case "1":
-            checkbox.classList.add("priority-1");
+            checkbox.setAttribute("class", "priority-1 checkbox");
             checkbox.style.borderColor = "rgb(209, 69, 59)";
             break;
           case "2":
-            checkbox.classList.add("priority-2");
+            checkbox.setAttribute("class", "priority-2 checkbox");
             checkbox.style.borderColor = "rgb(235, 137, 9)";
             break;
           case "3":
-            checkbox.classList.add("priority-3");
+            checkbox.setAttribute("class", "priority-3 checkbox");
             checkbox.style.borderColor = "rgb(36, 111, 224)";
             break;
           case "4":
-            checkbox.classList.add("priority-4");
+            checkbox.setAttribute("class", "priority-4 checkbox");
             checkbox.style.border = "1px solid rgba(32,32,32,0.6)";
             break;
         }
@@ -206,7 +185,6 @@ todoFactory.prototype.createTodo = function (
           var todo = getTodo(todoId);
           titleCtn.textContent = todo.title;
           dayInput.value = todo.day;
-          console.log(todo.priority);
           switch (todo.priority) {
             case "1":
               checkbox.classList.add("priority-1");
@@ -234,8 +212,29 @@ todoFactory.prototype.createTodo = function (
       };
     }.call(this),
     id: this.id++,
-    appendContent,
-    appendEditor,
+    appendContent() {
+      this.ctn.appendChild(this.content.main);
+    },
+    appendEditor(editor) {
+      this.content.main.remove();
+      this.ctn.appendChild(editor.ctn);
+      editor.titleInput.value = this.title;
+      editor.dateInput.value = this.day;
+      this.priority === "4"
+        ? editor.priorityIcon.setAttribute("class", "flaticon flaticon-flag")
+        : editor.priorityIcon.setAttribute("class", "flaticon flaticon-flag-1");
+      switch (this.priority) {
+        case "1":
+          editor.priorityIcon.style.color = "rgb(209, 69, 59)";
+          break;
+        case "2":
+          editor.priorityIcon.style.color = "rgb(235, 137, 9)";
+          break;
+        case "3":
+          editor.priorityIcon.style.color = "rgb(36, 111, 224)";
+          break;
+      }
+    },
     pushToList() {
       listOfTodos.push(this);
     },
@@ -244,9 +243,12 @@ todoFactory.prototype.createTodo = function (
       project.todoList.push(this);
     },
     del() {
-      var index = helpers.findItem(listOfTodos, this.id);
+      this.ctn.remove();
+      const index = listOfTodos.findIndex((todo) => todo.id === this.id);
       listOfTodos.splice(index, 1);
-      var pjIndex = helpers.findItem(this.project.todoList, this.id);
+      const pjIndex = this.project.todoList.findIndex(
+        (todo) => todo.id === this.id
+      );
       this.project.todoList.splice(pjIndex, 1);
     },
     editTitle(str) {

@@ -103,6 +103,8 @@ const content = (() => {
       text.textContent = str;
       btn.appendChild(text);
 
+      btn.dataset.id = `${this.main.id}-${str}`;
+
       return btn;
     },
     createTodoList() {
@@ -133,6 +135,19 @@ const content = (() => {
   const todayCtn = createCtn("today");
   var todayStr = new Date().toString().slice(0, 10);
   todayCtn.title.innerHTML = `<span>Today</span><small>${todayStr}</small>`;
+  todayCtn.actionCtn = todayCtn.createActionCtn();
+  todayCtn.headerContent.ctn.appendChild(todayCtn.actionCtn);
+  todayCtn.sortedBtn = todayCtn.createIconBtn("flaticon", "sorted-btn", "");
+  todayCtn.sortedBtn.classList.add("inactive");
+  todayCtn.sortedBtnIcon = todayCtn.sortedBtn.querySelector(".flaticon");
+  todayCtn.sortedBtnText = todayCtn.sortedBtn.querySelector(".btn-text");
+  todayCtn.sortBtn = todayCtn.createIconBtn(
+    "flaticon-sort",
+    "sort-btn",
+    "Sort"
+  );
+  todayCtn.actionCtn.appendChild(todayCtn.sortedBtn);
+  todayCtn.actionCtn.appendChild(todayCtn.sortBtn);
   todayCtn.todoBtn = todayCtn.createNewTodoBtn();
   todayCtn.todoList = todayCtn.createTodoList();
   todayCtn.todoList.appendChild(todayCtn.todoBtn);

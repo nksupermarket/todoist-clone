@@ -11,7 +11,6 @@ const popups = (() => {
       popups.hide();
       helpers.show(modal);
       helpers.show(this.ctn);
-      this.ctn.classList.add("active");
     },
     setDataBtn(value) {
       this.ctn.dataset.btn = value;
@@ -52,6 +51,8 @@ const popups = (() => {
   function createPopup(name) {
     var popup = Object.create(popupMethods);
     popup.ctn = modal.querySelector(`#${name}-popup`);
+    list.push(popup);
+
     return popup;
   }
 
@@ -92,23 +93,32 @@ const popups = (() => {
   sort.priorityBtn = sort.ctn.querySelector("#sort-priority-btn");
   sort.alphabetBtn = sort.ctn.querySelector("#sort-alphabet-btn");
 
+  const del = createPopup("delete");
+  del.text = del.ctn.querySelector(".delete-popup-text");
+  del.deleteBtn = del.ctn.querySelector(".delete-act-btn");
+  del.cancelBtn = del.ctn.querySelector(".cancel-act-btn");
+  del.updateText = function (str) {
+    this.text.textContent + `${str}?`;
+  };
+
   return {
     modal,
     priority,
     comment,
     sort,
+    del,
     hide() {
       helpers.hide(modal);
-      var popups = modal.querySelectorAll(".popup-popup");
-      popups.forEach((popup) => {
-        popup.classList.remove("active");
-        helpers.hide(popup);
+      list.forEach((popup) => {
+        helpers.hide(popup.ctn);
       });
+      this.modal.classList.remove("modal-full");
     },
     findActivePopup() {
-      return this.comment.ctn.classList.contains("active")
-        ? this.comment
-        : this.priority;
+      return list.find((popup) => !popup.ctn.classList.contains("inactive"));
+    },
+    toggleModalFull() {
+      this.modal.classList.toggle("modal-full");
     },
   };
 })();

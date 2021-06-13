@@ -7,7 +7,7 @@ const todoForm = (() => {
   let list = [];
 
   const formMethods = {
-    activateAddBtn() {
+    changeAddBtn() {
       this.titleInput.value
         ? this.addBtn.classList.remove("deactive")
         : this.addBtn.classList.add("deactive");
@@ -32,9 +32,10 @@ const todoForm = (() => {
     },
     hide() {
       helpers.hide(this.ctn);
+      this.form != undefined ? this.form.reset() : this.ctn.reset();
       this.resetPriorityIcon();
+      this.changeAddBtn();
       this.commentIcon.classList.remove("flaticon-comment-1");
-      this.form.reset();
     },
   };
 

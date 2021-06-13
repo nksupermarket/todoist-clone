@@ -128,6 +128,9 @@ select {
 .popup-popup {
   position: absolute;
 }
+.centered-popup {
+  width: 400px;
+}
 .popup-ctn,
 #comment-popup textarea {
   position: relative;
@@ -151,6 +154,18 @@ select {
 }
 .popup-ctn {
   box-sizing: border-box;
+}
+.popup-body {
+  padding: 2rem 2.4rem;
+}
+.popup-actions {
+  border-top: 1px solid #ddd;
+  padding: 1.2rem 2.4rem;
+  display: flex;
+  justify-content: flex-end;
+}
+.popup-actions button {
+  margin-left: 1rem;
 }
 .dropdown-select {
   box-shadow: 0 0.1rem 0.8rem 0 rgba(0, 0, 0, 0.08);
@@ -688,6 +703,15 @@ main .new-todo-btn:hover {
 .editor-actions {
   padding-top: 1rem;
 }
+.cancel-act-btn {
+  background-color: #f3f3f3;
+  border: 1px solid #ddd;
+}
+.cancel-act-btn:hover {
+  border-color: #999;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+.delete-act-btn,
 .add-todo-btn,
 .save-btn {
   background-color: var(--header-bg);

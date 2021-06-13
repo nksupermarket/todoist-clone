@@ -74,12 +74,6 @@
         </div>
       </div>
       <main id="content">
-        <!-- <header class="view-header view-content">
-          <div class="view-header-content">
-            <h2 class="content-title">Title</h2>
-          </div>
-        </header>
-        <ul class="todo-list view-content"></ul> -->
         <form class="todo-editor inactive">
           <div class="editor-area">
             <input class="title-input" type="text" />
@@ -188,6 +182,21 @@
       </form>
     </div>
     <div class="modal inactive" id="popup-modal">
+      <div id="delete-popup" class="centered-popup inactive">
+        <div class="popup popup-ctn">
+          <section class="popup-body">
+            <p class="delete-popup-text">Are you sure you want to delete</p>
+          </section>
+          <div class="popup-actions">
+            <button class="btn act-btn cancel-act-btn" type="button">
+              Cancel
+            </button>
+            <button class="btn act-btn delete-act-btn" type="button">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
       <div id="comment-popup" class="popup-popup inactive">
         <div class="popup popup-ctn">
           <header>
@@ -243,7 +252,7 @@
           </ul>
         </div>
       </div>
-      <div class="popup-popup" id="sort-popup">
+      <div class="popup-popup inactive" id="sort-popup">
         <div class="popup-ctn popup dropdown-select">
           <ul id="sort-ctn">
             <li class="sort-selection-btn btn" id="sort-date-btn">
