@@ -43,9 +43,10 @@ const commentModal = (() => {
     },
     close() {
       helpers.hide(modal);
-      form.removeAttribute("data-todo");
+      this.form.dataset.itemType = "";
+      this.form.dataset.itemId = "";
       commentList.textContent = "";
-      textarea.value = "";
+      this.textarea.value = "";
     },
   };
 })();

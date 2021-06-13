@@ -131,12 +131,6 @@ menu.newBtn.addEventListener("click", menuEvents.showPjForm);
 menu.addBtn.addEventListener("click", menuEvents.onAddPj);
 menu.cancelBtn.addEventListener("click", menuEvents.hidePjForm);
 
-commentModal.form.addEventListener("click", (e) => {
-  e.stopPropagation();
-});
-commentModal.modal.addEventListener("click", commentModal.close);
-commentModal.closeBtn.addEventListener("click", commentModal.close);
-
 const todoFormEvents = {
   fillPjInput(form) {
     var options = form.pjInput.querySelectorAll("option");
@@ -194,7 +188,14 @@ const todoFormEvents = {
 
     const commentsBtn = todo.content.main.querySelectorAll(".notes-btn");
     commentsBtn.forEach((btn) =>
-      btn.addEventListener("click", () => contentEvents.showCommentForm())
+      btn.addEventListener("click", () =>
+        contentEvents.showCommentForm(
+          "todo",
+          todo.id,
+          helpers.findItem(listOfPjs, todo.project).title,
+          todo.title
+        )
+      )
     );
 
     const editBtn = todo.content.editBtn;
@@ -333,17 +334,17 @@ const popupEvents = {
 
     const item = helpers.findItem(list, commentModal.form.dataset.itemId);
 
-    const note = textarea.value;
+    const note = commentModal.textarea.value;
     const date = today.getToday();
 
-    item.notes.text[todo.notes.text.length] = note;
-    item.notes.date[todo.notes.date.length] = date;
+    item.notes.text[item.notes.text.length] = note;
+    item.notes.date[item.notes.date.length] = date;
 
-    commentModal.fillCommentList(note, date);
+    commentModal.attachNote(note, date);
     if (commentModal.form.dataset.item === "todo")
       item.content.updateCommentCounter();
 
-    textarea.value = "";
+    commentModal.textarea.value = "";
   },
 };
 commentPopup.textarea.oninput = () => {
@@ -377,10 +378,17 @@ deletePopup.ctn.addEventListener("click", (e) => e.stopPropagation());
 deletePopup.cancelBtn.addEventListener("click", popups.hide);
 deletePopup.deleteBtn.addEventListener("click", popupEvents.onDelete);
 
+commentModal.addBtn.addEventListener("click", popupEvents.onAddComment);
+commentModal.form.addEventListener("click", (e) => {
+  e.stopPropagation();
+});
+commentModal.modal.addEventListener("click", commentModal.close);
+commentModal.closeBtn.addEventListener("click", commentModal.close);
+
 const contentEvents = {
   showCommentForm(itemType, itemID, pjTitle, todoTitle) {
     helpers.show(commentModal.modal);
-    commentModal.setDataItem(itemType);
+    commentModal.setDataItemType(itemType);
     commentModal.setDataItemID(itemID);
     commentModal.changePjTitle(pjTitle);
     commentModal.changeTodoTitle(todoTitle);
