@@ -98,9 +98,14 @@ const popups = (() => {
   del.deleteBtn = del.ctn.querySelector(".delete-act-btn");
   del.cancelBtn = del.ctn.querySelector(".cancel-act-btn");
   del.updateText = function (str) {
-    this.text.textContent + `${str}?`;
+    this.text.textContent = `Are you sure you want to delete ${str}?`;
   };
-
+  del.setDataItemType = function (str) {
+    this.ctn.dataset.itemType = str;
+  };
+  del.setDataItemID = function (str) {
+    this.ctn.dataset.itemId = str;
+  };
   return {
     modal,
     priority,

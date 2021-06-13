@@ -3,17 +3,20 @@ import { helpers } from "./helpers.js";
 import { listOfTodos } from "./projects.js";
 
 const content = (() => {
-  var main = document.getElementById("content");
+  const main = document.getElementById("content");
+  let list = [];
 
   const ctnMethods = {
     removeTodos() {
       var todoCtns = this.main.querySelectorAll(".todo-ctn");
-      if (todoCtns.length === 0) return;
+      if (todoCtns.length === 0) return this;
       todoCtns.forEach((todo) => todo.remove());
+      return this;
     },
     hideSortedBtn() {
-      if (!this.sortedBtn) return;
+      if (!this.sortedBtn) return this;
       helpers.hide(this.sortedBtn);
+      return this;
     },
     sortDate() {
       this.todoArray.sort(dueDateAscending);
@@ -46,10 +49,12 @@ const content = (() => {
       this.todoArray.reverse();
     },
     refresh() {
+      let fragment = document.createDocumentFragment();
       this.todoArray.forEach((todo) => todo.ctn.remove());
-      this.todoArray.forEach((todo) => this.todoList.appendChild(todo.ctn));
-      this.todoBtn.remove();
-      this.todoList.appendChild(this.todoBtn);
+      this.todoArray.forEach((todo) => fragment.appendChild(todo.ctn));
+      fragment.appendChild(this.todoBtn);
+      this.todoList.appendChild(fragment);
+      return this;
     },
     createHeader() {
       var header = document.createElement("header");
@@ -128,6 +133,8 @@ const content = (() => {
     ctn.main.appendChild(ctn.header);
 
     ctn.todoArray = [];
+
+    list.push(ctn);
 
     return ctn;
   }
@@ -225,21 +232,19 @@ const content = (() => {
   pjCtn.main.appendChild(pjCtn.todoList);
 
   return {
+    list,
     main,
     pjCtn,
     todayCtn,
     upcomingCtn,
     findActiveCtn() {
-      var ctns = [todayCtn, pjCtn, upcomingCtn];
-      var activeCtn = ctns.find((ctn) => this.main.contains(ctn.main));
-      return activeCtn;
+      return list.find((ctn) => this.main.contains(ctn.main));
     },
     removeActiveCtn() {
       var activeCtn = this.findActiveCtn();
       if (!activeCtn) return;
       activeCtn.main.remove();
-      activeCtn.hideSortedBtn();
-      return activeCtn;
+      activeCtn.hideSortedBtn().removeTodos();
     },
   };
 })();

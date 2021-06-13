@@ -3,7 +3,6 @@ import { today } from "./today.js";
 export { todoForm };
 
 const todoForm = (() => {
-  var newTodoBtns = document.querySelectorAll(".new-todo-btn");
   let list = [];
 
   const formMethods = {
@@ -133,7 +132,6 @@ const todoForm = (() => {
   list.push(modalForm);
 
   return {
-    newTodoBtns,
     editor,
     modalForm,
     contentForm,

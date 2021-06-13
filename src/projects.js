@@ -14,6 +14,10 @@ pjFactory.prototype.createProject = function (title) {
     id: this.id++,
     title,
     todoList,
+    notes: {
+      text: [],
+      date: [],
+    },
     menuItem: function () {
       var pjLink = document.createElement("li");
       pjLink.classList.add("pj-list-item", "btn");
@@ -74,13 +78,13 @@ todoFactory.prototype.createTodo = function (
       return todoItem;
     }.call(this),
     content: function createContent() {
-      var todoId = this.id;
-      var content = document.createElement("div");
+      const todoId = this.id;
+      const content = document.createElement("div");
       content.classList.add("todo-content");
       content.dataset.todo = this.id;
 
-      var checkbox = document.createElement("span");
-      var checkboxCtn = (function createFinishedCheckbox() {
+      const checkbox = document.createElement("span");
+      const checkboxCtn = (function createFinishedCheckbox() {
         var checkboxCtn = document.createElement("button");
         checkboxCtn.setAttribute("type", "button");
         var checkboxInput = document.createElement("input");
@@ -111,17 +115,17 @@ todoFactory.prototype.createTodo = function (
         return checkboxCtn;
       })();
 
-      var rhCtn = document.createElement("div");
+      const rhCtn = document.createElement("div");
       rhCtn.classList.add("todo-rh-ctn");
 
-      var titleCtn = document.createElement("p");
+      const titleCtn = document.createElement("p");
       (function createTitle() {
         titleCtn.classList.add("todo-title");
         titleCtn.textContent = title;
         rhCtn.appendChild(titleCtn);
       })();
 
-      var details = document.createElement("div");
+      const details = document.createElement("div");
       details.classList.add("todo-details");
       rhCtn.appendChild(details);
 
@@ -132,9 +136,10 @@ todoFactory.prototype.createTodo = function (
         btn.dataset.id = `${name}-${todoId}`;
         return btn;
       }
-      var dayInput = document.createElement("input");
+      let dayBtn;
+      const dayInput = document.createElement("input");
       (function createDayBtn() {
-        var dayBtn = createBtn("day");
+        dayBtn = createBtn("day");
         dayInput.setAttribute("type", "date");
         dayInput.setAttribute("required", "required");
         dayInput.value = day;
@@ -142,8 +147,8 @@ todoFactory.prototype.createTodo = function (
         details.appendChild(dayBtn);
       })();
 
-      var commentsBtn = createBtn("notes");
-      var commentsCount = document.createElement("span");
+      const commentsBtn = createBtn("notes");
+      const commentsCount = document.createElement("span");
       (function createCommentsBtn() {
         commentsBtn.classList.add("icon-btn");
         if (!notes.text[0]) commentsBtn.classList.add("inactive");
@@ -156,12 +161,16 @@ todoFactory.prototype.createTodo = function (
         details.appendChild(commentsBtn);
       })();
 
+      let editBtn;
+      let commentBtn;
+      let deleteBtn;
       (function createActions() {
         var todoActions = document.createElement("div");
         todoActions.classList.add("todo-actions");
-        createIconBtn("edit", "pen");
-        createIconBtn("notes", "comment");
-        createIconBtn("more", "more-1");
+        editBtn = createIconBtn("edit", "pen");
+        commentBtn = createIconBtn("notes", "comment");
+        deleteBtn = createIconBtn("delete", "trash");
+
         function createIconBtn(name, icon) {
           var btn = document.createElement("button");
           btn.setAttribute("type", "button");
@@ -180,6 +189,11 @@ todoFactory.prototype.createTodo = function (
       content.appendChild(checkboxCtn);
       content.appendChild(rhCtn);
       return {
+        dayBtn,
+        commentsBtn,
+        editBtn,
+        commentBtn,
+        deleteBtn,
         main: content,
         refresh() {
           var todo = getTodo(todoId);
@@ -246,10 +260,9 @@ todoFactory.prototype.createTodo = function (
       this.ctn.remove();
       const index = listOfTodos.findIndex((todo) => todo.id === this.id);
       listOfTodos.splice(index, 1);
-      const pjIndex = this.project.todoList.findIndex(
-        (todo) => todo.id === this.id
-      );
-      this.project.todoList.splice(pjIndex, 1);
+      const pj = helpers.findItem(listOfPjs, this.project);
+      const pjIndex = pj.todoList.findIndex((todo) => todo.id === this.id);
+      pj.todoList.splice(pjIndex, 1);
     },
     editTitle(str) {
       this.title = str;
