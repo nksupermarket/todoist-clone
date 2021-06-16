@@ -489,6 +489,14 @@ select {
   font-size: 1.2rem;
   font-weight: 400;
 }
+.header-title-input {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 2.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ddd;
+  padding: 3px 8px 5px;
+}
 #upcoming-ctn header {
   margin-bottom: 0;
 }

@@ -449,6 +449,21 @@ const contentEvents = {
     }
     activeCtn.refresh();
   },
+  onEditPj() {
+    pjCtn.title.classList.add("inactive");
+    pjCtn.editor.ctn.classList.remove("inactive");
+    pjCtn.editor.titleInput.focus();
+    pjCtn.editor.titleInput.value = pjCtn.title.textContent;
+  },
+  saveEditPj() {
+    const pj = helpers.findItem(listOfPjs, pjCtn.main.dataset.project);
+    pj.title = pjCtn.editor.titleInput.value;
+    pjCtn.refreshTitle(listOfPjs);
+  },
+  cancelPjEdit() {
+    pjCtn.title.classList.remove("inactive");
+    pjCtn.editor.classList.add("inactive");
+  },
   showDeletePopup(itemType, itemID, itemTitle) {
     deletePopup.show();
     deletePopup.setDataItemType(itemType);
@@ -518,6 +533,17 @@ upcomingCtn.sections.forEach((section) => {
   });
 });
 pjCtn.sortBtn.addEventListener("click", contentEvents.showSortPopup);
+pjCtn.editBtn.addEventListener("click", contentEvents.onEditPj);
+pjCtn.editor.saveBtn.addEventListener("click", contentEvents.saveEditPj);
+pjCtn.editor.cancelBtn.addEventListener("click", contentEvents.cancelPjEdit);
+pjCtn.commentBtn.addEventListener("click", () =>
+  contentEvents.showCommentForm(
+    "project",
+    pjCtn.main.dataset.project,
+    pjCtn.title.textContent,
+    ""
+  )
+);
 pjCtn.deleteBtn.addEventListener("click", () =>
   contentEvents.showDeletePopup(
     "project",
@@ -541,14 +567,7 @@ pjCtn.sortedBtn.addEventListener("click", () =>
 todayCtn.sortedBtn.addEventListener("click", () =>
   contentEvents.onSort("reverse")
 );
-pjCtn.commentBtn.addEventListener("click", () =>
-  contentEvents.showCommentForm(
-    "project",
-    pjCtn.main.dataset.project,
-    pjCtn.title.textContent,
-    ""
-  )
-);
+
 const init = (() => {
   var pjWork = pjFact.createProject("Work");
   var pjHome = pjFact.createProject("Home");
