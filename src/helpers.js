@@ -19,4 +19,14 @@ const helpers = (() => ({
     var todo = helpers.findItem(list, todoId);
     return todo;
   },
+  createIconBtn(iconName, className) {
+    var btn = document.createElement("button");
+    btn.classList.add("btn", "icon-btn", className);
+
+    var icon = document.createElement("i");
+    icon.classList.add("flaticon", iconName);
+    btn.prepend(icon);
+
+    return btn;
+  },
 }))();

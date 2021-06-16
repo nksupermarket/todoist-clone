@@ -11,7 +11,6 @@ pjFactory.prototype.createProject = function (title) {
   let todoList = [];
 
   return {
-    id: this.id++,
     title,
     todoList,
     notes: {
@@ -19,11 +18,16 @@ pjFactory.prototype.createProject = function (title) {
       date: [],
     },
     menuItem: function () {
-      var pjLink = document.createElement("li");
+      const pjLink = document.createElement("li");
       pjLink.classList.add("pj-list-item", "btn");
       pjLink.textContent = title;
-      pjLink.dataset.project = this.id - 1;
-      var pjMenu = document.querySelector("#pj-list");
+      pjLink.dataset.project = this.id;
+
+      const actionsBtn = helpers.createIconBtn("flaticon-more-1", "more-btn");
+      actionsBtn.dataset.id = `actions-btn-${this.id}`;
+
+      pjLink.appendChild(actionsBtn);
+      const pjMenu = document.querySelector("#pj-list");
       pjMenu.appendChild(pjLink);
       return pjLink;
     }.call(this),
@@ -38,6 +42,7 @@ pjFactory.prototype.createProject = function (title) {
       input.appendChild(pjOption);
     },
     del() {
+      this.todoList.forEach((todo) => todo.del());
       this.menuItem.remove();
       const index = listOfPjs.findIndex((pj) => pj.id === this.id);
       listOfPjs.splice(index, 1);
@@ -45,6 +50,7 @@ pjFactory.prototype.createProject = function (title) {
     editTitle(str) {
       this.title = str;
     },
+    id: this.id++,
   };
 };
 var pjFact = new pjFactory();
@@ -167,19 +173,15 @@ todoFactory.prototype.createTodo = function (
       (function createActions() {
         var todoActions = document.createElement("div");
         todoActions.classList.add("todo-actions");
-        editBtn = createIconBtn("edit", "pen");
-        commentBtn = createIconBtn("notes", "comment");
-        deleteBtn = createIconBtn("delete", "trash");
+        editBtn = createIconBtn("flaticon-pen", "edit-btn");
+        commentBtn = createIconBtn("flaticon-comment", "notes-btn");
+        deleteBtn = createIconBtn("flaticon-trash", "delete-btn");
 
-        function createIconBtn(name, icon) {
-          var btn = document.createElement("button");
-          btn.setAttribute("type", "button");
+        function createIconBtn(iconName, className) {
+          const btn = helpers.createIconBtn(iconName, className);
           btn.dataset.todo = todoId;
-          btn.dataset.id = `${name}-${todoId}`;
-          btn.classList.add(`${name}-btn`, "btn", "icon-btn");
-          var btnIcon = document.createElement("i");
-          btnIcon.classList.add("flaticon", `flaticon-${icon}`);
-          btn.appendChild(btnIcon);
+          btn.dataset.id = `${className}-${todoId}`;
+
           todoActions.appendChild(btn);
           return btn;
         }
@@ -232,22 +234,6 @@ todoFactory.prototype.createTodo = function (
     appendEditor(editor) {
       this.content.main.remove();
       this.ctn.appendChild(editor.ctn);
-      editor.titleInput.value = this.title;
-      editor.dateInput.value = this.day;
-      this.priority === "4"
-        ? editor.priorityIcon.setAttribute("class", "flaticon flaticon-flag")
-        : editor.priorityIcon.setAttribute("class", "flaticon flaticon-flag-1");
-      switch (this.priority) {
-        case "1":
-          editor.priorityIcon.style.color = "rgb(209, 69, 59)";
-          break;
-        case "2":
-          editor.priorityIcon.style.color = "rgb(235, 137, 9)";
-          break;
-        case "3":
-          editor.priorityIcon.style.color = "rgb(36, 111, 224)";
-          break;
-      }
     },
     pushToList() {
       listOfTodos.push(this);
@@ -259,6 +245,7 @@ todoFactory.prototype.createTodo = function (
     del() {
       this.ctn.remove();
       const index = listOfTodos.findIndex((todo) => todo.id === this.id);
+      console.log(listOfTodos[index]);
       listOfTodos.splice(index, 1);
       const pj = helpers.findItem(listOfPjs, this.project);
       const pjIndex = pj.todoList.findIndex((todo) => todo.id === this.id);

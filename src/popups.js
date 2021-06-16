@@ -106,12 +106,39 @@ const popups = (() => {
   del.setDataItemID = function (str) {
     this.ctn.dataset.itemId = str;
   };
+
+  const editPj = createPopup("editPj");
+  editPj.listHolder = editPj.ctn.querySelector("ul");
+  editPj.editBtn = createEditPjListItem("flaticon-pen", "edit-pj-btn", "Edit");
+  editPj.deleteBtn = createEditPjListItem(
+    "flaticon-trash",
+    "delete-pj-btn",
+    "Delete Project"
+  );
+  editPj.listHolder.appendChild(editPj.editBtn);
+  editPj.listHolder.appendChild(editPj.deleteBtn);
+
+  function createEditPjListItem(iconName, className, str) {
+    const listItem = document.createElement("li");
+    listItem.classList.add("btn", "editPj-list-btn", className);
+
+    const icon = document.createElement("i");
+    icon.classList.add("flaticon", iconName);
+
+    listItem.textContent = str;
+
+    listItem.prepend(icon);
+
+    return listItem;
+  }
+
   return {
     modal,
     priority,
     comment,
     sort,
     del,
+    editPj,
     hide() {
       helpers.hide(modal);
       list.forEach((popup) => {

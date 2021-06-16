@@ -102,12 +102,7 @@ const content = (() => {
       return ctn;
     },
     iconBtn(iconName, className, str, id) {
-      var btn = document.createElement("button");
-      btn.classList.add("btn", "icon-btn", className);
-
-      var icon = document.createElement("i");
-      icon.classList.add("flaticon", iconName);
-      btn.prepend(icon);
+      const btn = helpers.createIconBtn(iconName, className);
 
       var text = document.createElement("span");
       text.classList.add("btn-text");

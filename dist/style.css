@@ -374,12 +374,19 @@ select {
   padding: 0.5rem;
   padding-bottom: 0;
 }
+#editPj-popup,
 #sort-popup {
   width: 200px;
 }
+#editPj-popup li,
 #sort-popup li {
   line-height: 2.4rem;
   padding: 0.4rem 1rem;
+}
+#editPj-popup .flaticon {
+  height: 2.4rem;
+  width: 2.4rem;
+  margin-right: 1rem;
 }
 #add-todo-btn {
   margin-bottom: 0;
@@ -403,13 +410,13 @@ select {
   width: 265px;
   padding-top: 30px;
 }
-#menu button {
+.menu button {
   opacity: 0;
 }
-#menu-ctn:hover > #pj-menu button {
+#menu-ctn:hover > #pj-menu .title-ctn button {
   opacity: 0.6;
 }
-#pj-menu button:hover {
+#pj-menu li:hover {
   opacity: 0.8 !important;
 }
 #menu li {
@@ -440,6 +447,23 @@ select {
 }
 #pj-menu input[value="Cancel"] {
   background-color: var(--menu-accent);
+}
+.pj-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.pj-list-item button {
+  opacity: 0;
+}
+.focused {
+  background-color: var(--menu-accent);
+}
+.focused button {
+  opacity: 0.6;
+}
+.hovered button {
+  opacity: 0.6;
 }
 #content {
   min-height: 380px;
