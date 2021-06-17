@@ -117,6 +117,9 @@ const popups = (() => {
   );
   editPj.listHolder.appendChild(editPj.editBtn);
   editPj.listHolder.appendChild(editPj.deleteBtn);
+  editPj.setDataProject = function (id) {
+    editPj.ctn.dataset.project = id;
+  };
 
   function createEditPjListItem(iconName, className, str) {
     const listItem = document.createElement("li");

@@ -416,9 +416,6 @@ select {
 #menu-ctn:hover > #pj-menu .title-ctn button {
   opacity: 0.6;
 }
-#pj-menu li:hover {
-  opacity: 0.8 !important;
-}
 #menu li {
   padding: 0.8rem;
 }

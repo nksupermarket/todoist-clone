@@ -45,8 +45,7 @@ const menuEvents = {
       );
       const moreBtn = newPj.menuItem.querySelector(".more-btn");
       moreBtn.addEventListener("click", (e) => {
-        menuEvents.showActionsBtn(e);
-        popupEvents.onIconBtn(popups.editPj, moreBtn);
+        popupEvents.showEditPJPopup(e, moreBtn);
       });
       moreBtn.addEventListener("click", (e) => e.stopPropagation());
     })();
@@ -465,7 +464,12 @@ const popupEvents = {
     }
     activeCtn.refresh();
   },
-  showEditPjPopup() {},
+  showEditPJPopup(e, btn) {
+    menuEvents.addFocusToListItem(e);
+    popupEvents.onIconBtn(popups.editPj, btn);
+    const listItem = e.target.closest("li");
+    popups.editPj.setDataProject(listItem.dataset.project);
+  },
 };
 popups.modal.addEventListener("click", popupEvents.closeModal);
 const priorityPopup = popups.priority;
@@ -497,8 +501,24 @@ priorityPopup.btns.forEach((btn) =>
 );
 const deletePopup = popups.del;
 deletePopup.ctn.addEventListener("click", (e) => e.stopPropagation());
-deletePopup.cancelBtn.addEventListener("click", popups.hide);
+deletePopup.cancelBtn.addEventListener("click", () => popups.hide());
 deletePopup.deleteBtn.addEventListener("click", popupEvents.onDelete);
+
+const editPjPopup = popups.editPj;
+editPjPopup.ctn.addEventListener("click", (e) => e.stopPropagation());
+// editPjPopup.editBtn.addEventListener()
+editPjPopup.deleteBtn.addEventListener("click", () => {
+  const pjTitle = helpers.findItem(
+    listOfPjs,
+    editPjPopup.ctn.dataset.project
+  ).title;
+  popupEvents.showDeletePopup(
+    "project",
+    editPjPopup.ctn.dataset.project,
+    pjTitle
+  );
+  menuEvents.removeFocusFromListItem();
+});
 
 commentModal.addBtn.addEventListener("click", popupEvents.onAddComment);
 commentModal.form.addEventListener("click", (e) => {
@@ -638,8 +658,7 @@ const init = (() => {
       );
       const moreBtn = pj.menuItem.querySelector(".more-btn");
       moreBtn.addEventListener("click", (e) => {
-        menuEvents.addFocusToListItem(e);
-        popupEvents.onIconBtn(popups.editPj, moreBtn);
+        popupEvents.showEditPJPopup(e, moreBtn);
       });
       moreBtn.addEventListener("click", (e) => e.stopPropagation());
     });
