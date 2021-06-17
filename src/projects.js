@@ -42,7 +42,8 @@ pjFactory.prototype.createProject = function (title) {
       input.appendChild(pjOption);
     },
     del() {
-      this.todoList.forEach((todo) => todo.del());
+      const copy = [...this.todoList];
+      copy.forEach((todo) => todo.del());
       this.menuItem.remove();
       const index = listOfPjs.findIndex((pj) => pj.id === this.id);
       listOfPjs.splice(index, 1);
@@ -245,7 +246,6 @@ todoFactory.prototype.createTodo = function (
     del() {
       this.ctn.remove();
       const index = listOfTodos.findIndex((todo) => todo.id === this.id);
-      console.log(listOfTodos[index]);
       listOfTodos.splice(index, 1);
       const pj = helpers.findItem(listOfPjs, this.project);
       const pjIndex = pj.todoList.findIndex((todo) => todo.id === this.id);
