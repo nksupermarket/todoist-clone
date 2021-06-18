@@ -67,13 +67,17 @@ const menuEvents = {
     contentEvents.closeOpenEditors();
     if (content.findActiveCtn() !== undefined) content.removeActiveCtn();
     const todayList = today.getTodayTodos(listOfTodos);
-    const fragment = document.createDocumentFragment();
-    todayList.forEach((todo) => {
-      fragment.prepend(todo.ctn);
-    });
-    content.todayCtn.todoList.prepend(fragment);
+    content.todayCtn.fillTodoList(todayList);
     content.todayCtn.todoArray = todayList;
     content.main.appendChild(content.todayCtn.main);
+
+    (function showOverdue() {
+      const overdueList = today.getOverdueTodos(listOfTodos);
+      if (overdueList.length === 0)
+        return todayCtn.overdueSection.main.classList.add("inactive");
+      todayCtn.overdueSection.fillTodoList(overdueList);
+      todayCtn.overdueSection.main.classList.remove("inactive");
+    })();
   },
   showUpcoming() {
     contentEvents.closeOpenEditors();
@@ -119,9 +123,7 @@ const menuEvents = {
           var todos = listOfTodos.filter((item) => item.day === dayStr);
           if (todos.length === 0)
             return content.upcomingCtn.sections[i].title.classList.add("empty");
-          var fragment = document.createDocumentFragment();
-          todos.forEach((todo) => fragment.prepend(todo.ctn));
-          content.upcomingCtn.sections[i].todoList.prepend(fragment);
+          content.upcomingCtn.sections[i].fillTodoList(todos);
         }
       }
     }
@@ -591,6 +593,7 @@ const contentEvents = {
     contentForm.setDefaultDate();
     ctn.todoList.appendChild(contentForm.ctn);
     helpers.show(contentForm.ctn);
+    contentForm.titleInput.focus();
     ctn.todoBtn.remove();
   },
   closeTodoForm() {
@@ -646,11 +649,11 @@ upcomingCtn.sections.forEach((section) => {
     });
   });
 });
-pjCtn.sortBtn.addEventListener("click", popupEvents.showSortPopup);
-pjCtn.editBtn.addEventListener("click", contentEvents.showPJEditor);
+pjCtn.actions.sortBtn.addEventListener("click", popupEvents.showSortPopup);
+pjCtn.actions.editBtn.addEventListener("click", contentEvents.showPJEditor);
 pjCtn.editor.saveBtn.addEventListener("click", contentEvents.saveEditPj);
 pjCtn.editor.cancelBtn.addEventListener("click", contentEvents.cancelPjEdit);
-pjCtn.commentBtn.addEventListener("click", () =>
+pjCtn.actions.commentBtn.addEventListener("click", () =>
   popupEvents.showCommentForm(
     "project",
     pjCtn.main.dataset.project,
@@ -658,14 +661,14 @@ pjCtn.commentBtn.addEventListener("click", () =>
     ""
   )
 );
-pjCtn.deleteBtn.addEventListener("click", () =>
+pjCtn.actions.deleteBtn.addEventListener("click", () =>
   popupEvents.showDeletePopup(
     "project",
     pjCtn.main.dataset.project,
     pjCtn.title.textContent
   )
 );
-todayCtn.sortBtn.addEventListener("click", popupEvents.showSortPopup);
+todayCtn.actions.sortBtn.addEventListener("click", popupEvents.showSortPopup);
 popups.sort.dateBtn.addEventListener("click", () => popupEvents.onSort("date"));
 popups.sort.priorityBtn.addEventListener("click", () =>
   popupEvents.onSort("priority")
@@ -673,8 +676,10 @@ popups.sort.priorityBtn.addEventListener("click", () =>
 popups.sort.alphabetBtn.addEventListener("click", () =>
   popupEvents.onSort("alphabet")
 );
-pjCtn.sortedBtn.addEventListener("click", () => popupEvents.onSort("reverse"));
-todayCtn.sortedBtn.addEventListener("click", () =>
+pjCtn.actions.sortedBtn.addEventListener("click", () =>
+  popupEvents.onSort("reverse")
+);
+todayCtn.actions.sortedBtn.addEventListener("click", () =>
   popupEvents.onSort("reverse")
 );
 

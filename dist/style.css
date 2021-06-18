@@ -405,7 +405,7 @@ select {
   padding: 3rem 0 0 3.5rem;
   min-height: calc(100vh - 5rem);
   background-color: var(--menu-bg);
-  transition: all 0.5s ease-out;
+  transition: all 0.3s ease-in-out;
 }
 .minimize {
   transform: translateX(-100%);
@@ -491,7 +491,7 @@ select {
   margin-left: 300px;
   width: 100%;
   background-color: var(--content-bg);
-  transition: all 0.5s ease-out;
+  transition: all 0.3s ease-in-out;
 }
 #content.menu-minimized {
   margin-left: 0;
@@ -534,7 +534,7 @@ select {
   font-size: 1.2rem;
   font-weight: 400;
 }
-.title-input {
+.pj-editor .title-input {
   border-radius: 0.5rem;
   border: 1px solid #ddd;
   padding: 3px 8px 5px;

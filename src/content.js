@@ -7,6 +7,11 @@ const content = (() => {
   let list = [];
 
   const ctnMethods = {
+    fillTodoList(list) {
+      var fragment = document.createDocumentFragment();
+      list.forEach((todo) => fragment.prepend(todo.ctn));
+      this.todoList.prepend(fragment);
+    },
     removeTodos() {
       var todoCtns = this.main.querySelectorAll(".todo-ctn");
       if (todoCtns.length === 0) return this;
@@ -61,7 +66,35 @@ const content = (() => {
     },
   };
 
-  const createNew = {
+  const create = {
+    ctn(ctnEl, className, name, titleTag, todoList = true, todoBtn = true) {
+      const ctn = Object.create(ctnMethods);
+      ctn.main = document.createElement(ctnEl);
+      ctn.main.classList.add(className);
+      if (name) ctn.main.id = `${name}-ctn`;
+
+      ctn.header = create.header();
+      const headerContentObj = create.headerContent(titleTag);
+      ctn.headerContent = headerContentObj.ctn;
+      ctn.header.appendChild(ctn.headerContent);
+      ctn.title = headerContentObj.title;
+
+      ctn.main.appendChild(ctn.header);
+
+      if (todoList) {
+        ctn.todoArray = [];
+        ctn.todoList = create.todoList();
+        ctn.main.appendChild(ctn.todoList);
+      }
+      if (todoBtn) {
+        ctn.todoBtn = create.todoBtn();
+        ctn.todoList.appendChild(ctn.todoBtn);
+      }
+
+      if (className === "main-ctn") list.push(ctn);
+
+      return ctn;
+    },
     header() {
       var header = document.createElement("header");
       header.classList.add("view-header", "view-content");
@@ -101,6 +134,54 @@ const content = (() => {
       ctn.classList.add("action-ctn");
       return ctn;
     },
+    actionBtns(id, ctn, ...btns) {
+      let obj = {};
+
+      if (btns.includes("sort")) {
+        const sortedBtn = create.iconBtn("flaticon", "sorted-btn", "", id);
+        sortedBtn.classList.add("inactive");
+        const sortedBtnIcon = sortedBtn.querySelector(".flaticon");
+        const sortedBtnText = sortedBtn.querySelector(".btn-text");
+        sortedBtn.appendChild(sortedBtnIcon);
+        sortedBtn.appendChild(sortedBtnText);
+
+        const sortBtn = create.iconBtn("flaticon-sort", "sort-btn", "Sort", id);
+        obj.sortedBtn = sortedBtn;
+        obj.sortedBtnIcon = sortedBtnIcon;
+        obj.sortedBtnText = sortedBtnText;
+        obj.sortBtn = sortBtn;
+      }
+
+      if (btns.includes("comment")) {
+        const commentBtn = create.iconBtn(
+          "flaticon-comment",
+          "comment-btn",
+          "Comments"
+        );
+        obj.commentBtn = commentBtn;
+      }
+
+      if (btns.includes("delete")) {
+        const deleteBtn = create.iconBtn(
+          "flaticon-trash",
+          "delete-btn",
+          "Delete",
+          id
+        );
+        obj.deleteBtn = deleteBtn;
+      }
+
+      if (btns.includes("edit")) {
+        const editBtn = create.iconBtn("flaticon-pen", "edit-btn", "Edit", id);
+        obj.editBtn = editBtn;
+      }
+
+      for (const btn in obj) {
+        ctn.appendChild(obj[btn]);
+      }
+
+      return obj;
+    },
     iconBtn(iconName, className, str, id) {
       const btn = helpers.createIconBtn(iconName, className);
 
@@ -120,90 +201,53 @@ const content = (() => {
     },
   };
 
-  function createCtn(name) {
-    var ctn = Object.create(ctnMethods);
-    ctn.main = document.createElement("div");
-    ctn.main.classList.add("main-ctn");
-    ctn.main.id = `${name}-ctn`;
-
-    ctn.header = createNew.header();
-    const headerContentObj = createNew.headerContent("h1");
-    ctn.headerContent = headerContentObj.ctn;
-    ctn.header.appendChild(ctn.headerContent);
-    ctn.title = headerContentObj.title;
-
-    ctn.main.appendChild(ctn.header);
-
-    ctn.todoArray = [];
-
-    list.push(ctn);
-
-    return ctn;
-  }
-
-  const todayCtn = createCtn("today");
-  var todayStr = new Date().toString().slice(0, 10);
-  todayCtn.title.innerHTML = `<span>Today</span><small>${todayStr}</small>`;
-  todayCtn.actionCtn = createNew.actionCtn();
-  todayCtn.headerContent.appendChild(todayCtn.actionCtn);
-  todayCtn.sortedBtn = createNew.iconBtn(
-    "flaticon",
-    "sorted-btn",
+  const todayCtn = create.ctn("section", "main-ctn", "today", "h1");
+  const todayStr = new Date().toString().slice(0, 10);
+  todayCtn.overdueSection = create.ctn(
+    "section",
+    "overdue-section",
     "",
-    todayCtn.main.id
+    "h1",
+    true,
+    false
   );
-  todayCtn.sortedBtn.classList.add("inactive");
-  todayCtn.sortedBtnIcon = todayCtn.sortedBtn.querySelector(".flaticon");
-  todayCtn.sortedBtnText = todayCtn.sortedBtn.querySelector(".btn-text");
-  todayCtn.sortBtn = createNew.iconBtn(
-    "flaticon-sort",
-    "sort-btn",
-    "Sort",
-    todayCtn.main.id
+  todayCtn.overdueSection.title.textContent = "Overdue";
+  todayCtn.title.innerHTML = `<span>Today</span><small>${todayStr}</small>`;
+  const todayCtnActionCtn = create.actionCtn();
+  todayCtn.actions = create.actionBtns(
+    todayCtn.main.id,
+    todayCtnActionCtn,
+    "sort"
   );
-  todayCtn.actionCtn.appendChild(todayCtn.sortedBtn);
-  todayCtn.actionCtn.appendChild(todayCtn.sortBtn);
-  todayCtn.todoBtn = createNew.todoBtn();
-  todayCtn.todoList = createNew.todoList();
-  todayCtn.todoList.appendChild(todayCtn.todoBtn);
-  todayCtn.main.appendChild(todayCtn.todoList);
+  todayCtn.main.prepend(todayCtn.overdueSection.main);
+  todayCtn.headerContent.appendChild(todayCtnActionCtn);
 
-  const upcomingCtn = createCtn("upcoming");
+  const upcomingCtn = create.ctn(
+    "div",
+    "main-ctn",
+    "upcoming",
+    "h1",
+    false,
+    false
+  );
   upcomingCtn.title.textContent = "Upcoming";
   upcomingCtn.listHolder = document.createElement("div");
   upcomingCtn.sections = [];
-  upcomingCtn.createSections = (number) => {
+  const createUpcomingSections = (number) => {
     for (var i = 1; i < number; i++) {
-      var ctn = document.createElement("section");
+      const ctn = create.ctn("section", "section-ctn", "", "h2");
+      ctn.header.setAttribute("class", "section-header section-content");
+      ctn.headerContent.setAttribute("class", "section-header-content");
 
-      var header = createNew.header();
-      header.setAttribute("class", "section-header section-content");
-      var headerContent = createNew.headerContent("h2");
-      headerContent.ctn.setAttribute("class", "section-header-content");
-
-      var title = headerContent.title;
-
-      header.appendChild(headerContent.ctn);
-
-      var todoList = document.createElement("ul");
-      todoList.classList.add("todo-list");
-
-      var todoBtn = createNew.todoBtn();
-      todoList.appendChild(todoBtn);
-
-      ctn.appendChild(header);
-      ctn.appendChild(todoList);
-
-      upcomingCtn.listHolder.appendChild(ctn);
-
-      upcomingCtn.sections.push({ ctn, title, todoList, todoBtn });
+      upcomingCtn.listHolder.appendChild(ctn.main);
+      upcomingCtn.sections.push(ctn);
     }
   };
-  upcomingCtn.createSections(8);
+  createUpcomingSections(8);
   upcomingCtn.main.appendChild(upcomingCtn.listHolder);
   upcomingCtn.refresh = function () {
     this.sections.forEach((section) => {
-      var todos = listOfTodos.filter(
+      const todos = listOfTodos.filter(
         (item) => item.day == section.todoList.dataset.dateStr
       );
       if (!todos[0]) return section.title.classList.add("empty");
@@ -212,52 +256,20 @@ const content = (() => {
     });
   };
 
-  const pjCtn = createCtn("pj");
+  const pjCtn = create.ctn("div", "main-ctn", "pj", "h1");
   pjCtn.editor = helpers.createPJEditor("header-title-input");
   pjCtn.headerContent.appendChild(pjCtn.editor.ctn);
-  pjCtn.actionCtn = createNew.actionCtn();
-  pjCtn.headerContent.appendChild(pjCtn.actionCtn);
-  pjCtn.sortedBtn = createNew.iconBtn(
-    "flaticon",
-    "sorted-btn",
-    "",
-    pjCtn.main.id
+  const pjCtnActionCtn = create.actionCtn();
+  pjCtn.actions = create.actionBtns(
+    pjCtn.main.id,
+    pjCtnActionCtn,
+    "sort",
+    "edit",
+    "comment",
+    "delete"
   );
-  pjCtn.sortedBtn.classList.add("inactive");
-  pjCtn.sortedBtnIcon = pjCtn.sortedBtn.querySelector(".flaticon");
-  pjCtn.sortedBtnText = pjCtn.sortedBtn.querySelector(".btn-text");
-  pjCtn.sortBtn = createNew.iconBtn(
-    "flaticon-sort",
-    "sort-btn",
-    "Sort",
-    pjCtn.main.id
-  );
-  pjCtn.commentBtn = createNew.iconBtn(
-    "flaticon-comment",
-    "comment-btn",
-    "Comments"
-  );
-  pjCtn.deleteBtn = createNew.iconBtn(
-    "flaticon-trash",
-    "delete-btn",
-    "Delete",
-    pjCtn.main.id
-  );
-  pjCtn.editBtn = createNew.iconBtn(
-    "flaticon-pen",
-    "edit-btn",
-    "Edit",
-    pjCtn.main.id
-  );
-  pjCtn.actionCtn.appendChild(pjCtn.sortedBtn);
-  pjCtn.actionCtn.appendChild(pjCtn.sortBtn);
-  pjCtn.actionCtn.appendChild(pjCtn.editBtn);
-  pjCtn.actionCtn.appendChild(pjCtn.commentBtn);
-  pjCtn.actionCtn.appendChild(pjCtn.deleteBtn);
-  pjCtn.todoList = createNew.todoList();
-  pjCtn.todoBtn = createNew.todoBtn();
-  pjCtn.todoList.appendChild(pjCtn.todoBtn);
-  pjCtn.main.appendChild(pjCtn.todoList);
+  pjCtn.headerContent.appendChild(pjCtnActionCtn);
+
   pjCtn.refreshTitle = function (list) {
     const pj = helpers.findItem(list, pjCtn.main.dataset.project);
     pjCtn.title.textContent = pj.title;
