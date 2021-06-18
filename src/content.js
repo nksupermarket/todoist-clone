@@ -1,6 +1,7 @@
 export { content };
 import { helpers } from "./helpers.js";
 import { listOfTodos } from "./projects.js";
+import { today } from "./today.js";
 
 const content = (() => {
   const main = document.getElementById("content");
@@ -199,19 +200,38 @@ const content = (() => {
       todoList.classList.add("todo-list", "view-content");
       return todoList;
     },
+    sections(number, sectionHolder, arr, todoBtn = true) {
+      for (var i = 0; i < number; i++) {
+        const ctn = create.ctn(
+          "section",
+          "section-ctn",
+          "",
+          "h2",
+          true,
+          todoBtn
+        );
+        ctn.header.setAttribute("class", "section-header section-content");
+        ctn.headerContent.setAttribute("class", "section-header-content");
+
+        sectionHolder.appendChild(ctn.main);
+        if (arr) return arr.push(ctn);
+        return ctn;
+      }
+    },
   };
 
-  const todayCtn = create.ctn("section", "main-ctn", "today", "h1");
+  const todayCtn = create.ctn("div", "main-ctn", "today", "h1");
   const todayStr = new Date().toString().slice(0, 10);
-  todayCtn.overdueSection = create.ctn(
-    "section",
-    "overdue-section",
-    "",
-    "h1",
-    true,
+  todayCtn.sectionView = document.createElement("div");
+  todayCtn.overdueSection = create.sections(
+    1,
+    todayCtn.sectionView,
+    null,
     false
   );
   todayCtn.overdueSection.title.textContent = "Overdue";
+  todayCtn.todaySection = create.sections(1, todayCtn.sectionView, null, true);
+  todayCtn.todaySection.title.textContent = "Today";
   todayCtn.title.innerHTML = `<span>Today</span><small>${todayStr}</small>`;
   const todayCtnActionCtn = create.actionCtn();
   todayCtn.actions = create.actionBtns(
@@ -219,7 +239,7 @@ const content = (() => {
     todayCtnActionCtn,
     "sort"
   );
-  todayCtn.main.prepend(todayCtn.overdueSection.main);
+  todayCtn.main.appendChild(todayCtn.sectionView);
   todayCtn.headerContent.appendChild(todayCtnActionCtn);
 
   const upcomingCtn = create.ctn(
@@ -231,20 +251,10 @@ const content = (() => {
     false
   );
   upcomingCtn.title.textContent = "Upcoming";
-  upcomingCtn.listHolder = document.createElement("div");
+  upcomingCtn.sectionHolder = document.createElement("div");
   upcomingCtn.sections = [];
-  const createUpcomingSections = (number) => {
-    for (var i = 1; i < number; i++) {
-      const ctn = create.ctn("section", "section-ctn", "", "h2");
-      ctn.header.setAttribute("class", "section-header section-content");
-      ctn.headerContent.setAttribute("class", "section-header-content");
-
-      upcomingCtn.listHolder.appendChild(ctn.main);
-      upcomingCtn.sections.push(ctn);
-    }
-  };
-  createUpcomingSections(8);
-  upcomingCtn.main.appendChild(upcomingCtn.listHolder);
+  create.sections(7, upcomingCtn.sectionHolder, upcomingCtn.sections);
+  upcomingCtn.main.appendChild(upcomingCtn.sectionHolder);
   upcomingCtn.refresh = function () {
     this.sections.forEach((section) => {
       const todos = listOfTodos.filter(

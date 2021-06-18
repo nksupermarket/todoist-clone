@@ -66,18 +66,29 @@ const menuEvents = {
   showToday() {
     contentEvents.closeOpenEditors();
     if (content.findActiveCtn() !== undefined) content.removeActiveCtn();
-    const todayList = today.getTodayTodos(listOfTodos);
-    content.todayCtn.fillTodoList(todayList);
-    content.todayCtn.todoArray = todayList;
     content.main.appendChild(content.todayCtn.main);
 
-    (function showOverdue() {
-      const overdueList = today.getOverdueTodos(listOfTodos);
-      if (overdueList.length === 0)
-        return todayCtn.overdueSection.main.classList.add("inactive");
+    const overdueList = today.getOverdueTodos(listOfTodos);
+    if (overdueList.length === 0) {
+      helpers.hide(todayCtn.sectionView);
+      helpers.show(todayCtn.todoList);
+      showTodayTodos(todayCtn);
+      return;
+    }
+
+    (function showOverdueTodos() {
+      helpers.hide(todayCtn.todoList);
+      helpers.show(todayCtn.sectionView);
+      todayCtn.overdueSection.todoArray = overdueList;
       todayCtn.overdueSection.fillTodoList(overdueList);
-      todayCtn.overdueSection.main.classList.remove("inactive");
+      showTodayTodos(todayCtn.todaySection);
     })();
+
+    function showTodayTodos(ctn) {
+      const todayList = today.getTodayTodos(listOfTodos);
+      ctn.fillTodoList(todayList);
+      ctn.todoArray = todayList;
+    }
   },
   showUpcoming() {
     contentEvents.closeOpenEditors();
@@ -447,47 +458,47 @@ const popupEvents = {
   },
   showSortPopup() {
     const activeCtn = content.findActiveCtn();
-    console.log(activeCtn.sortBtn.dataset.id);
-    popups.sort.setDataBtn(activeCtn.sortBtn.dataset.id);
+    console.log(activeCtn.actions.sortBtn.dataset.id);
+    popups.sort.setDataBtn(activeCtn.actions.sortBtn.dataset.id);
     popups.sort.show();
-    popups.sort.position(activeCtn.sortBtn);
+    popups.sort.position(activeCtn.actions.sortBtn);
   },
   onSort(method) {
     var activeCtn = content.findActiveCtn();
-    helpers.show(activeCtn.sortedBtn);
+    helpers.show(activeCtn.actions.sortedBtn);
 
     switch (method) {
       case "date":
-        activeCtn.sortedBtnText.textContent = "Sorted by due date";
-        activeCtn.sortedBtnIcon.setAttribute(
+        activeCtn.actions.sortedBtnText.textContent = "Sorted by due date";
+        activeCtn.actions.sortedBtnIcon.setAttribute(
           "class",
           "flaticon flaticon-down-arrow-1"
         );
         activeCtn.sortDate();
         break;
       case "priority":
-        activeCtn.sortedBtnText.textContent = "Sorted by priority";
-        activeCtn.sortedBtnIcon.setAttribute(
+        activeCtn.actions.sortedBtnText.textContent = "Sorted by priority";
+        activeCtn.actions.sortedBtnIcon.setAttribute(
           "class",
           "flaticon flaticon-down-arrow-1"
         );
         activeCtn.sortPriority();
         break;
       case "alphabet":
-        activeCtn.sortedBtnText.textContent = "Sorted alphabetically";
-        activeCtn.sortedBtnIcon.setAttribute(
+        activeCtn.actions.sortedBtnText.textContent = "Sorted alphabetically";
+        activeCtn.actions.sortedBtnIcon.setAttribute(
           "class",
           "flaticon flaticon-down-arrow-1"
         );
         activeCtn.sortAlphabetically();
         break;
       case "reverse":
-        activeCtn.sortedBtnIcon.classList.contains("flaticon-up-arrow")
-          ? activeCtn.sortedBtnIcon.setAttribute(
+        activeCtn.actions.sortedBtnIcon.classList.contains("flaticon-up-arrow")
+          ? activeCtn.actions.sortedBtnIcon.setAttribute(
               "class",
               "flaticon flaticon-down-arrow-1"
             )
-          : activeCtn.sortedBtnIcon.setAttribute(
+          : activeCtn.actions.sortedBtnIcon.setAttribute(
               "class",
               "flaticon flaticon-up-arrow"
             );
