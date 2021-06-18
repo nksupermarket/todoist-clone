@@ -374,16 +374,16 @@ select {
   padding: 0.5rem;
   padding-bottom: 0;
 }
-#editPj-popup,
+#pj-actions-popup,
 #sort-popup {
   width: 200px;
 }
-#editPj-popup li,
+#pj-actions-popup li,
 #sort-popup li {
   line-height: 2.4rem;
   padding: 0.4rem 1rem;
 }
-#editPj-popup .flaticon {
+#pj-actions-popup .flaticon {
   height: 2.4rem;
   width: 2.4rem;
   margin-right: 1rem;
@@ -405,12 +405,16 @@ select {
   padding: 3rem 0 0 3.5rem;
   min-height: calc(100vh - 5rem);
   background-color: var(--menu-bg);
+  transition: all 0.5s ease-out;
+}
+.minimize {
+  transform: translateX(-100%);
 }
 #menu-ctn {
   width: 265px;
   padding-top: 30px;
 }
-.menu button {
+.menu .title-ctn button {
   opacity: 0;
 }
 #menu-ctn:hover > #pj-menu .title-ctn button {
@@ -419,12 +423,16 @@ select {
 #menu li {
   padding: 0.8rem;
 }
-#menu li:hover {
+#menu li:not(.editor):hover {
   background-color: var(--menu-accent);
 }
 .title-ctn,
 #menu li {
   margin-right: 1em;
+}
+#menu li .icon-btn {
+  padding: 0;
+  padding-right: 0.5rem;
 }
 #pj-menu .small-title {
   padding-left: 0.8rem;
@@ -445,12 +453,7 @@ select {
 #pj-menu input[value="Cancel"] {
   background-color: var(--menu-accent);
 }
-.pj-list-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.pj-list-item button {
+.pj-list-content button {
   opacity: 0;
 }
 .focused {
@@ -459,8 +462,26 @@ select {
 .focused button {
   opacity: 0.6;
 }
-.hovered button {
+.hovered:not(.editor) button {
   opacity: 0.6;
+}
+.pj-list-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+.editor {
+  cursor: default;
+}
+.pj-list-item .pj-editor input {
+  cursor: text;
+}
+.menu-title-input {
+  background-color: var(--content-bg);
+}
+.pj-list-item .cancel-btn {
+  background-color: var(--menu-bg);
 }
 #content {
   min-height: 380px;
@@ -469,8 +490,11 @@ select {
   overflow: hidden auto;
   margin-left: 300px;
   width: 100%;
-  grid-area: content;
   background-color: var(--content-bg);
+  transition: all 0.5s ease-out;
+}
+#content.menu-minimized {
+  margin-left: 0;
 }
 .main-ctn {
   padding-bottom: 100px;
@@ -510,13 +534,15 @@ select {
   font-size: 1.2rem;
   font-weight: 400;
 }
+.title-input {
+  border-radius: 0.5rem;
+  border: 1px solid #ddd;
+  padding: 3px 8px 5px;
+}
 .header-title-input {
   font-size: 2rem;
   font-weight: 700;
   line-height: 2.5rem;
-  border-radius: 0.5rem;
-  border: 1px solid #ddd;
-  padding: 3px 8px 5px;
 }
 #upcoming-ctn header {
   margin-bottom: 0;

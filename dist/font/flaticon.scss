@@ -2,11 +2,11 @@ $flaticon-font: "flaticon";
 
 @font-face {
     font-family: $flaticon-font;
-    src: url("./flaticon.ttf?d1781dc9fddee1ac0593699af6f8f9fd") format("truetype"),
-url("./flaticon.woff?d1781dc9fddee1ac0593699af6f8f9fd") format("woff"),
-url("./flaticon.woff2?d1781dc9fddee1ac0593699af6f8f9fd") format("woff2"),
-url("./flaticon.eot?d1781dc9fddee1ac0593699af6f8f9fd#iefix") format("embedded-opentype"),
-url("./flaticon.svg?d1781dc9fddee1ac0593699af6f8f9fd#flaticon") format("svg");
+    src: url("./flaticon.ttf?b29ec80af1b77678cb03f6bd485c9aec") format("truetype"),
+url("./flaticon.woff?b29ec80af1b77678cb03f6bd485c9aec") format("woff"),
+url("./flaticon.woff2?b29ec80af1b77678cb03f6bd485c9aec") format("woff2"),
+url("./flaticon.eot?b29ec80af1b77678cb03f6bd485c9aec#iefix") format("embedded-opentype"),
+url("./flaticon.svg?b29ec80af1b77678cb03f6bd485c9aec#flaticon") format("svg");
 }
 
 i[class^="flaticon-"]:before, i[class*=" flaticon-"]:before {
@@ -39,6 +39,7 @@ $flaticon-map: (
     "pen": "\f110",
     "up-arrow": "\f111",
     "down-arrow-1": "\f112",
+    "house": "\f113",
 );
 
 .flaticon-more:before {
@@ -94,4 +95,7 @@ $flaticon-map: (
 }
 .flaticon-down-arrow-1:before {
     content: map-get($flaticon-map, "down-arrow-1");
+}
+.flaticon-house:before {
+    content: map-get($flaticon-map, "house");
 }

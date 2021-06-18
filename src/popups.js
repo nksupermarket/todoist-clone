@@ -107,23 +107,27 @@ const popups = (() => {
     this.ctn.dataset.itemId = str;
   };
 
-  const editPj = createPopup("editPj");
-  editPj.listHolder = editPj.ctn.querySelector("ul");
-  editPj.editBtn = createEditPjListItem("flaticon-pen", "edit-pj-btn", "Edit");
-  editPj.deleteBtn = createEditPjListItem(
+  const pjActions = createPopup("pj-actions");
+  pjActions.listHolder = pjActions.ctn.querySelector("ul");
+  pjActions.editBtn = createpjActionsListItem(
+    "flaticon-pen",
+    "edit-pj-btn",
+    "Edit"
+  );
+  pjActions.deleteBtn = createpjActionsListItem(
     "flaticon-trash",
     "delete-pj-btn",
     "Delete Project"
   );
-  editPj.listHolder.appendChild(editPj.editBtn);
-  editPj.listHolder.appendChild(editPj.deleteBtn);
-  editPj.setDataProject = function (id) {
-    editPj.ctn.dataset.project = id;
+  pjActions.listHolder.appendChild(pjActions.editBtn);
+  pjActions.listHolder.appendChild(pjActions.deleteBtn);
+  pjActions.setDataProject = function (id) {
+    pjActions.ctn.dataset.project = id;
   };
 
-  function createEditPjListItem(iconName, className, str) {
+  function createpjActionsListItem(iconName, className, str) {
     const listItem = document.createElement("li");
-    listItem.classList.add("btn", "editPj-list-btn", className);
+    listItem.classList.add("btn", "pj-actions-list-btn", className);
 
     const icon = document.createElement("i");
     icon.classList.add("flaticon", iconName);
@@ -141,7 +145,7 @@ const popups = (() => {
     comment,
     sort,
     del,
-    editPj,
+    pjActions,
     hide() {
       helpers.hide(modal);
       list.forEach((popup) => {

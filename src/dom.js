@@ -17,7 +17,20 @@ const headerEvents = {
     todoFormEvents.fillPjInput(modalForm);
     modalForm.setDefaultDate();
   },
+  hideMenu() {
+    menu.ctn.classList.add("minimize");
+    content.main.classList.add("menu-minimized");
+  },
+  showMenu() {
+    menu.ctn.classList.remove("minimize");
+    content.main.classList.remove("menu-minimized");
+  },
 };
+header.menuBtn.addEventListener("click", () => {
+  menu.ctn.classList.contains("minimize")
+    ? headerEvents.showMenu()
+    : headerEvents.hideMenu();
+});
 header.todoBtn.addEventListener("click", headerEvents.showModalTodoForm);
 
 const menuEvents = {
@@ -45,7 +58,7 @@ const menuEvents = {
       );
       const moreBtn = newPj.menuItem.querySelector(".more-btn");
       moreBtn.addEventListener("click", (e) => {
-        popupEvents.showEditPJPopup(e, moreBtn);
+        popupEvents.showPJActionsPopup(e, moreBtn);
       });
       moreBtn.addEventListener("click", (e) => e.stopPropagation());
     })();
@@ -116,18 +129,16 @@ const menuEvents = {
   },
   showPj(e) {
     contentEvents.closeOpenEditors();
-    var pjId = e.target.dataset.project;
     (function closeOpenCtn() {
       contentEvents.closeTodoForm();
       content.removeActiveCtn();
     })();
-    (function setDatatset() {
-      pjCtn.main.dataset.project = pjId;
-      var pjCtnBtns = content.pjCtn.header.querySelectorAll("button");
-      pjCtnBtns.forEach((btn) => (btn.dataset.pj = `${pjId}`));
-    })();
 
-    var pj = helpers.findItem(listOfPjs, pjId);
+    const menuItem = e.target.closest("li");
+    const pjId = menuItem.dataset.project;
+    pjCtn.setDataProject(pjId);
+
+    const pj = helpers.findItem(listOfPjs, pjId);
     content.pjCtn.title.textContent = pj.title;
 
     (function populateList() {
@@ -158,12 +169,29 @@ const menuEvents = {
     const btn = document.querySelector(".focused");
     btn.classList.remove("focused");
   },
+  hidePJEditor() {
+    helpers.hide(menu.editor.ctn);
+    const pj = helpers.findItem(listOfPjs, menu.editor.ctn.dataset.project);
+    helpers.show(pj.menuContent);
+    pj.menuItem.classList.remove("editor");
+  },
+  savePJEdit() {
+    const pj = helpers.findItem(listOfPjs, menu.editor.ctn.dataset.project);
+    pj.title = menu.editor.titleInput.value;
+    pj.menuContent.querySelector("span").textContent = pj.title;
+    if (content.findActiveCtn() === content.pjCtn)
+      content.pjCtn.refreshTitle(listOfPjs);
+    menuEvents.hidePJEditor();
+  },
 };
 menu.today.addEventListener("click", menuEvents.showToday);
 menu.upcoming.addEventListener("click", menuEvents.showUpcoming);
 menu.newBtn.addEventListener("click", menuEvents.showPjForm);
 menu.addBtn.addEventListener("click", menuEvents.onAddPj);
 menu.cancelBtn.addEventListener("click", menuEvents.hidePjForm);
+menu.editor.ctn.addEventListener("click", (e) => e.stopPropagation());
+menu.editor.saveBtn.addEventListener("click", menuEvents.savePJEdit);
+menu.editor.cancelBtn.addEventListener("click", menuEvents.hidePJEditor);
 
 const todoFormEvents = {
   fillPjInput(form) {
@@ -332,7 +360,7 @@ editorForm.cancelBtn.addEventListener("click", () => {
 
 const popupEvents = {
   closeModal() {
-    if (popups.findActivePopup() === popups.editPj)
+    if (popups.findActivePopup() === popups.pjActions)
       menuEvents.removeFocusFromListItem();
     popups.hide();
   },
@@ -417,6 +445,7 @@ const popupEvents = {
   },
   showSortPopup() {
     const activeCtn = content.findActiveCtn();
+    console.log(activeCtn.sortBtn.dataset.id);
     popups.sort.setDataBtn(activeCtn.sortBtn.dataset.id);
     popups.sort.show();
     popups.sort.position(activeCtn.sortBtn);
@@ -464,11 +493,24 @@ const popupEvents = {
     }
     activeCtn.refresh();
   },
-  showEditPJPopup(e, btn) {
+  showPJActionsPopup(e, btn) {
     menuEvents.addFocusToListItem(e);
-    popupEvents.onIconBtn(popups.editPj, btn);
+    popupEvents.onIconBtn(popups.pjActions, btn);
     const listItem = e.target.closest("li");
-    popups.editPj.setDataProject(listItem.dataset.project);
+    popups.pjActions.setDataProject(listItem.dataset.project);
+  },
+  showPJMenuEditor() {
+    popups.hide();
+    menuEvents.removeFocusFromListItem();
+    const pj = helpers.findItem(listOfPjs, pjActionsPopup.ctn.dataset.project);
+    helpers.hide(pj.menuContent);
+    helpers.show(menu.editor.ctn);
+    menu.editor.titleInput.value = pj.title;
+    menu.editor.ctn.dataset.project = pj.id;
+
+    pj.menuItem.appendChild(menu.editor.ctn);
+    pj.menuItem.classList.add("editor");
+    menu.editor.titleInput.focus();
   },
 };
 popups.modal.addEventListener("click", popupEvents.closeModal);
@@ -504,17 +546,17 @@ deletePopup.ctn.addEventListener("click", (e) => e.stopPropagation());
 deletePopup.cancelBtn.addEventListener("click", () => popups.hide());
 deletePopup.deleteBtn.addEventListener("click", popupEvents.onDelete);
 
-const editPjPopup = popups.editPj;
-editPjPopup.ctn.addEventListener("click", (e) => e.stopPropagation());
-// editPjPopup.editBtn.addEventListener()
-editPjPopup.deleteBtn.addEventListener("click", () => {
+const pjActionsPopup = popups.pjActions;
+pjActionsPopup.ctn.addEventListener("click", (e) => e.stopPropagation());
+pjActionsPopup.editBtn.addEventListener("click", popupEvents.showPJMenuEditor);
+pjActionsPopup.deleteBtn.addEventListener("click", () => {
   const pjTitle = helpers.findItem(
     listOfPjs,
-    editPjPopup.ctn.dataset.project
+    pjActionsPopup.ctn.dataset.project
   ).title;
   popupEvents.showDeletePopup(
     "project",
-    editPjPopup.ctn.dataset.project,
+    pjActionsPopup.ctn.dataset.project,
     pjTitle
   );
   menuEvents.removeFocusFromListItem();
@@ -528,9 +570,9 @@ commentModal.modal.addEventListener("click", () => commentModal.close());
 commentModal.closeBtn.addEventListener("click", () => commentModal.close());
 
 const contentEvents = {
-  onEditPj() {
-    pjCtn.title.classList.add("inactive");
-    pjCtn.editor.ctn.classList.remove("inactive");
+  showPJEditor() {
+    helpers.hide(pjCtn.title);
+    helpers.show(pjCtn.editor.ctn);
     pjCtn.editor.titleInput.focus();
     pjCtn.editor.titleInput.value = pjCtn.title.textContent;
   },
@@ -604,8 +646,8 @@ upcomingCtn.sections.forEach((section) => {
     });
   });
 });
-pjCtn.sortBtn.addEventListener("click", contentEvents.showSortPopup);
-pjCtn.editBtn.addEventListener("click", contentEvents.onEditPj);
+pjCtn.sortBtn.addEventListener("click", popupEvents.showSortPopup);
+pjCtn.editBtn.addEventListener("click", contentEvents.showPJEditor);
 pjCtn.editor.saveBtn.addEventListener("click", contentEvents.saveEditPj);
 pjCtn.editor.cancelBtn.addEventListener("click", contentEvents.cancelPjEdit);
 pjCtn.commentBtn.addEventListener("click", () =>
@@ -645,6 +687,8 @@ const init = (() => {
   pjHome.pushToList();
   pjCode.pushToList();
 
+  listOfPjs.forEach((pj) => pj.addToMenu());
+
   samples.generate(50);
   listOfTodos.forEach((todo) => todoFormEvents.addTodoCtnEvents(todo));
   (function addEventsToPJMenuItems() {
@@ -658,7 +702,7 @@ const init = (() => {
       );
       const moreBtn = pj.menuItem.querySelector(".more-btn");
       moreBtn.addEventListener("click", (e) => {
-        popupEvents.showEditPJPopup(e, moreBtn);
+        popupEvents.showPJActionsPopup(e, moreBtn);
       });
       moreBtn.addEventListener("click", (e) => e.stopPropagation());
     });

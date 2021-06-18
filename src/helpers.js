@@ -29,4 +29,36 @@ const helpers = (() => ({
 
     return btn;
   },
+  createPJEditor(className) {
+    const ctn = document.createElement("div");
+    ctn.classList.add("inactive", "pj-editor");
+
+    const titleInput = document.createElement("input");
+    titleInput.classList.add("title-input", className);
+    ctn.appendChild(titleInput);
+
+    const editorActions = document.createElement("div");
+    editorActions.classList.add("editor-actions");
+    ctn.appendChild(editorActions);
+
+    const saveBtn = document.createElement("button");
+    saveBtn.classList.add("btn", "act-btn", "save-btn");
+    saveBtn.setAttribute("type", "button");
+    saveBtn.textContent = "Save";
+    editorActions.appendChild(saveBtn);
+
+    const cancelBtn = document.createElement("button");
+    cancelBtn.classList.add("btn", "act-btn", "cancel-btn");
+    cancelBtn.setAttribute("type", "button");
+    cancelBtn.textContent = "Cancel";
+    editorActions.appendChild(cancelBtn);
+
+    return {
+      ctn,
+      titleInput,
+      editorActions,
+      saveBtn,
+      cancelBtn,
+    };
+  },
 }))();

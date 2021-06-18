@@ -20,19 +20,36 @@ pjFactory.prototype.createProject = function (title) {
     menuItem: function () {
       const pjLink = document.createElement("li");
       pjLink.classList.add("pj-list-item", "btn");
-      pjLink.textContent = title;
       pjLink.dataset.project = this.id;
+      return pjLink;
+    }.call(this),
+    menuContent: function () {
+      const div = document.createElement("div");
+      div.classList.add("pj-list-content");
+
+      const span = document.createElement("span");
+      span.textContent = title;
 
       const actionsBtn = helpers.createIconBtn("flaticon-more-1", "more-btn");
       actionsBtn.dataset.id = `actions-btn-${this.id}`;
 
-      pjLink.appendChild(actionsBtn);
-      const pjMenu = document.querySelector("#pj-list");
-      pjMenu.appendChild(pjLink);
-      return pjLink;
+      div.appendChild(span);
+      div.appendChild(actionsBtn);
+
+      return div;
     }.call(this),
+    appendContent() {
+      this.menuItem.appendChild(this.menuContent);
+    },
+    addToMenu() {
+      this.menuItem.appendChild(this.menuContent);
+      const pjMenu = document.querySelector("#pj-list");
+      pjMenu.appendChild(this.menuItem);
+      return this;
+    },
     pushToList() {
       listOfPjs.push(this);
+      return this;
     },
     addToForm(input) {
       var pjOption = document.createElement("option");
@@ -40,6 +57,7 @@ pjFactory.prototype.createProject = function (title) {
       pjOption.value = this.id;
 
       input.appendChild(pjOption);
+      return this;
     },
     del() {
       const copy = [...this.todoList];
@@ -50,6 +68,7 @@ pjFactory.prototype.createProject = function (title) {
     },
     editTitle(str) {
       this.title = str;
+      return this;
     },
     id: this.id++,
   };

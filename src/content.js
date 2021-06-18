@@ -213,38 +213,7 @@ const content = (() => {
   };
 
   const pjCtn = createCtn("pj");
-  pjCtn.editor = (function createEditor() {
-    const ctn = document.createElement("div");
-    ctn.classList.add("inactive");
-
-    const titleInput = document.createElement("input");
-    titleInput.classList.add("title-input", "header-title-input");
-    ctn.appendChild(titleInput);
-
-    const editorActions = document.createElement("div");
-    editorActions.classList.add("editor-actions");
-    ctn.appendChild(editorActions);
-
-    const saveBtn = document.createElement("button");
-    saveBtn.classList.add("btn", "act-btn", "save-btn");
-    saveBtn.setAttribute("type", "button");
-    saveBtn.textContent = "Save";
-    editorActions.appendChild(saveBtn);
-
-    const cancelBtn = document.createElement("button");
-    cancelBtn.classList.add("btn", "act-btn", "cancel-btn");
-    cancelBtn.setAttribute("type", "button");
-    cancelBtn.textContent = "Cancel";
-    editorActions.appendChild(cancelBtn);
-
-    return {
-      ctn,
-      titleInput,
-      editorActions,
-      saveBtn,
-      cancelBtn,
-    };
-  })();
+  pjCtn.editor = helpers.createPJEditor("header-title-input");
   pjCtn.headerContent.appendChild(pjCtn.editor.ctn);
   pjCtn.actionCtn = createNew.actionCtn();
   pjCtn.headerContent.appendChild(pjCtn.actionCtn);
@@ -295,6 +264,12 @@ const content = (() => {
     helpers.show(this.title);
     helpers.hide(this.editor.ctn);
     return this;
+  };
+  pjCtn.setDataProject = function (id) {
+    pjCtn.main.dataset.project = id;
+    const btnKeys = Object.keys(pjCtn).filter((key) => key.endsWith("Btn"));
+
+    btnKeys.forEach((key) => (pjCtn[key].dataset.project = id));
   };
 
   return {

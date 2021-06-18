@@ -1,19 +1,22 @@
+import { helpers } from "./helpers.js";
+
 export { menu };
 
 const menu = (() => {
-  var menu = document.getElementById("menu");
-  var today = menu.querySelector("#today-menu");
-  var upcoming = menu.querySelector("#upcoming-menu");
-  var form = menu.querySelector("#new-pj-form");
-  var newBtn = menu.querySelector("#new-pj-btn");
-  var addBtn = menu.querySelector("#add-pj-btn");
-  var cancelBtn = menu.querySelector("#cancel-pj-btn");
-
-  var titleInput = document.querySelector("#new-pj-form input[name=pj-title]");
-
-  var pjListItems = menu.querySelectorAll(".pj-list-item");
+  const ctn = document.getElementById("menu");
+  const today = ctn.querySelector("#today-menu");
+  const upcoming = ctn.querySelector("#upcoming-menu");
+  const form = ctn.querySelector("#new-pj-form");
+  const newBtn = ctn.querySelector("#new-pj-btn");
+  const addBtn = ctn.querySelector("#add-pj-btn");
+  const cancelBtn = ctn.querySelector("#cancel-pj-btn");
+  const titleInput = document.querySelector(
+    "#new-pj-form input[name=pj-title]"
+  );
+  const editor = helpers.createPJEditor("menu-title-input");
 
   return {
+    ctn,
     today,
     upcoming,
     form,
@@ -21,6 +24,6 @@ const menu = (() => {
     newBtn,
     addBtn,
     cancelBtn,
-    pjListItems,
+    editor,
   };
 })();
