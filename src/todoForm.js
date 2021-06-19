@@ -70,6 +70,7 @@ const todoForm = (() => {
   const contentForm = (function createTodoForm() {
     const ctn = document.querySelector(".new-todo-form");
     const titleInput = ctn.querySelector(".title-input");
+    titleInput.placeholder = "e.g., Learn Portuguese";
     const dateInput = ctn.querySelector("input[type='date']");
     const pjInput = ctn.querySelector("select");
     const priorityBtn = ctn.querySelector(".priority-btn");
@@ -98,21 +99,20 @@ const todoForm = (() => {
   list.push(contentForm);
 
   const modalForm = (() => {
-    var form = document.getElementById("new-todo-form");
-    var ctn = form.closest(".modal");
-    var addBtn = form.querySelector("#add-todo-btn");
-    var cancelBtn = form.querySelector(".close-btn");
-
-    var commentBtn = form.querySelector(".comment-btn");
+    const form = document.getElementById("new-todo-form");
+    const ctn = form.closest(".modal");
+    const addBtn = form.querySelector("#add-todo-btn");
+    const cancelBtn = form.querySelector(".close-btn");
+    const commentBtn = form.querySelector(".comment-btn");
     commentBtn.dataset.id = "comment-modal-form";
-    var commentIcon = commentBtn.querySelector(".flaticon");
-    var priorityBtn = form.querySelector(".priority-btn");
+    const commentIcon = commentBtn.querySelector(".flaticon");
+    const priorityBtn = form.querySelector(".priority-btn");
     priorityBtn.dataset.id = "priority-modal-form";
-    var priorityIcon = priorityBtn.querySelector(".flaticon");
-
-    var titleInput = form.querySelector("input[name=todo-title");
-    var dateInput = form.querySelector("input[type=date");
-    var pjInput = form.querySelector("select[name=todo-pj");
+    const priorityIcon = priorityBtn.querySelector(".flaticon");
+    const titleInput = form.querySelector("input[name=todo-title");
+    titleInput.placeholder = "e.g., Learn Portuguese";
+    const dateInput = form.querySelector("input[type=date");
+    const pjInput = form.querySelector("select[name=todo-pj");
 
     return {
       form,

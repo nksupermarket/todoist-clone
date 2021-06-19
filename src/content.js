@@ -5,9 +5,14 @@ import { today } from "./today.js";
 
 const content = (() => {
   const main = document.getElementById("content");
-  let list = [];
+  let mainCtns = [];
 
   const ctnMethods = {
+    checkSectionView() {
+      if (!this.sectionView) return false;
+      if (this.sectionView.classList.contains("inactive")) return false;
+      return true;
+    },
     fillTodoList(list) {
       var fragment = document.createDocumentFragment();
       list.forEach((todo) => fragment.prepend(todo.ctn));
@@ -59,9 +64,9 @@ const content = (() => {
         let fragment = document.createDocumentFragment();
         this.todoArray.forEach((todo) => todo.ctn.remove());
         this.todoArray.forEach((todo) => fragment.appendChild(todo.ctn));
-        fragment.appendChild(this.todoBtn);
+        if (this.todoBtn) fragment.appendChild(this.todoBtn);
         this.todoList.appendChild(fragment);
-      })();
+      }.call(this));
 
       return this;
     },
@@ -92,7 +97,7 @@ const content = (() => {
         ctn.todoList.appendChild(ctn.todoBtn);
       }
 
-      if (className === "main-ctn") list.push(ctn);
+      if (className === "main-ctn") mainCtns.push(ctn);
 
       return ctn;
     },
@@ -143,8 +148,6 @@ const content = (() => {
         sortedBtn.classList.add("inactive");
         const sortedBtnIcon = sortedBtn.querySelector(".flaticon");
         const sortedBtnText = sortedBtn.querySelector(".btn-text");
-        sortedBtn.appendChild(sortedBtnIcon);
-        sortedBtn.appendChild(sortedBtnText);
 
         const sortBtn = create.iconBtn("flaticon-sort", "sort-btn", "Sort", id);
         obj.sortedBtn = sortedBtn;
@@ -177,8 +180,8 @@ const content = (() => {
         obj.editBtn = editBtn;
       }
 
-      for (const btn in obj) {
-        ctn.appendChild(obj[btn]);
+      for (const btnKey in obj) {
+        if (btnKey.endsWith("Btn")) ctn.appendChild(obj[btnKey]);
       }
 
       return obj;
@@ -212,25 +215,30 @@ const content = (() => {
         );
         ctn.header.setAttribute("class", "section-header section-content");
         ctn.headerContent.setAttribute("class", "section-header-content");
-
+        arr.push(ctn);
         sectionHolder.appendChild(ctn.main);
-        if (arr) return arr.push(ctn);
-        return ctn;
+        if (number === 1) return ctn;
       }
     },
   };
 
   const todayCtn = create.ctn("div", "main-ctn", "today", "h1");
   const todayStr = new Date().toString().slice(0, 10);
+  todayCtn.sections = [];
   todayCtn.sectionView = document.createElement("div");
   todayCtn.overdueSection = create.sections(
     1,
     todayCtn.sectionView,
-    null,
+    todayCtn.sections,
     false
   );
   todayCtn.overdueSection.title.textContent = "Overdue";
-  todayCtn.todaySection = create.sections(1, todayCtn.sectionView, null, true);
+  todayCtn.todaySection = create.sections(
+    1,
+    todayCtn.sectionView,
+    todayCtn.sections,
+    true
+  );
   todayCtn.todaySection.title.textContent = "Today";
   todayCtn.title.innerHTML = `<span>Today</span><small>${todayStr}</small>`;
   const todayCtnActionCtn = create.actionCtn();
@@ -251,10 +259,10 @@ const content = (() => {
     false
   );
   upcomingCtn.title.textContent = "Upcoming";
-  upcomingCtn.sectionHolder = document.createElement("div");
+  upcomingCtn.sectionView = document.createElement("div");
   upcomingCtn.sections = [];
-  create.sections(7, upcomingCtn.sectionHolder, upcomingCtn.sections);
-  upcomingCtn.main.appendChild(upcomingCtn.sectionHolder);
+  create.sections(7, upcomingCtn.sectionView, upcomingCtn.sections);
+  upcomingCtn.main.appendChild(upcomingCtn.sectionView);
   upcomingCtn.refresh = function () {
     this.sections.forEach((section) => {
       const todos = listOfTodos.filter(
@@ -281,7 +289,7 @@ const content = (() => {
   pjCtn.headerContent.appendChild(pjCtnActionCtn);
 
   pjCtn.refreshTitle = function (list) {
-    const pj = helpers.findItem(list, pjCtn.main.dataset.project);
+    const pj = helpers.findItem(mainCtns, pjCtn.main.dataset.project);
     pjCtn.title.textContent = pj.title;
     helpers.show(this.title);
     helpers.hide(this.editor.ctn);
@@ -295,13 +303,13 @@ const content = (() => {
   };
 
   return {
-    list,
+    mainCtns,
     main,
     pjCtn,
     todayCtn,
     upcomingCtn,
     findActiveCtn() {
-      return list.find((ctn) => this.main.contains(ctn.main));
+      return mainCtns.find((ctn) => this.main.contains(ctn.main));
     },
     removeActiveCtn() {
       var activeCtn = this.findActiveCtn();

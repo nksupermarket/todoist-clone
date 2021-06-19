@@ -668,19 +668,19 @@ main .new-todo-btn:hover {
   left: 50%;
   margin-left: -0.5rem;
 }
-.todo-checkbox:hover > .priority-1 {
+.priority-1 {
   background-color: rgba(209, 69, 59, 0.1);
 }
 .todo-checkbox:hover > .priority-1::before {
   color: rgb(209, 69, 59) !important;
 }
-.todo-checkbox:hover > .priority-2 {
+.priority-2 {
   background-color: rgba(235, 137, 9, 0.1);
 }
 .todo-checkbox:hover > .priority-2::before {
   color: rgb(235, 137, 9) !important;
 }
-.todo-checkbox:hover > .priority-3 {
+.priority-3 {
   background-color: rgba(36, 111, 224, 0.1);
 }
 .todo-checkbox:hover > .priority-3::before {

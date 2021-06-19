@@ -135,6 +135,7 @@ const menuEvents = {
           if (todos.length === 0)
             return content.upcomingCtn.sections[i].title.classList.add("empty");
           content.upcomingCtn.sections[i].fillTodoList(todos);
+          upcomingCtn.sections[i].main.dataset.dayStr = dayStr;
         }
       }
     }
@@ -142,6 +143,7 @@ const menuEvents = {
   },
   showPj(e) {
     contentEvents.closeOpenEditors();
+    helpers.hide(pjCtn.actions.sortedBtn);
     (function closeOpenCtn() {
       contentEvents.closeTodoForm();
       content.removeActiveCtn();
@@ -411,7 +413,7 @@ const popupEvents = {
     }
     if (deletePopup.ctn.dataset.itemType === "todo") {
       (function removeFromContentTodoList() {
-        content.list.forEach((ctn) => {
+        content.mainCtns.forEach((ctn) => {
           const todoIndex = ctn.todoArray.findIndex(
             (todo) => todo.id.toString() === deletePopup.ctn.dataset.itemId
           );
@@ -458,39 +460,40 @@ const popupEvents = {
   },
   showSortPopup() {
     const activeCtn = content.findActiveCtn();
-    console.log(activeCtn.actions.sortBtn.dataset.id);
     popups.sort.setDataBtn(activeCtn.actions.sortBtn.dataset.id);
     popups.sort.show();
     popups.sort.position(activeCtn.actions.sortBtn);
   },
   onSort(method) {
-    var activeCtn = content.findActiveCtn();
+    const activeCtn = content.findActiveCtn();
     helpers.show(activeCtn.actions.sortedBtn);
+    activeCtn.actions.sortedBtnIcon.setAttribute(
+      "class",
+      "flaticon flaticon-down-arrow-1"
+    );
 
+    let sortCtn;
+    activeCtn.checkSectionView()
+      ? (sortCtn = activeCtn.sections)
+      : (sortCtn = activeCtn);
     switch (method) {
       case "date":
         activeCtn.actions.sortedBtnText.textContent = "Sorted by due date";
-        activeCtn.actions.sortedBtnIcon.setAttribute(
-          "class",
-          "flaticon flaticon-down-arrow-1"
-        );
-        activeCtn.sortDate();
+        Array.isArray(sortCtn)
+          ? sortCtn.forEach((ctn) => ctn.sortDate())
+          : sortCtn.sortDate();
         break;
       case "priority":
         activeCtn.actions.sortedBtnText.textContent = "Sorted by priority";
-        activeCtn.actions.sortedBtnIcon.setAttribute(
-          "class",
-          "flaticon flaticon-down-arrow-1"
-        );
-        activeCtn.sortPriority();
+        Array.isArray(sortCtn)
+          ? sortCtn.forEach((ctn) => ctn.sortPriority())
+          : sortCtn.sortPriority();
         break;
       case "alphabet":
         activeCtn.actions.sortedBtnText.textContent = "Sorted alphabetically";
-        activeCtn.actions.sortedBtnIcon.setAttribute(
-          "class",
-          "flaticon flaticon-down-arrow-1"
-        );
-        activeCtn.sortAlphabetically();
+        Array.isArray(sortCtn)
+          ? sortCtn.forEach((ctn) => ctn.sortAlphabetically())
+          : sortCtn.sortAlphabetically();
         break;
       case "reverse":
         activeCtn.actions.sortedBtnIcon.classList.contains("flaticon-up-arrow")
@@ -502,9 +505,14 @@ const popupEvents = {
               "class",
               "flaticon flaticon-up-arrow"
             );
-        activeCtn.sortReverse();
+        Array.isArray(sortCtn)
+          ? sortCtn.forEach((ctn) => ctn.sortReverse())
+          : sortCtn.sortReverse();
+        break;
     }
-    activeCtn.refresh();
+    Array.isArray(sortCtn)
+      ? sortCtn.forEach((ctn) => ctn.refresh())
+      : sortCtn.refresh();
   },
   showPJActionsPopup(e, btn) {
     menuEvents.addFocusToListItem(e);
@@ -649,12 +657,16 @@ pjCtn.todoBtn.addEventListener("click", () => {
 });
 const todayCtn = content.todayCtn;
 todayCtn.todoBtn.addEventListener("click", () => {
-  contentEvents.showTodoForm(content.todayCtn);
+  contentEvents.showTodoForm(todayCtn);
 });
+todayCtn.todaySection.todoBtn.addEventListener("click", () =>
+  contentEvents.showTodoForm(todayCtn.todaySection)
+);
 const upcomingCtn = content.upcomingCtn;
 upcomingCtn.sections.forEach((section) => {
   section.todoBtn.addEventListener("click", () => {
     contentEvents.showTodoForm(section);
+    contentForm.dateInput.value = section.main.dataset.dayStr;
     upcomingCtn.sections.forEach((section) => {
       section.todoBtn.remove();
     });
