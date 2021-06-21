@@ -589,6 +589,7 @@ section .view-content {
   font-size: 1.4rem;
   white-space: nowrap;
   font-weight: 400;
+  align-self: flex-start;
 }
 .new-todo-btn .flaticon {
   color: var(--header-bg);
@@ -605,6 +606,17 @@ main .new-todo-btn:hover {
 .todo-list {
   padding-left: 55px;
   padding-right: 55px;
+  display: flex;
+  flex-direction: column;
+}
+.project-link {
+  padding: 1rem 1rem;
+  margin: 1rem 1rem;
+  cursor: pointer;
+}
+.project-link:hover {
+  color: grey;
+  text-decoration: underline;
 }
 .todo-content {
   display: flex;

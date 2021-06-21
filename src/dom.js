@@ -25,6 +25,37 @@ const headerEvents = {
     menu.ctn.classList.remove("minimize");
     content.main.classList.remove("menu-minimized");
   },
+  showSearch() {
+    contentEvents.closeOpenEditors();
+    content.removeActiveCtn();
+
+    searchCtn.title.textContent = `Results for "${header.search.value}"`;
+    (function fillPJSection() {
+      const projects = listOfPjs.filter((project) =>
+        project.title.toLowerCase().includes(header.search.value.toLowerCase())
+      );
+      if (projects.length === 0)
+        return searchCtn.projectSection.title.classList.add("empty");
+      searchCtn.projectSection.title.classList.remove("empty");
+      projects.forEach((project) => {
+        const link = document.createElement("a");
+        link.classList.add("project-link");
+        link.textContent = project.title;
+        searchCtn.projectSection.todoList.appendChild(link);
+        link.addEventListener("click", () => menuEvents.showPj(project.id));
+      });
+    })();
+    (function fillTodoSection() {
+      const todos = listOfTodos.filter((todo) =>
+        todo.title.toLowerCase().includes(header.search.value.toLowerCase())
+      );
+      if (todos.length === 0)
+        return searchCtn.todoSection.title.classList.add("empty");
+      searchCtn.todoSection.title.classList.remove("empty");
+      searchCtn.todoSection.fillTodoList(todos);
+    })();
+    content.main.appendChild(searchCtn.main);
+  },
 };
 header.menuBtn.addEventListener("click", () => {
   menu.ctn.classList.contains("minimize")
@@ -32,6 +63,10 @@ header.menuBtn.addEventListener("click", () => {
     : headerEvents.hideMenu();
 });
 header.todoBtn.addEventListener("click", headerEvents.showModalTodoForm);
+header.search.addEventListener("keyup", (e) => {
+  e.preventDefault();
+  if (e.keyCode === 13) headerEvents.showSearch();
+});
 
 const menuEvents = {
   showPjForm() {
@@ -45,11 +80,19 @@ const menuEvents = {
     if (!menu.titleInput.value) return helpers.inputError("empty");
     var newPj = pjFact.createProject(menu.titleInput.value);
     newPj.pushToList();
-    newPj.addToMenu().addEventListener("click", (e) => showPj(e));
+    newPj.addToMenu().addEventListener("click", (e) => {
+      const menuItem = e.target.closest("li");
+      const pjId = menuItem.dataset.project;
+      showPj(pjId);
+    });
     hidePjForm();
 
     (function addEvents() {
-      newPj.menuItem.addEventListener("click", (e) => menuEvents.showPj(e));
+      newPj.menuItem.addEventListener("click", (e) => {
+        const menuItem = e.target.closest("li");
+        const pjId = menuItem.dataset.project;
+        menuEvents.showPj(pjId);
+      });
       newPj.menuItem.addEventListener("mouseover", (e) =>
         menuEvents.showActionsBtn(e)
       );
@@ -65,6 +108,7 @@ const menuEvents = {
   },
   showToday() {
     contentEvents.closeOpenEditors();
+    header.search.value = "";
     if (content.findActiveCtn() !== undefined) content.removeActiveCtn();
     content.main.appendChild(content.todayCtn.main);
 
@@ -92,6 +136,7 @@ const menuEvents = {
   },
   showUpcoming() {
     contentEvents.closeOpenEditors();
+    header.search.value = "";
     content.removeActiveCtn();
     fillSections();
     function fillSections() {
@@ -141,19 +186,18 @@ const menuEvents = {
     }
     content.main.appendChild(content.upcomingCtn.main);
   },
-  showPj(e) {
+  showPj(id) {
     contentEvents.closeOpenEditors();
+    header.search.value = "";
     helpers.hide(pjCtn.actions.sortedBtn);
     (function closeOpenCtn() {
       contentEvents.closeTodoForm();
       content.removeActiveCtn();
     })();
 
-    const menuItem = e.target.closest("li");
-    const pjId = menuItem.dataset.project;
-    pjCtn.setDataProject(pjId);
+    pjCtn.setDataProject(id);
 
-    const pj = helpers.findItem(listOfPjs, pjId);
+    const pj = helpers.findItem(listOfPjs, id);
     content.pjCtn.title.textContent = pj.title;
 
     (function populateList() {
@@ -623,7 +667,7 @@ const contentEvents = {
       return content.upcomingCtn.sections.forEach((section) =>
         section.todoList.appendChild(section.todoBtn)
       );
-    activeCtn.todoList.appendChild(activeCtn.todoBtn);
+    if (activeCtn.todoBtn) activeCtn.todoList.appendChild(activeCtn.todoBtn);
   },
   setDefaultPjForTodoForm() {
     var defaultPj = contentForm.pjInput.querySelector(
@@ -705,6 +749,7 @@ pjCtn.actions.sortedBtn.addEventListener("click", () =>
 todayCtn.actions.sortedBtn.addEventListener("click", () =>
   popupEvents.onSort("reverse")
 );
+const searchCtn = content.searchCtn;
 
 const init = (() => {
   var pjWork = pjFact.createProject("Work");
@@ -721,7 +766,11 @@ const init = (() => {
   listOfTodos.forEach((todo) => todoFormEvents.addTodoCtnEvents(todo));
   (function addEventsToPJMenuItems() {
     listOfPjs.forEach((pj) => {
-      pj.menuItem.addEventListener("click", (e) => menuEvents.showPj(e));
+      pj.menuItem.addEventListener("click", (e) => {
+        const menuItem = e.target.closest("li");
+        const pjId = menuItem.dataset.project;
+        menuEvents.showPj(pjId);
+      });
       pj.menuItem.addEventListener("mouseover", (e) =>
         menuEvents.showActionsBtn(e)
       );

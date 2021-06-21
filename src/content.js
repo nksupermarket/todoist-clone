@@ -203,7 +203,7 @@ const content = (() => {
       todoList.classList.add("todo-list", "view-content");
       return todoList;
     },
-    sections(number, sectionHolder, arr, todoBtn = true) {
+    sections(number, sectionHolder, sectionArr, todoBtn = true) {
       for (var i = 0; i < number; i++) {
         const ctn = create.ctn(
           "section",
@@ -215,7 +215,7 @@ const content = (() => {
         );
         ctn.header.setAttribute("class", "section-header section-content");
         ctn.headerContent.setAttribute("class", "section-header-content");
-        arr.push(ctn);
+        sectionArr.push(ctn);
         sectionHolder.appendChild(ctn.main);
         if (number === 1) return ctn;
       }
@@ -302,12 +302,32 @@ const content = (() => {
     btnKeys.forEach((key) => (pjCtn[key].dataset.project = id));
   };
 
+  const searchCtn = create.ctn("div", "main-ctn", "search", "h1", false, false);
+  searchCtn.sections = [];
+  searchCtn.sectionHolder = document.createElement("div");
+  searchCtn.main.appendChild(searchCtn.sectionHolder);
+  searchCtn.projectSection = create.sections(
+    1,
+    searchCtn.sectionHolder,
+    searchCtn.sections,
+    false
+  );
+  searchCtn.projectSection.title.textContent = "Projects";
+  searchCtn.todoSection = create.sections(
+    1,
+    searchCtn.sectionHolder,
+    searchCtn.sections,
+    false
+  );
+  searchCtn.todoSection.title.textContent = "Todos";
+
   return {
     mainCtns,
     main,
     pjCtn,
     todayCtn,
     upcomingCtn,
+    searchCtn,
     findActiveCtn() {
       return mainCtns.find((ctn) => this.main.contains(ctn.main));
     },
@@ -316,6 +336,7 @@ const content = (() => {
       if (!activeCtn) return;
       activeCtn.main.remove();
       activeCtn.hideSortedBtn().removeTodos();
+      return activeCtn;
     },
   };
 })();
