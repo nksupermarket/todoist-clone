@@ -25,12 +25,21 @@ const headerEvents = {
     menu.ctn.classList.remove("minimize");
     content.main.classList.remove("menu-minimized");
   },
-  showSearch() {
+  showFullSearchbar() {
+    header.search.parentElement.classList.add("focused");
+  },
+  hideFullSearchbar() {
+    header.search.parentElement.classList.remove("focused");
+  },
+  showSearchResult() {
+    if (!header.search.value || !/\S/.test(header.search.value)) return;
+
     contentEvents.closeOpenEditors();
     content.removeActiveCtn();
 
     searchCtn.title.textContent = `Results for "${header.search.value}"`;
     (function fillPJSection() {
+      searchCtn.projectSection.todoList.textContent = "";
       const projects = listOfPjs.filter((project) =>
         project.title.toLowerCase().includes(header.search.value.toLowerCase())
       );
@@ -65,8 +74,10 @@ header.menuBtn.addEventListener("click", () => {
 header.todoBtn.addEventListener("click", headerEvents.showModalTodoForm);
 header.search.addEventListener("keyup", (e) => {
   e.preventDefault();
-  if (e.keyCode === 13) headerEvents.showSearch();
+  if (e.keyCode === 13) headerEvents.showSearchResult();
 });
+header.search.addEventListener("focus", headerEvents.showFullSearchbar);
+header.search.addEventListener("blur", headerEvents.hideFullSearchbar);
 
 const menuEvents = {
   showPjForm() {
@@ -114,17 +125,20 @@ const menuEvents = {
 
     const overdueList = today.getOverdueTodos(listOfTodos);
     if (overdueList.length === 0) {
-      helpers.hide(todayCtn.sectionView);
+      helpers.hide(todayCtn.sectionHolder);
       helpers.show(todayCtn.todoList);
+      todayCtn.sectionView = false;
       showTodayTodos(todayCtn);
       return;
     }
 
     (function showOverdueTodos() {
       helpers.hide(todayCtn.todoList);
-      helpers.show(todayCtn.sectionView);
+      helpers.show(todayCtn.sectionHolder);
+      todayCtn.sectionView = true;
       todayCtn.overdueSection.todoArray = overdueList;
       todayCtn.overdueSection.fillTodoList(overdueList);
+      overdueList.forEach((todo) => todo.checkOverdue());
       showTodayTodos(todayCtn.todaySection);
     })();
 
@@ -179,6 +193,7 @@ const menuEvents = {
           var todos = listOfTodos.filter((item) => item.day === dayStr);
           if (todos.length === 0)
             return content.upcomingCtn.sections[i].title.classList.add("empty");
+          content.upcomingCtn.sections[i].title.classList.remove("empty");
           content.upcomingCtn.sections[i].fillTodoList(todos);
           upcomingCtn.sections[i].main.dataset.dayStr = dayStr;
         }
@@ -196,20 +211,10 @@ const menuEvents = {
     })();
 
     pjCtn.setDataProject(id);
-
     const pj = helpers.findItem(listOfPjs, id);
     content.pjCtn.title.textContent = pj.title;
-
-    (function populateList() {
-      let fragment = document.createDocumentFragment();
-      pj.todoList.forEach((todo) => {
-        helpers.show(todo.ctn);
-        fragment.prepend(todo.ctn);
-      });
-      content.pjCtn.todoList.prepend(fragment);
-      content.pjCtn.todoArray = pj.todoList;
-    })();
-
+    pjCtn.fillTodoList(pj.todoList);
+    pj.todoList.forEach((todo) => todo.checkOverdue());
     content.main.appendChild(content.pjCtn.main);
   },
   showActionsBtn(e) {
@@ -279,16 +284,33 @@ const todoFormEvents = {
       priority,
       notes
     );
-    addTodoCtnEvents(newTodo);
+    todoFormEvents.addTodoCtnEvents(newTodo);
     newTodo.pushToList();
     newTodo.appendContent();
+    newTodo.checkOverdue();
     if (form.pjInput.value != "None") newTodo.pushToProject();
 
-    todoForm.hide();
-    contentEvents.closeTodoForm();
+    form === todoForm.modalForm ? form.hide() : contentEvents.closeTodoForm();
+    popups.comment.reset();
+    popups.priority.reset();
 
-    var activeCtn = content.findActiveCtn();
-    activeCtn.refresh();
+    const activeCtn = content.findActiveCtn();
+    activeCtn.checkSectionView()
+      ? activeCtn.sections.forEach((section) => section.refresh())
+      : activeCtn.refresh();
+    switch (activeCtn) {
+      case todayCtn: {
+        menuEvents.showToday();
+        break;
+      }
+      case upcomingCtn: {
+        menuEvents.showUpcoming();
+        break;
+      }
+      case pjCtn: {
+        break;
+      }
+    }
   },
   close(form) {
     form.hide();
@@ -319,7 +341,7 @@ const todoFormEvents = {
 
     const deleteBtn = todo.content.deleteBtn;
     deleteBtn.addEventListener("click", () =>
-      contentEvents.showDeletePopup("todo", todo.id, todo.title)
+      popupEvents.showDeletePopup("todo", todo.id, todo.title)
     );
 
     function showTodoEditor() {
@@ -361,9 +383,9 @@ modalForm.titleInput.addEventListener("input", () => {
 contentForm.titleInput.addEventListener("input", () => {
   contentForm.changeAddBtn();
 });
-modalForm.addBtn.addEventListener("click", () => {
-  () => todoFormEvents.onAddTodo(modalForm);
-});
+modalForm.addBtn.addEventListener("click", () =>
+  todoFormEvents.onAddTodo(modalForm)
+);
 modalForm.form.addEventListener("click", function (e) {
   e.stopPropagation();
 });
@@ -457,14 +479,18 @@ const popupEvents = {
     }
     if (deletePopup.ctn.dataset.itemType === "todo") {
       (function removeFromContentTodoList() {
-        content.mainCtns.forEach((ctn) => {
-          const todoIndex = ctn.todoArray.findIndex(
-            (todo) => todo.id.toString() === deletePopup.ctn.dataset.itemId
-          );
-          ctn.todoArray.splice(todoIndex, 1);
+        content.allCtns.forEach((ctn) => {
+          if (!ctn.todoArray || ctn.todoArray.length === 0) return;
+          const todoIndex = ctn.todoArray.findIndex(findTodo);
+          function findTodo(todo) {
+            return todo.id.toString() === deletePopup.ctn.dataset.itemId;
+          }
+          if (todoIndex !== -1) {
+            const deleted = ctn.todoArray.splice(todoIndex, 1);
+            if (ctn.todoArray.length === 0) ctn.title.classList.add("empty");
+          }
         });
       })();
-      content.findActiveCtn().refresh();
     }
     popups.hide();
   },
@@ -654,10 +680,10 @@ const contentEvents = {
     contentEvents.closeOpenEditors();
     todoFormEvents.fillPjInput(contentForm);
     contentForm.setDefaultDate();
-    ctn.todoList.appendChild(contentForm.ctn);
-    helpers.show(contentForm.ctn);
+    ctn.todoList.appendChild(contentForm.form);
+    helpers.show(contentForm.form);
     contentForm.titleInput.focus();
-    ctn.todoBtn.remove();
+    helpers.hide(ctn.todoBtn);
   },
   closeTodoForm() {
     var activeCtn = content.findActiveCtn();
@@ -712,10 +738,15 @@ upcomingCtn.sections.forEach((section) => {
     contentEvents.showTodoForm(section);
     contentForm.dateInput.value = section.main.dataset.dayStr;
     upcomingCtn.sections.forEach((section) => {
-      section.todoBtn.remove();
+      helpers.hide(section.todoBtn);
     });
   });
 });
+upcomingCtn.actions.sortBtn.addEventListener(
+  "click",
+  popupEvents.showSortPopup
+);
+
 pjCtn.actions.sortBtn.addEventListener("click", popupEvents.showSortPopup);
 pjCtn.actions.editBtn.addEventListener("click", contentEvents.showPJEditor);
 pjCtn.editor.saveBtn.addEventListener("click", contentEvents.saveEditPj);
@@ -747,6 +778,9 @@ pjCtn.actions.sortedBtn.addEventListener("click", () =>
   popupEvents.onSort("reverse")
 );
 todayCtn.actions.sortedBtn.addEventListener("click", () =>
+  popupEvents.onSort("reverse")
+);
+upcomingCtn.actions.sortedBtn.addEventListener("click", () =>
   popupEvents.onSort("reverse")
 );
 const searchCtn = content.searchCtn;

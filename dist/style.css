@@ -215,6 +215,16 @@ select {
   align-self: center;
 }
 #searchbar input {
+  width: 100%;
+}
+#searchbar:hover {
+  background-color: var(--content-bg);
+  color: var(--main-text);
+}
+#searchbar.focused {
+  background-color: var(--content-bg);
+  color: var(--main-text);
+  width: 450px;
 }
 #header .new-todo-btn {
   height: 80%;
@@ -300,7 +310,7 @@ select {
 #new-todo-form input[name="todo-title"] {
   grid-area: title;
   line-height: 1.5em;
-  margin-bottom: 0.5em;
+  margin-bottom: 1rem;
 }
 .todo-inputs-ctn .required-details {
   grid-area: required;
@@ -569,8 +579,7 @@ section .view-content {
 .empty {
   color: grey;
 }
-#today-ctn .view-header-content,
-#pj-ctn .view-header-content {
+.main-ctn .view-header-content {
   display: flex;
   justify-content: space-between;
 }
@@ -711,12 +720,18 @@ main .new-todo-btn:hover {
 }
 .todo-details {
   grid-area: details;
+  display: flex;
+  align-items: center;
 }
 .todo-details button:first-child {
   margin-left: 0;
 }
 .todo-details button {
-  margin-left: 1rem;
+  height: 16px;
+  line-height: 16px;
+}
+.todo-content .overdue {
+  color: var(--header-bg);
 }
 .day-btn {
   font-size: 1.2rem;
@@ -731,6 +746,13 @@ main .new-todo-btn:hover {
   padding-right: 0;
   padding-top: 0;
   padding-bottom: 0;
+}
+.todo-details .notes-btn {
+  padding: 0 0.5rem;
+}
+.todo-details .notes-btn i {
+  font-size: 1rem;
+  transform: translateY(0);
 }
 .notes-btn-count {
   margin-left: 0.5rem;

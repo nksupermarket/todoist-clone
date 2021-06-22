@@ -1,21 +1,27 @@
 export { content };
 import { helpers } from "./helpers.js";
 import { listOfTodos } from "./projects.js";
-import { today } from "./today.js";
 
 const content = (() => {
   const main = document.getElementById("content");
   let mainCtns = [];
+  let allCtns = [];
 
   const ctnMethods = {
+    show() {
+      contentEvents.closeOpenEditors();
+      header.search.value = "";
+      content.removeActiveCtn();
+      content.main.appendChild(this.main);
+    },
     checkSectionView() {
       if (!this.sectionView) return false;
-      if (this.sectionView.classList.contains("inactive")) return false;
-      return true;
+      return this.sectionView;
     },
     fillTodoList(list) {
+      this.todoArray = list;
       var fragment = document.createDocumentFragment();
-      list.forEach((todo) => fragment.prepend(todo.ctn));
+      list.forEach((todo) => fragment.appendChild(todo.ctn));
       this.todoList.prepend(fragment);
     },
     removeTodos() {
@@ -64,7 +70,10 @@ const content = (() => {
         let fragment = document.createDocumentFragment();
         this.todoArray.forEach((todo) => todo.ctn.remove());
         this.todoArray.forEach((todo) => fragment.appendChild(todo.ctn));
-        if (this.todoBtn) fragment.appendChild(this.todoBtn);
+        if (this.todoBtn) {
+          helpers.show(this.todoBtn);
+          fragment.appendChild(this.todoBtn);
+        }
         this.todoList.appendChild(fragment);
       }.call(this));
 
@@ -98,6 +107,7 @@ const content = (() => {
       }
 
       if (className === "main-ctn") mainCtns.push(ctn);
+      allCtns.push(ctn);
 
       return ctn;
     },
@@ -225,17 +235,18 @@ const content = (() => {
   const todayCtn = create.ctn("div", "main-ctn", "today", "h1");
   const todayStr = new Date().toString().slice(0, 10);
   todayCtn.sections = [];
-  todayCtn.sectionView = document.createElement("div");
+  todayCtn.sectionView = false;
+  todayCtn.sectionHolder = document.createElement("div");
   todayCtn.overdueSection = create.sections(
     1,
-    todayCtn.sectionView,
+    todayCtn.sectionHolder,
     todayCtn.sections,
     false
   );
   todayCtn.overdueSection.title.textContent = "Overdue";
   todayCtn.todaySection = create.sections(
     1,
-    todayCtn.sectionView,
+    todayCtn.sectionHolder,
     todayCtn.sections,
     true
   );
@@ -247,7 +258,7 @@ const content = (() => {
     todayCtnActionCtn,
     "sort"
   );
-  todayCtn.main.appendChild(todayCtn.sectionView);
+  todayCtn.main.appendChild(todayCtn.sectionHolder);
   todayCtn.headerContent.appendChild(todayCtnActionCtn);
 
   const upcomingCtn = create.ctn(
@@ -259,10 +270,18 @@ const content = (() => {
     false
   );
   upcomingCtn.title.textContent = "Upcoming";
-  upcomingCtn.sectionView = document.createElement("div");
+  const upcomingCtnActionCtn = create.actionCtn();
+  upcomingCtn.actions = create.actionBtns(
+    upcomingCtn.main.id,
+    upcomingCtnActionCtn,
+    "sort"
+  );
+  upcomingCtn.headerContent.appendChild(upcomingCtnActionCtn);
+  upcomingCtn.sectionHolder = document.createElement("div");
   upcomingCtn.sections = [];
-  create.sections(7, upcomingCtn.sectionView, upcomingCtn.sections);
-  upcomingCtn.main.appendChild(upcomingCtn.sectionView);
+  upcomingCtn.sectionView = true;
+  create.sections(7, upcomingCtn.sectionHolder, upcomingCtn.sections);
+  upcomingCtn.main.appendChild(upcomingCtn.sectionHolder);
   upcomingCtn.refresh = function () {
     this.sections.forEach((section) => {
       const todos = listOfTodos.filter(
@@ -323,6 +342,7 @@ const content = (() => {
 
   return {
     mainCtns,
+    allCtns,
     main,
     pjCtn,
     todayCtn,

@@ -31,7 +31,7 @@ const todoForm = (() => {
     },
     hide() {
       helpers.hide(this.ctn);
-      this.form != undefined ? this.form.reset() : this.ctn.reset();
+      this.form.reset();
       this.resetPriorityIcon();
       this.changeAddBtn();
       this.commentIcon.classList.remove("flaticon-comment-1");
@@ -69,21 +69,23 @@ const todoForm = (() => {
 
   const contentForm = (function createTodoForm() {
     const ctn = document.querySelector(".new-todo-form");
-    const titleInput = ctn.querySelector(".title-input");
+    const form = document.querySelector(".new-todo-form");
+    const titleInput = form.querySelector(".title-input");
     titleInput.placeholder = "e.g., Learn Portuguese";
-    const dateInput = ctn.querySelector("input[type='date']");
-    const pjInput = ctn.querySelector("select");
-    const priorityBtn = ctn.querySelector(".priority-btn");
+    const dateInput = form.querySelector("input[type='date']");
+    const pjInput = form.querySelector("select");
+    const priorityBtn = form.querySelector(".priority-btn");
     priorityBtn.dataset.id = "priority-content-form";
     const priorityIcon = priorityBtn.querySelector("i");
-    const commentBtn = ctn.querySelector(".comment-btn");
+    const commentBtn = form.querySelector(".comment-btn");
     commentBtn.dataset.id = "comment-content-form";
     const commentIcon = commentBtn.querySelector("i");
-    const addBtn = ctn.querySelector(".add-todo-btn");
-    const cancelBtn = ctn.querySelector(".cancel-btn");
+    const addBtn = form.querySelector(".add-todo-btn");
+    const cancelBtn = form.querySelector(".cancel-btn");
 
     return {
       ctn,
+      form,
       titleInput,
       dateInput,
       pjInput,

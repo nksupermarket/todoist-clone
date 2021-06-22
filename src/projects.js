@@ -296,6 +296,14 @@ todoFactory.prototype.createTodo = function (
         .editProject(editor.pjInput.value)
         .editPriority(prioritySelected.dataset.value);
     },
+    checkOverdue() {
+      const dateObj = new Date(this.day);
+      dateObj.setDate(dateObj.getUTCDate());
+      const todayDate = new Date();
+      dateObj < todayDate
+        ? this.content.dayBtn.classList.add("overdue")
+        : this.content.dayBtn.classList.remove("overdue");
+    },
   };
 };
 var todoFact = new todoFactory();
