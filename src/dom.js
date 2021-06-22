@@ -8,6 +8,22 @@ import { todoForm } from "./todoForm.js";
 import { samples } from "./samples.js";
 import { popups } from "./popups.js";
 import { header } from "./header.js";
+import { init } from "./init.js";
+
+export { headerEvents, menuEvents, todoFormEvents, contentEvents, popupEvents };
+
+function storeInLS(item) {
+  switch (item) {
+    case "todo": {
+      localStorage.setItem("listOfTodos", listOfTodos);
+      break;
+    }
+    case "project": {
+      localStorage.setItem("listOfPjs", listOfPjs);
+      break;
+    }
+  }
+}
 
 const modalForm = todoForm.modalForm;
 const headerEvents = {
@@ -793,40 +809,3 @@ upcomingCtn.actions.sortedBtn.addEventListener("click", () =>
   popupEvents.onSort("reverse")
 );
 const searchCtn = content.searchCtn;
-
-const init = (() => {
-  var pjWork = pjFact.createProject("Work");
-  var pjHome = pjFact.createProject("Home");
-  var pjCode = pjFact.createProject("Code");
-
-  pjWork.pushToList();
-  pjHome.pushToList();
-  pjCode.pushToList();
-
-  listOfPjs.forEach((pj) => pj.addToMenu());
-
-  samples.generate(50);
-  listOfTodos.forEach((todo) => todoFormEvents.addTodoCtnEvents(todo));
-  (function addEventsToPJMenuItems() {
-    listOfPjs.forEach((pj) => {
-      pj.menuItem.addEventListener("click", (e) => {
-        const menuItem = e.target.closest("li");
-        const pjId = menuItem.dataset.project;
-        menuEvents.showPj(pjId);
-      });
-      pj.menuItem.addEventListener("mouseover", (e) =>
-        menuEvents.showActionsBtn(e)
-      );
-      pj.menuItem.addEventListener("mouseleave", (e) =>
-        menuEvents.hideActionsBtn(e)
-      );
-      const moreBtn = pj.menuItem.querySelector(".more-btn");
-      moreBtn.addEventListener("click", (e) => {
-        popupEvents.showPJActionsPopup(e, moreBtn);
-      });
-      moreBtn.addEventListener("click", (e) => e.stopPropagation());
-    });
-  })();
-
-  menuEvents.showToday();
-})();
