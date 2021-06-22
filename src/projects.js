@@ -218,7 +218,7 @@ todoFactory.prototype.createTodo = function (
         deleteBtn,
         main: content,
         refresh() {
-          var todo = getTodo(todoId);
+          const todo = getTodo(todoId);
           titleCtn.textContent = todo.title;
           dayInput.value = todo.day;
           switch (todo.priority) {
@@ -241,26 +241,31 @@ todoFactory.prototype.createTodo = function (
           }
         },
         updateCommentCounter() {
-          var count = notes.text.length;
-          todoCommentsCount.textContent = count;
-          helpers.show(todoComments);
+          const count = notes.text.length;
+          if (count === 0) return helpers.hide(commentsBtn);
+          commentsCount.textContent = count;
+          helpers.show(commentsBtn);
         },
       };
     }.call(this),
     id: this.id++,
     appendContent() {
       this.ctn.appendChild(this.content.main);
+      return this;
     },
     appendEditor(editor) {
       this.content.main.remove();
       this.ctn.appendChild(editor.ctn);
+      return this;
     },
     pushToList() {
       listOfTodos.push(this);
+      return this;
     },
     pushToProject() {
       var project = helpers.findItem(listOfPjs, this.project);
       project.todoList.push(this);
+      return this;
     },
     del() {
       this.ctn.remove();

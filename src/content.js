@@ -18,6 +18,13 @@ const content = (() => {
       if (!this.sectionView) return false;
       return this.sectionView;
     },
+    changeCommentBtn(status) {
+      if (!this.actions.commentBtn) return;
+      const commentIcon = this.actions.commentBtn.querySelector("i");
+      status === "empty"
+        ? commentIcon.classList.remove("flaticon-comment-1")
+        : commentIcon.classList.add("flaticon-comment-1");
+    },
     fillTodoList(list) {
       this.todoArray = list;
       var fragment = document.createDocumentFragment();

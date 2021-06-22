@@ -7,6 +7,7 @@ const menu = (() => {
   const today = ctn.querySelector("#today-menu");
   const upcoming = ctn.querySelector("#upcoming-menu");
   const form = ctn.querySelector("#new-pj-form");
+  const formInput = form.querySelector("input");
   const newBtn = ctn.querySelector("#new-pj-btn");
   const addBtn = ctn.querySelector("#add-pj-btn");
   const cancelBtn = ctn.querySelector("#cancel-pj-btn");
@@ -20,10 +21,15 @@ const menu = (() => {
     today,
     upcoming,
     form,
+    formInput,
     titleInput,
     newBtn,
     addBtn,
     cancelBtn,
     editor,
+    hidePjForm() {
+      helpers.hide(this.form);
+      this.formInput.value = "";
+    },
   };
 })();

@@ -461,7 +461,7 @@ select {
   color: var(--content-bg);
 }
 #pj-menu input[value="Cancel"] {
-  background-color: var(--menu-accent);
+  background-color: var(--menu-bg);
 }
 .pj-list-content button {
   opacity: 0;
@@ -492,6 +492,11 @@ select {
 }
 .pj-list-item .cancel-btn {
   background-color: var(--menu-bg);
+}
+#new-pj-form {
+  background-color: var(--menu-bg);
+  padding: 0.8rem;
+  margin-right: 1rem;
 }
 #content {
   min-height: 380px;
@@ -832,9 +837,47 @@ main .new-todo-btn:hover {
 .item-detail-header {
   display: flex;
   justify-content: space-between;
+  padding-left: 1rem;
+}
+.item-detail-header .close-btn {
+  align-self: flex-start;
+}
+.project-title {
+  padding-top: 0.5rem;
+  font-size: 1.2rem;
+  margin: 0;
+  padding-bottom: 1.5rem;
+}
+.comment-modal .todo-title {
+  font-size: 1.8rem;
 }
 .comment-list {
   height: 100%;
+}
+.note-date {
+  margin: 0;
+  padding-top: 1.5rem;
+  display: flex;
+  flex-direction: row;
+  color: grey;
+  font-style: italic;
+  font-size: 1.2rem;
+}
+.note-date:before,
+.note-date:after {
+  content: "";
+  flex: 1 1;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.3);
+  margin: auto;
+}
+.note-date:before {
+  margin-right: 1rem;
+}
+.note-date:after {
+  margin-left: 1rem;
+}
+.note-text {
+  padding-left: 1rem;
 }
 .comment-editor {
   border-radius: 3px;

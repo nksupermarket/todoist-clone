@@ -59,7 +59,7 @@
               </button>
             </div>
             <ul id="pj-list"></ul>
-            <form id="new-pj-form" class="popup inactive">
+            <form id="new-pj-form" class="inactive">
               <div>
                 <input
                   type="text"
@@ -77,7 +77,7 @@
                 <input
                   type="button"
                   value="Cancel"
-                  class="btn act-btn"
+                  class="btn cancel-btn act-btn"
                   id="cancel-pj-btn"
                 />
               </div>
@@ -289,13 +289,14 @@
       <div id="add-comment">
         <div class="item-detail-header">
           <div class="detail-ctn">
-            <h3 class="project-title">project</h3>
-            <h4 class="todo-title">todo</h4>
+            <p class="project-title">project</h3>
+            <p class="todo-title">todo</h4>
           </div>
-          <button type="button" class="btn close-btn">
+          <button type="button" class="btn icon-btn close-btn">
             <i class="flaticon flaticon-cancel"></i>
           </button>
         </div>
+        <div class="note-date inactive" id="no-notes-note">No Comments</div>
         <div class="comment-list"></div>
         <form class="comment-editor">
           <textarea

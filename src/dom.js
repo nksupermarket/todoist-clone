@@ -82,6 +82,7 @@ header.search.addEventListener("blur", headerEvents.hideFullSearchbar);
 const menuEvents = {
   showPjForm() {
     helpers.show(menu.form);
+    menu.formInput.focus();
   },
   hidePjForm() {
     helpers.hide(menu.form);
@@ -90,14 +91,13 @@ const menuEvents = {
   onAddPj() {
     if (!menu.titleInput.value) return helpers.inputError("empty");
     var newPj = pjFact.createProject(menu.titleInput.value);
-    newPj.pushToList();
-    newPj.addToMenu().addEventListener("click", (e) => {
+    newPj.pushToList().addToMenu();
+    newPj.menuItem.addEventListener("click", (e) => {
       const menuItem = e.target.closest("li");
       const pjId = menuItem.dataset.project;
       showPj(pjId);
     });
-    hidePjForm();
-
+    menu.hidePjForm();
     (function addEvents() {
       newPj.menuItem.addEventListener("click", (e) => {
         const menuItem = e.target.closest("li");
@@ -212,6 +212,10 @@ const menuEvents = {
 
     pjCtn.setDataProject(id);
     const pj = helpers.findItem(listOfPjs, id);
+    console.log(pj.notes);
+    pj.notes.text.length === 0
+      ? pjCtn.changeCommentBtn("empty")
+      : pjCtn.changeCommentBtn("not empty");
     content.pjCtn.title.textContent = pj.title;
     pjCtn.fillTodoList(pj.todoList);
     pj.todoList.forEach((todo) => todo.checkOverdue());
@@ -285,9 +289,7 @@ const todoFormEvents = {
       notes
     );
     todoFormEvents.addTodoCtnEvents(newTodo);
-    newTodo.pushToList();
-    newTodo.appendContent();
-    newTodo.checkOverdue();
+    newTodo.pushToList().appendContent();
     if (form.pjInput.value != "None") newTodo.pushToProject();
 
     form === todoForm.modalForm ? form.hide() : contentEvents.closeTodoForm();
@@ -327,7 +329,7 @@ const todoFormEvents = {
     const commentsBtn = todo.content.main.querySelectorAll(".notes-btn");
     commentsBtn.forEach((btn) =>
       btn.addEventListener("click", () =>
-        contentEvents.showCommentForm(
+        popupEvents.showCommentForm(
           "todo",
           todo.id,
           helpers.findItem(listOfPjs, todo.project).title,
@@ -486,8 +488,12 @@ const popupEvents = {
             return todo.id.toString() === deletePopup.ctn.dataset.itemId;
           }
           if (todoIndex !== -1) {
-            const deleted = ctn.todoArray.splice(todoIndex, 1);
-            if (ctn.todoArray.length === 0) ctn.title.classList.add("empty");
+            ctn.todoArray.splice(todoIndex, 1);
+            console.log(ctn === todayCtn.overdueSection);
+            if (ctn.todoArray.length === 0 && ctn === todayCtn.overdueSection)
+              return menuEvents.showToday();
+            if (ctn.todoArray.length === 0)
+              return ctn.title.classList.add("empty");
           }
         });
       })();
@@ -503,13 +509,15 @@ const popupEvents = {
     let list;
     itemType === "project" ? (list = listOfPjs) : (list = listOfTodos);
     const item = helpers.findItem(list, itemID);
-    if (!item.notes) return;
+    if (item.notes.text.length === 0) return commentModal.showNoNotesNote();
     for (let i = 0; i < item.notes.text.length; i++) {
-      commentModal.fillCommentList(item.notes.text[i], item.notes.date[i]);
+      commentModal.attachNote(item.notes.text[i], item.notes.date[i]);
     }
   },
   onAddComment() {
-    let list = [];
+    commentModal.hideNoNotesNote();
+
+    let list;
     commentModal.form.dataset.itemType === "project"
       ? (list = listOfPjs)
       : (list = listOfTodos);
@@ -523,8 +531,9 @@ const popupEvents = {
     item.notes.date[item.notes.date.length] = date;
 
     commentModal.attachNote(note, date);
-    if (commentModal.form.dataset.item === "todo")
-      item.content.updateCommentCounter();
+    commentModal.form.dataset.itemType === "todo"
+      ? item.content.updateCommentCounter()
+      : pjCtn.changeCommentBtn("not empty");
 
     commentModal.textarea.value = "";
   },
