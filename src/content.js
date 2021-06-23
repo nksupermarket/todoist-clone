@@ -27,7 +27,7 @@ const content = (() => {
     },
     fillTodoList(list) {
       this.todoArray = list;
-      var fragment = document.createDocumentFragment();
+      const fragment = document.createDocumentFragment();
       list.forEach((todo) => fragment.appendChild(todo.ctn));
       this.todoList.prepend(fragment);
     },

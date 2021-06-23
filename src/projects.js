@@ -1,14 +1,8 @@
 export { pjFact, todoFact, listOfPjs, listOfTodos };
 import { helpers } from "./helpers.js";
 
-let listOfPjs;
-localStorage.listOfPjs
-  ? (listOfPjs = localStorage.getItem("listOfPjs"))
-  : (listOfPjs = []);
-let listOfTodos;
-localStorage.listOfTodos
-  ? (listOfTodos = localStorage.getItem("listOfTodos"))
-  : (listOfTodos = []);
+let listOfPjs = [];
+let listOfTodos = [];
 
 function pjFactory() {
   this.id = 1;
@@ -79,7 +73,7 @@ pjFactory.prototype.createProject = function (title) {
     id: this.id++,
   };
 };
-var pjFact = new pjFactory();
+const pjFact = new pjFactory();
 
 function todoFactory() {
   this.id = 1;
@@ -317,4 +311,4 @@ todoFactory.prototype.createTodo = function (
     },
   };
 };
-var todoFact = new todoFactory();
+const todoFact = new todoFactory();

@@ -11,14 +11,15 @@ import { header } from "./header.js";
 
 export { headerEvents, menuEvents, todoFormEvents, contentEvents, popupEvents };
 
-function saveToLS(item) {
-  switch (item) {
-    case "todo": {
-      localStorage.setItem("listOfTodos", listOfTodos);
+function saveToLS(list) {
+  const iceBlock = JSON.stringify(list);
+  switch (list) {
+    case listOfTodos: {
+      localStorage.setItem("listOfTodos", iceBlock);
       break;
     }
-    case "project": {
-      localStorage.setItem("listOfPjs", listOfPjs);
+    case listOfPjs: {
+      localStorage.setItem("listOfPjs", iceBlock);
       break;
     }
   }
@@ -105,33 +106,27 @@ const menuEvents = {
   },
   onAddPj() {
     if (!menu.titleInput.value) return helpers.inputError("empty");
-    var newPj = pjFact.createProject(menu.titleInput.value);
+    const newPj = pjFact.createProject(menu.titleInput.value);
     newPj.pushToList().addToMenu();
-    saveToLS("project");
-    newPj.menuItem.addEventListener("click", (e) => {
-      const menuItem = e.target.closest("li");
-      const pjId = menuItem.dataset.project;
-      showPj(pjId);
-    });
+    saveToLS(listOfPjs);
+    this.addPJMenuItemEvents(newPj.id);
     menu.hidePjForm();
-    (function addEvents() {
-      newPj.menuItem.addEventListener("click", (e) => {
-        const menuItem = e.target.closest("li");
-        const pjId = menuItem.dataset.project;
-        menuEvents.showPj(pjId);
-      });
-      newPj.menuItem.addEventListener("mouseover", (e) =>
-        menuEvents.showActionsBtn(e)
-      );
-      newPj.menuItem.addEventListener("mouseleave", (e) =>
-        menuEvents.hideActionsBtn(e)
-      );
-      const moreBtn = newPj.menuItem.querySelector(".more-btn");
-      moreBtn.addEventListener("click", (e) => {
-        popupEvents.showPJActionsPopup(e, moreBtn);
-      });
-      moreBtn.addEventListener("click", (e) => e.stopPropagation());
-    })();
+  },
+  addPJMenuItemEvents(pj) {
+    pj.menuItem.addEventListener("click", () => {
+      menuEvents.showPj(pj.id);
+    });
+    pj.menuItem.addEventListener("mouseover", (e) =>
+      menuEvents.showActionsBtn(e)
+    );
+    pj.menuItem.addEventListener("mouseleave", (e) =>
+      menuEvents.hideActionsBtn(e)
+    );
+    const moreBtn = pj.menuItem.querySelector(".more-btn");
+    moreBtn.addEventListener("click", (e) => {
+      popupEvents.showPJActionsPopup(e, moreBtn);
+    });
+    moreBtn.addEventListener("click", (e) => e.stopPropagation());
   },
   showToday() {
     contentEvents.closeOpenEditors();
@@ -228,11 +223,11 @@ const menuEvents = {
 
     pjCtn.setDataProject(id);
     const pj = helpers.findItem(listOfPjs, id);
-    console.log(pj.notes);
     pj.notes.text.length === 0
       ? pjCtn.changeCommentBtn("empty")
       : pjCtn.changeCommentBtn("not empty");
     content.pjCtn.title.textContent = pj.title;
+    console.log(pj.todoList[0]);
     pjCtn.fillTodoList(pj.todoList);
     pj.todoList.forEach((todo) => todo.checkOverdue());
     content.main.appendChild(content.pjCtn.main);
@@ -262,7 +257,7 @@ const menuEvents = {
   savePJEdit() {
     const pj = helpers.findItem(listOfPjs, menu.editor.ctn.dataset.project);
     pj.title = menu.editor.titleInput.value;
-    saveToLS("project");
+    saveToLS(listOfPjs);
     pj.menuContent.querySelector("span").textContent = pj.title;
     if (content.findActiveCtn() === content.pjCtn)
       content.pjCtn.refreshTitle(listOfPjs);
@@ -307,7 +302,7 @@ const todoFormEvents = {
     );
     todoFormEvents.addTodoCtnEvents(newTodo);
     newTodo.pushToList().appendContent();
-    saveToLS("todo");
+    saveToLS(listOfTodos);
     if (form.pjInput.value != "None") newTodo.pushToProject();
 
     form === todoForm.modalForm ? form.hide() : contentEvents.closeTodoForm();
@@ -399,7 +394,7 @@ const todoFormEvents = {
     const todo = helpers.findItem(listOfTodos, editorForm.ctn.dataset.id);
     const prioritySelected = priorityPopup.ctn.querySelector(".active");
     todo.saveEdits(editorForm, prioritySelected);
-    saveToLS("todo");
+    saveToLS(listOfTodos);
     todo.content.refresh();
     editorForm.ctn.remove();
     helpers.hide(editorForm.ctn);
@@ -497,8 +492,8 @@ const popupEvents = {
     const item = helpers.findItem(list, deletePopup.ctn.dataset.itemId);
     item.del();
     deletePopup.ctn.dataset.itemType === "project"
-      ? saveToLS("project")
-      : saveToLS("todo");
+      ? saveToLS(listOfPjs)
+      : saveToLS(listOfTodos);
     if (deletePopup.ctn.dataset.itemType === "project") {
       menuEvents.showToday();
     }
@@ -544,14 +539,12 @@ const popupEvents = {
     commentModal.form.dataset.itemType === "project"
       ? (list = listOfPjs)
       : (list = listOfTodos);
-
     const item = helpers.findItem(list, commentModal.form.dataset.itemId);
-
     const note = commentModal.textarea.value;
     const date = today.getToday();
-
     item.notes.text[item.notes.text.length] = note;
     item.notes.date[item.notes.date.length] = date;
+    saveToLS(list);
 
     commentModal.attachNote(note, date);
     commentModal.form.dataset.itemType === "todo"
@@ -703,7 +696,7 @@ const contentEvents = {
     const pj = helpers.findItem(listOfPjs, pjCtn.main.dataset.project);
     pj.title = pjCtn.editor.titleInput.value;
     pjCtn.refreshTitle(listOfPjs);
-    saveToLS("project");
+    saveToLS(listOfPjs);
   },
   cancelPjEdit() {
     pjCtn.title.classList.remove("inactive");
@@ -818,41 +811,49 @@ upcomingCtn.actions.sortedBtn.addEventListener("click", () =>
 );
 const searchCtn = content.searchCtn;
 
-const init = (() => {
+(function init() {
   if (!localStorage.listOfPjs) {
     const pjWork = pjFact.createProject("Work");
     const pjHome = pjFact.createProject("Home");
     const pjCode = pjFact.createProject("Code");
-
-    pjWork.pushToList();
-    pjHome.pushToList();
-    pjCode.pushToList();
-
-    listOfPjs.forEach((pj) => pj.addToMenu());
+    pjWork.pushToList().addToMenu();
+    pjHome.pushToList().addToMenu();
+    pjCode.pushToList().addToMenu();
     samples.generate(50);
-    listOfTodos.forEach((todo) => todoFormEvents.addTodoCtnEvents(todo));
-    (function addEventsToPJMenuItems() {
-      listOfPjs.forEach((pj) => {
-        pj.menuItem.addEventListener("click", (e) => {
-          const menuItem = e.target.closest("li");
-          const pjId = menuItem.dataset.project;
-          menuEvents.showPj(pjId);
-        });
-        pj.menuItem.addEventListener("mouseover", (e) =>
-          menuEvents.showActionsBtn(e)
-        );
-        pj.menuItem.addEventListener("mouseleave", (e) =>
-          menuEvents.hideActionsBtn(e)
-        );
-        const moreBtn = pj.menuItem.querySelector(".more-btn");
-        moreBtn.addEventListener("click", (e) => {
-          popupEvents.showPJActionsPopup(e, moreBtn);
-        });
-        moreBtn.addEventListener("click", (e) => e.stopPropagation());
-      });
-    })();
-    saveToLS("project");
-    saveToLS("todo");
+    saveToLS(listOfPjs);
+    saveToLS(listOfTodos);
   }
+
+  if (localStorage.listOfPjs) {
+    const LOPzombie = JSON.parse(localStorage.getItem("listOfPjs"));
+    LOPzombie.forEach((pj) => bringToLife(pj, "project"));
+    const LOTzombie = JSON.parse(localStorage.getItem("listOfTodos"));
+    LOTzombie.forEach((todo) => bringToLife(todo, "todo"));
+
+    function bringToLife(item, itemType) {
+      if (item.title === "sample todo 8") console.log(item.notes);
+      switch (itemType) {
+        case "project": {
+          const project = pjFact.createProject(item.title);
+          project.notes = item.notes;
+          project.pushToList().addToMenu();
+          break;
+        }
+        case "todo": {
+          const todo = todoFact.createTodo(
+            item.project,
+            item.title,
+            item.day,
+            item.priority,
+            item.notes
+          );
+          todo.pushToList().appendContent();
+          if (item.project != "None") todo.pushToProject();
+        }
+      }
+    }
+  }
+  listOfTodos.forEach((todo) => todoFormEvents.addTodoCtnEvents(todo));
+  listOfPjs.forEach((pj) => menuEvents.addPJMenuItemEvents(pj));
   menuEvents.showToday();
 })();
