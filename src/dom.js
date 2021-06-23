@@ -8,11 +8,10 @@ import { todoForm } from "./todoForm.js";
 import { samples } from "./samples.js";
 import { popups } from "./popups.js";
 import { header } from "./header.js";
-import { init } from "./init.js";
 
 export { headerEvents, menuEvents, todoFormEvents, contentEvents, popupEvents };
 
-function storeInLS(item) {
+function saveToLS(item) {
   switch (item) {
     case "todo": {
       localStorage.setItem("listOfTodos", listOfTodos);
@@ -108,6 +107,7 @@ const menuEvents = {
     if (!menu.titleInput.value) return helpers.inputError("empty");
     var newPj = pjFact.createProject(menu.titleInput.value);
     newPj.pushToList().addToMenu();
+    saveToLS("project");
     newPj.menuItem.addEventListener("click", (e) => {
       const menuItem = e.target.closest("li");
       const pjId = menuItem.dataset.project;
@@ -262,6 +262,7 @@ const menuEvents = {
   savePJEdit() {
     const pj = helpers.findItem(listOfPjs, menu.editor.ctn.dataset.project);
     pj.title = menu.editor.titleInput.value;
+    saveToLS("project");
     pj.menuContent.querySelector("span").textContent = pj.title;
     if (content.findActiveCtn() === content.pjCtn)
       content.pjCtn.refreshTitle(listOfPjs);
@@ -287,8 +288,8 @@ const todoFormEvents = {
     listOfPjs.forEach((pj) => pj.addToForm(form.pjInput));
   },
   onAddTodo(form) {
-    var priority = popups.priority.ctn.querySelector(".active").dataset.value;
-    var notes = {
+    const priority = popups.priority.ctn.querySelector(".active").dataset.value;
+    let notes = {
       text: [],
       date: [],
     };
@@ -297,7 +298,7 @@ const todoFormEvents = {
       notes.text[0] = popups.comment.textarea.value;
       notes.date[0] = today.getToday();
     })();
-    var newTodo = todoFact.createTodo(
+    const newTodo = todoFact.createTodo(
       form.pjInput.value,
       form.titleInput.value,
       form.dateInput.value,
@@ -306,6 +307,7 @@ const todoFormEvents = {
     );
     todoFormEvents.addTodoCtnEvents(newTodo);
     newTodo.pushToList().appendContent();
+    saveToLS("todo");
     if (form.pjInput.value != "None") newTodo.pushToProject();
 
     form === todoForm.modalForm ? form.hide() : contentEvents.closeTodoForm();
@@ -393,6 +395,22 @@ const todoFormEvents = {
       helpers.show(editorForm.ctn);
     }
   },
+  onSaveEdit() {
+    const todo = helpers.findItem(listOfTodos, editorForm.ctn.dataset.id);
+    const prioritySelected = priorityPopup.ctn.querySelector(".active");
+    todo.saveEdits(editorForm, prioritySelected);
+    saveToLS("todo");
+    todo.content.refresh();
+    editorForm.ctn.remove();
+    helpers.hide(editorForm.ctn);
+    todo.appendContent();
+  },
+  onCancelEdit() {
+    editorForm.ctn.remove();
+    helpers.hide(editorForm.ctn);
+    const todo = helpers.findItem(listOfTodos, editorForm.ctn.dataset.id);
+    todo.appendContent();
+  },
 };
 const contentForm = todoForm.contentForm;
 modalForm.titleInput.addEventListener("input", () => {
@@ -440,22 +458,8 @@ editorForm.priorityBtn.addEventListener("click", function showPriorityPopup() {
   })();
 });
 
-editorForm.saveBtn.addEventListener("click", () => {
-  var todo = helpers.findItem(listOfTodos, editorForm.ctn.dataset.id);
-  var prioritySelected = priorityPopup.ctn.querySelector(".active");
-  todo.saveEdits(editorForm, prioritySelected);
-  todo.content.refresh();
-  editorForm.ctn.remove();
-  helpers.hide(editorForm.ctn);
-  todo.appendContent();
-});
-
-editorForm.cancelBtn.addEventListener("click", () => {
-  editorForm.ctn.remove();
-  helpers.hide(editorForm.ctn);
-  var todo = helpers.findItem(listOfTodos, editorForm.ctn.dataset.id);
-  todo.appendContent();
-});
+editorForm.saveBtn.addEventListener("click", todoFormEvents.onSaveEdit);
+editorForm.cancelBtn.addEventListener("click", todoFormEvents.onCancelEdit);
 
 const popupEvents = {
   closeModal() {
@@ -492,6 +496,9 @@ const popupEvents = {
       : (list = listOfTodos);
     const item = helpers.findItem(list, deletePopup.ctn.dataset.itemId);
     item.del();
+    deletePopup.ctn.dataset.itemType === "project"
+      ? saveToLS("project")
+      : saveToLS("todo");
     if (deletePopup.ctn.dataset.itemType === "project") {
       menuEvents.showToday();
     }
@@ -696,6 +703,7 @@ const contentEvents = {
     const pj = helpers.findItem(listOfPjs, pjCtn.main.dataset.project);
     pj.title = pjCtn.editor.titleInput.value;
     pjCtn.refreshTitle(listOfPjs);
+    saveToLS("project");
   },
   cancelPjEdit() {
     pjCtn.title.classList.remove("inactive");
@@ -809,3 +817,42 @@ upcomingCtn.actions.sortedBtn.addEventListener("click", () =>
   popupEvents.onSort("reverse")
 );
 const searchCtn = content.searchCtn;
+
+const init = (() => {
+  if (!localStorage.listOfPjs) {
+    const pjWork = pjFact.createProject("Work");
+    const pjHome = pjFact.createProject("Home");
+    const pjCode = pjFact.createProject("Code");
+
+    pjWork.pushToList();
+    pjHome.pushToList();
+    pjCode.pushToList();
+
+    listOfPjs.forEach((pj) => pj.addToMenu());
+    samples.generate(50);
+    listOfTodos.forEach((todo) => todoFormEvents.addTodoCtnEvents(todo));
+    (function addEventsToPJMenuItems() {
+      listOfPjs.forEach((pj) => {
+        pj.menuItem.addEventListener("click", (e) => {
+          const menuItem = e.target.closest("li");
+          const pjId = menuItem.dataset.project;
+          menuEvents.showPj(pjId);
+        });
+        pj.menuItem.addEventListener("mouseover", (e) =>
+          menuEvents.showActionsBtn(e)
+        );
+        pj.menuItem.addEventListener("mouseleave", (e) =>
+          menuEvents.hideActionsBtn(e)
+        );
+        const moreBtn = pj.menuItem.querySelector(".more-btn");
+        moreBtn.addEventListener("click", (e) => {
+          popupEvents.showPJActionsPopup(e, moreBtn);
+        });
+        moreBtn.addEventListener("click", (e) => e.stopPropagation());
+      });
+    })();
+    saveToLS("project");
+    saveToLS("todo");
+  }
+  menuEvents.showToday();
+})();

@@ -1,8 +1,14 @@
 export { pjFact, todoFact, listOfPjs, listOfTodos };
 import { helpers } from "./helpers.js";
 
-let listOfPjs = [];
-let listOfTodos = [];
+let listOfPjs;
+localStorage.listOfPjs
+  ? (listOfPjs = localStorage.getItem("listOfPjs"))
+  : (listOfPjs = []);
+let listOfTodos;
+localStorage.listOfTodos
+  ? (listOfTodos = localStorage.getItem("listOfTodos"))
+  : (listOfTodos = []);
 
 function pjFactory() {
   this.id = 1;
