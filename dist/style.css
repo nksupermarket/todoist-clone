@@ -622,6 +622,7 @@ main .new-todo-btn:hover {
   padding-right: 55px;
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
 }
 .project-link {
   padding: 1rem 1rem;
@@ -632,12 +633,22 @@ main .new-todo-btn:hover {
   color: grey;
   text-decoration: underline;
 }
+.todo-ctn {
+  border-bottom: 1px solid var(--content-accent);
+  width: 100%;
+  transition: width 0.1s ease-out;
+}
+.todo-ctn.complete {
+  width: 95%;
+}
 .todo-content {
   display: flex;
   flex-direction: row;
   align-content: center;
-  border-bottom: 1px solid var(--content-accent);
   padding: 0.5rem 0;
+}
+.complete .todo-content {
+  opacity: 0.5;
 }
 .todo-content button {
   color: grey;
@@ -656,10 +667,8 @@ main .new-todo-btn:hover {
 }
 .todo-checkbox {
   padding-left: 2rem;
-  grid-area: checkbox;
   margin-right: 1rem;
-  height: fit-content;
-  width: fit-content;
+  cursor: default;
   position: relative;
   top: 3px;
   -webkit-user-select: none;
@@ -674,6 +683,7 @@ main .new-todo-btn:hover {
   opacity: 0;
 }
 .checkbox {
+  cursor: pointer;
   position: absolute;
   top: 0;
   left: 0;
@@ -682,7 +692,7 @@ main .new-todo-btn:hover {
   border: 2px solid;
   border-radius: 50%;
 }
-.todo-checkbox:hover > .checkbox::before {
+.checkbox:hover::before {
   font-family: flaticon;
   content: "\f10b";
   font-size: 1rem;
@@ -718,6 +728,13 @@ main .new-todo-btn:hover {
 .todo-checkbox:hover > .priority-4::before {
   color: rgba(32, 32, 32, 0.6) !important;
 }
+.priority-5 {
+  background-color: rgba(5, 133, 39, 0.1);
+  border-width: 1px !important;
+}
+.todo-checkbox:hover > .priority-5 {
+  color: #058527 !important;
+}
 .todo-title {
   grid-area: title;
   margin: 0;
@@ -737,6 +754,9 @@ main .new-todo-btn:hover {
 }
 .todo-content .overdue {
   color: var(--header-bg);
+}
+.complete .day-btn {
+  pointer-events: none;
 }
 .day-btn {
   font-size: 1.2rem;
@@ -775,7 +795,13 @@ main .new-todo-btn:hover {
 .todo-actions button {
   margin-left: 0.5em;
 }
+.complete .edit-btn {
+  opacity: 0;
+  position: absolute;
+  pointer-events: none;
+}
 .todo-editor {
+  width: 100%;
   padding: 4px;
 }
 .editor-area {

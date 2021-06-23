@@ -97,7 +97,7 @@ todoFactory.prototype.createTodo = function (
     priority,
     notes,
     ctn: function createCtn() {
-      var todoItem = document.createElement("li");
+      const todoItem = document.createElement("li");
       todoItem.dataset.todo = this.id;
       todoItem.classList.add("todo-ctn");
 
@@ -131,6 +131,10 @@ todoFactory.prototype.createTodo = function (
           case "4":
             checkbox.setAttribute("class", "priority-4 checkbox");
             checkbox.style.border = "1px solid rgba(32,32,32,0.6)";
+            break;
+          case "5":
+            checkbox.setAttribute("class", "priority-5 checkbox");
+            checkbox.style.borderColor = "#058527";
             break;
         }
         checkbox.classList.add("checkbox");
@@ -216,6 +220,7 @@ todoFactory.prototype.createTodo = function (
         editBtn,
         commentBtn,
         deleteBtn,
+        checkbox,
         main: content,
         refresh() {
           const todo = getTodo(todoId);
@@ -223,20 +228,24 @@ todoFactory.prototype.createTodo = function (
           dayInput.value = todo.day;
           switch (todo.priority) {
             case "1":
-              checkbox.classList.add("priority-1");
+              checkbox.setAttribute("class", "priority-1 checkbox");
               checkbox.style.borderColor = "rgb(209, 69, 59)";
               break;
             case "2":
-              checkbox.classList.add("priority-2");
+              checkbox.setAttribute("class", "priority-2 checkbox");
               checkbox.style.borderColor = "rgb(235, 137, 9)";
               break;
             case "3":
-              checkbox.classList.add("priority-3");
+              checkbox.setAttribute("class", "priority-3 checkbox");
               checkbox.style.borderColor = "rgb(36, 111, 224)";
               break;
             case "4":
-              checkbox.classList.add("priority-4");
+              checkbox.setAttribute("class", "priority-4 checkbox");
               checkbox.style.border = "1px solid rgba(32,32,32,0.6)";
+              break;
+            case "5":
+              checkbox.setAttribute("class", "priority-5 checkbox");
+              checkbox.style.borderColor = "#058527";
               break;
           }
         },
@@ -275,6 +284,18 @@ todoFactory.prototype.createTodo = function (
       const pjIndex = pj.todoList.findIndex((todo) => todo.id === this.id);
       pj.todoList.splice(pjIndex, 1);
     },
+    markComplete() {
+      this.priority = "5";
+      this.content.refresh();
+      this.ctn.classList.add("complete");
+      this.content.dayBtn.classList.remove("overdue");
+    },
+    markIncomplete() {
+      this.priority = "4";
+      this.content.refresh();
+      this.ctn.classList.remove("complete");
+      this.checkOverdue();
+    },
     editTitle(str) {
       this.title = str;
       return this;
@@ -302,12 +323,18 @@ todoFactory.prototype.createTodo = function (
         .editPriority(prioritySelected.dataset.value);
     },
     checkOverdue() {
-      const dateObj = new Date(this.day);
-      dateObj.setDate(dateObj.getUTCDate());
+      if (this.priority === "5") return;
+      const dateObj = new Date(this.day + " 00:00");
       const todayDate = new Date();
+      todayDate.setHours(0, 0, 0, 0);
       dateObj < todayDate
         ? this.content.dayBtn.classList.add("overdue")
         : this.content.dayBtn.classList.remove("overdue");
+      return this;
+    },
+    checkComplete() {
+      if (this.priority === "5") this.ctn.classList.add("complete");
+      return this;
     },
   };
 };

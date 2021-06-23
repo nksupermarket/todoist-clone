@@ -1,44 +1,50 @@
-import { listOfTodos, listOfPjs, todoFact } from "./projects.js";
+import { listOfPjs, todoFact } from "./projects.js";
 export { samples };
 
 const samples = (() => {
   return {
     generate(quantity) {
       for (var i = 0; i < quantity; i++) {
-        var project = getRandomProject();
-        var title = `sample todo ${i}`;
-        var day = getRandomDay();
-        var priority = getRandomPriority();
-        var notes = { text: [], date: [] };
+        const project = getRandomProject();
+        const title = `sample todo ${i}`;
+        const day = getRandomDay();
+        const priority = getRandomPriority();
+        const notes = { text: [], date: [] };
 
-        var newTodo = todoFact.createTodo(project, title, day, priority, notes);
-        newTodo.pushToList();
-        newTodo.pushToProject();
-        newTodo.appendContent();
+        const newTodo = todoFact.createTodo(
+          project,
+          title,
+          day,
+          priority,
+          notes
+        );
+        newTodo.pushToList().pushToProject().appendContent();
         function getRandomProject() {
-          var randomIndex = Math.floor(Math.random() * listOfPjs.length);
+          const randomIndex = Math.floor(Math.random() * listOfPjs.length);
           return listOfPjs[randomIndex].id;
         }
         function getRandomDay() {
-          var currentYear = new Date().getFullYear();
-          var today = new Date();
-          var todayDay = today.getDate();
-          today.setDate(todayDay - 1);
-          var nextWeek = new Date();
+          const currentYear = new Date().getFullYear();
+          let today = new Date();
+          let todayDay = today.getDate();
+          let yesterday = new Date();
+          yesterday.setDate(todayDay - 1);
+          let nextWeek = new Date();
           nextWeek.setDate(todayDay + 7);
-          var randomDay = new Date(
-            today.getTime() +
-              Math.random() * (nextWeek.getTime() - today.getTime())
+          const randomDay = new Date(
+            yesterday.getTime() +
+              Math.random() * (nextWeek.getTime() - yesterday.getTime())
           );
+          console.log(yesterday.getDate(), randomDay);
 
-          var randomDayMonth = randomDay.getMonth() + 1;
+          let randomDayMonth = randomDay.getMonth() + 1;
           if (randomDayMonth.toString().length != 2)
             randomDayMonth = `0${randomDayMonth}`;
-          var randomDayDay = randomDay.getDate();
+          let randomDayDay = randomDay.getDate();
           if (randomDayDay.toString().length != 2)
             randomDayDay = `0${randomDayDay}`;
 
-          var randomDayStr = `${currentYear}-${randomDayMonth}-${randomDayDay}`;
+          const randomDayStr = `${currentYear}-${randomDayMonth}-${randomDayDay}`;
           return randomDayStr;
         }
       }

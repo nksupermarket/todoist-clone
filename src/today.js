@@ -3,24 +3,29 @@ export { today };
 const today = (() => {
   return {
     getToday() {
-      var today = new Date();
-      var year = today.getFullYear();
-      var month = today.getMonth() + 1;
+      const today = new Date();
+      const year = today.getFullYear();
+      let month = today.getMonth() + 1;
       if (month.toString().length === 1) month = "0".concat(month.toString());
-      var day = today.getDate();
+      const day = today.getDate();
       if (day.toString().length === 1) day = "0".concat(day.toString());
-      var todayStr = `${year}-${month}-${day}`;
+      const todayStr = `${year}-${month}-${day}`;
       return todayStr;
     },
     getTodayTodos(list) {
-      var today = this.getToday();
-      var todoList = list.filter((item) => item.day == today);
+      const today = this.getToday();
+      const todoList = list.filter((item) => {
+        if (item.priority === "5") return false;
+        return item.day == today;
+      });
       return todoList;
     },
     getOverdueTodos(list) {
-      var today = new Date(this.getToday());
-      var todoList = list.filter((item) => {
-        var dueDay = new Date(item.day);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todoList = list.filter((item) => {
+        if (item.priority === "5") return false;
+        const dueDay = new Date(item.day + " 00:00");
         return dueDay < today;
       });
       return todoList;

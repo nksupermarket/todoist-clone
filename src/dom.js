@@ -9,8 +9,6 @@ import { samples } from "./samples.js";
 import { popups } from "./popups.js";
 import { header } from "./header.js";
 
-export { headerEvents, menuEvents, todoFormEvents, contentEvents, popupEvents };
-
 function saveToLS(list) {
   const iceBlock = JSON.stringify(list);
   switch (list) {
@@ -143,16 +141,17 @@ const menuEvents = {
       return;
     }
 
-    (function showOverdueTodos() {
+    showOverdueTodos();
+    showTodayTodos(todayCtn.todaySection);
+
+    function showOverdueTodos() {
       helpers.hide(todayCtn.todoList);
       helpers.show(todayCtn.sectionHolder);
       todayCtn.sectionView = true;
       todayCtn.overdueSection.todoArray = overdueList;
       todayCtn.overdueSection.fillTodoList(overdueList);
       overdueList.forEach((todo) => todo.checkOverdue());
-      showTodayTodos(todayCtn.todaySection);
-    })();
-
+    }
     function showTodayTodos(ctn) {
       const todayList = today.getTodayTodos(listOfTodos);
       ctn.fillTodoList(todayList);
@@ -201,7 +200,10 @@ const menuEvents = {
             return `${year}-${month}-${day}`;
           })();
 
-          var todos = listOfTodos.filter((item) => item.day === dayStr);
+          var todos = listOfTodos.filter((item) => {
+            if (item.priority === "5") return false;
+            return item.day === dayStr;
+          });
           if (todos.length === 0)
             return content.upcomingCtn.sections[i].title.classList.add("empty");
           content.upcomingCtn.sections[i].title.classList.remove("empty");
@@ -227,7 +229,6 @@ const menuEvents = {
       ? pjCtn.changeCommentBtn("empty")
       : pjCtn.changeCommentBtn("not empty");
     content.pjCtn.title.textContent = pj.title;
-    console.log(pj.todoList[0]);
     pjCtn.fillTodoList(pj.todoList);
     pj.todoList.forEach((todo) => todo.checkOverdue());
     content.main.appendChild(content.pjCtn.main);
@@ -353,12 +354,6 @@ const todoFormEvents = {
 
     const editBtn = todo.content.editBtn;
     editBtn.addEventListener("click", showTodoEditor);
-
-    const deleteBtn = todo.content.deleteBtn;
-    deleteBtn.addEventListener("click", () =>
-      popupEvents.showDeletePopup("todo", todo.id, todo.title)
-    );
-
     function showTodoEditor() {
       contentEvents.closeOpenEditors();
       editorForm.setDataset(todo.id);
@@ -388,6 +383,21 @@ const todoFormEvents = {
       editorForm.changeFlagIcon(flagColor, todo.priority);
       todo.appendEditor(editorForm);
       helpers.show(editorForm.ctn);
+    }
+
+    const deleteBtn = todo.content.deleteBtn;
+    deleteBtn.addEventListener("click", () =>
+      popupEvents.showDeletePopup("todo", todo.id, todo.title)
+    );
+
+    const checkbox = todo.content.checkbox;
+    checkbox.addEventListener("click", onCheckbox);
+    function onCheckbox() {
+      todo.priority === "5" ? todo.markIncomplete() : todo.markComplete();
+      saveToLS(listOfTodos);
+      const activeCtn = content.findActiveCtn();
+      if (activeCtn === todayCtn) menuEvents.showToday();
+      if (activeCtn === upcomingCtn) menuEvents.showUpcoming();
     }
   },
   onSaveEdit() {
@@ -507,7 +517,6 @@ const popupEvents = {
           }
           if (todoIndex !== -1) {
             ctn.todoArray.splice(todoIndex, 1);
-            console.log(ctn === todayCtn.overdueSection);
             if (ctn.todoArray.length === 0 && ctn === todayCtn.overdueSection)
               return menuEvents.showToday();
             if (ctn.todoArray.length === 0)
@@ -812,18 +821,6 @@ upcomingCtn.actions.sortedBtn.addEventListener("click", () =>
 const searchCtn = content.searchCtn;
 
 (function init() {
-  if (!localStorage.listOfPjs) {
-    const pjWork = pjFact.createProject("Work");
-    const pjHome = pjFact.createProject("Home");
-    const pjCode = pjFact.createProject("Code");
-    pjWork.pushToList().addToMenu();
-    pjHome.pushToList().addToMenu();
-    pjCode.pushToList().addToMenu();
-    samples.generate(50);
-    saveToLS(listOfPjs);
-    saveToLS(listOfTodos);
-  }
-
   if (localStorage.listOfPjs) {
     const LOPzombie = JSON.parse(localStorage.getItem("listOfPjs"));
     LOPzombie.forEach((pj) => bringToLife(pj, "project"));
@@ -831,7 +828,6 @@ const searchCtn = content.searchCtn;
     LOTzombie.forEach((todo) => bringToLife(todo, "todo"));
 
     function bringToLife(item, itemType) {
-      if (item.title === "sample todo 8") console.log(item.notes);
       switch (itemType) {
         case "project": {
           const project = pjFact.createProject(item.title);
@@ -847,12 +843,24 @@ const searchCtn = content.searchCtn;
             item.priority,
             item.notes
           );
-          todo.pushToList().appendContent();
+          todo.pushToList().appendContent().checkComplete();
           if (item.project != "None") todo.pushToProject();
         }
       }
     }
   }
+  if (!localStorage.listOfPjs) {
+    const pjWork = pjFact.createProject("Work");
+    const pjHome = pjFact.createProject("Home");
+    const pjCode = pjFact.createProject("Code");
+    pjWork.pushToList().addToMenu();
+    pjHome.pushToList().addToMenu();
+    pjCode.pushToList().addToMenu();
+    samples.generate(50);
+    saveToLS(listOfPjs);
+    saveToLS(listOfTodos);
+  }
+
   listOfTodos.forEach((todo) => todoFormEvents.addTodoCtnEvents(todo));
   listOfPjs.forEach((pj) => menuEvents.addPJMenuItemEvents(pj));
   menuEvents.showToday();
