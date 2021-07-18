@@ -1,16 +1,16 @@
 export { content };
-import { helpers } from "./helpers.js";
-import { listOfTodos } from "./projects.js";
+import { helpers } from './helpers.js';
+import { listOfTodos } from './projects.js';
 
 const content = (() => {
-  const main = document.getElementById("content");
+  const main = document.getElementById('content');
   let mainCtns = [];
   let allCtns = [];
 
   const ctnMethods = {
     show() {
       contentEvents.closeOpenEditors();
-      header.search.value = "";
+      header.search.value = '';
       content.removeActiveCtn();
       content.main.appendChild(this.main);
     },
@@ -20,10 +20,10 @@ const content = (() => {
     },
     changeCommentBtn(status) {
       if (!this.actions.commentBtn) return;
-      const commentIcon = this.actions.commentBtn.querySelector("i");
-      status === "empty"
-        ? commentIcon.classList.remove("flaticon-comment-1")
-        : commentIcon.classList.add("flaticon-comment-1");
+      const commentIcon = this.actions.commentBtn.querySelector('i');
+      status === 'empty'
+        ? commentIcon.classList.remove('flaticon-comment-1')
+        : commentIcon.classList.add('flaticon-comment-1');
     },
     fillTodoList(list) {
       this.todoArray = list;
@@ -32,7 +32,7 @@ const content = (() => {
       this.todoList.prepend(fragment);
     },
     removeTodos() {
-      var todoCtns = this.main.querySelectorAll(".todo-ctn");
+      var todoCtns = this.main.querySelectorAll('.todo-ctn');
       if (todoCtns.length === 0) return this;
       todoCtns.forEach((todo) => todo.remove());
       return this;
@@ -113,22 +113,22 @@ const content = (() => {
         ctn.todoList.appendChild(ctn.todoBtn);
       }
 
-      if (className === "main-ctn") mainCtns.push(ctn);
+      if (className === 'main-ctn') mainCtns.push(ctn);
       allCtns.push(ctn);
 
       return ctn;
     },
     header() {
-      var header = document.createElement("header");
-      header.classList.add("view-header", "view-content");
+      var header = document.createElement('header');
+      header.classList.add('view-header', 'view-content');
       return header;
     },
     headerContent(titleTag) {
-      var ctn = document.createElement("div");
-      ctn.classList.add("view-header-content");
+      var ctn = document.createElement('div');
+      ctn.classList.add('view-header-content');
 
       var title = document.createElement(titleTag);
-      title.classList.add("content-title");
+      title.classList.add('content-title');
       ctn.appendChild(title);
 
       return {
@@ -137,15 +137,15 @@ const content = (() => {
       };
     },
     todoBtn() {
-      var btn = document.createElement("button");
-      btn.classList.add("btn", "new-todo-btn");
+      var btn = document.createElement('button');
+      btn.classList.add('btn', 'new-todo-btn');
 
-      var icon = document.createElement("i");
-      icon.classList.add("flaticon", "flaticon-plus");
+      var icon = document.createElement('i');
+      icon.classList.add('flaticon', 'flaticon-plus');
 
-      var text = document.createElement("span");
-      text.classList.add("add-todo-btn-text");
-      text.textContent = "Add todo";
+      var text = document.createElement('span');
+      text.classList.add('add-todo-btn-text');
+      text.textContent = 'Add todo';
 
       btn.appendChild(icon);
       btn.appendChild(text);
@@ -153,52 +153,52 @@ const content = (() => {
       return btn;
     },
     actionCtn() {
-      var ctn = document.createElement("div");
-      ctn.classList.add("action-ctn");
+      var ctn = document.createElement('div');
+      ctn.classList.add('action-ctn');
       return ctn;
     },
     actionBtns(id, ctn, ...btns) {
       let obj = {};
 
-      if (btns.includes("sort")) {
-        const sortedBtn = create.iconBtn("flaticon", "sorted-btn", "", id);
-        sortedBtn.classList.add("inactive");
-        const sortedBtnIcon = sortedBtn.querySelector(".flaticon");
-        const sortedBtnText = sortedBtn.querySelector(".btn-text");
+      if (btns.includes('sort')) {
+        const sortedBtn = create.iconBtn('flaticon', 'sorted-btn', '', id);
+        sortedBtn.classList.add('inactive');
+        const sortedBtnIcon = sortedBtn.querySelector('.flaticon');
+        const sortedBtnText = sortedBtn.querySelector('.btn-text');
 
-        const sortBtn = create.iconBtn("flaticon-sort", "sort-btn", "Sort", id);
+        const sortBtn = create.iconBtn('flaticon-sort', 'sort-btn', 'Sort', id);
         obj.sortedBtn = sortedBtn;
         obj.sortedBtnIcon = sortedBtnIcon;
         obj.sortedBtnText = sortedBtnText;
         obj.sortBtn = sortBtn;
       }
 
-      if (btns.includes("comment")) {
+      if (btns.includes('comment')) {
         const commentBtn = create.iconBtn(
-          "flaticon-comment",
-          "comment-btn",
-          "Comments"
+          'flaticon-comment',
+          'comment-btn',
+          'Comments'
         );
         obj.commentBtn = commentBtn;
       }
 
-      if (btns.includes("delete")) {
+      if (btns.includes('delete')) {
         const deleteBtn = create.iconBtn(
-          "flaticon-trash",
-          "delete-btn",
-          "Delete",
+          'flaticon-trash',
+          'delete-btn',
+          'Delete',
           id
         );
         obj.deleteBtn = deleteBtn;
       }
 
-      if (btns.includes("edit")) {
-        const editBtn = create.iconBtn("flaticon-pen", "edit-btn", "Edit", id);
+      if (btns.includes('edit')) {
+        const editBtn = create.iconBtn('flaticon-pen', 'edit-btn', 'Edit', id);
         obj.editBtn = editBtn;
       }
 
       for (const btnKey in obj) {
-        if (btnKey.endsWith("Btn")) ctn.appendChild(obj[btnKey]);
+        if (btnKey.endsWith('Btn')) ctn.appendChild(obj[btnKey]);
       }
 
       return obj;
@@ -206,8 +206,8 @@ const content = (() => {
     iconBtn(iconName, className, str, id) {
       const btn = helpers.createIconBtn(iconName, className);
 
-      var text = document.createElement("span");
-      text.classList.add("btn-text");
+      var text = document.createElement('span');
+      text.classList.add('btn-text');
       text.textContent = str;
       btn.appendChild(text);
 
@@ -216,22 +216,22 @@ const content = (() => {
       return btn;
     },
     todoList() {
-      var todoList = document.createElement("ul");
-      todoList.classList.add("todo-list", "view-content");
+      var todoList = document.createElement('ul');
+      todoList.classList.add('todo-list', 'view-content');
       return todoList;
     },
     sections(number, sectionHolder, sectionArr, todoBtn = true) {
       for (var i = 0; i < number; i++) {
         const ctn = create.ctn(
-          "section",
-          "section-ctn",
-          "",
-          "h2",
+          'section',
+          'section-ctn',
+          '',
+          'h2',
           true,
           todoBtn
         );
-        ctn.header.setAttribute("class", "section-header section-content");
-        ctn.headerContent.setAttribute("class", "section-header-content");
+        ctn.header.setAttribute('class', 'section-header section-content');
+        ctn.headerContent.setAttribute('class', 'section-header-content');
         sectionArr.push(ctn);
         sectionHolder.appendChild(ctn.main);
         if (number === 1) return ctn;
@@ -239,52 +239,52 @@ const content = (() => {
     },
   };
 
-  const todayCtn = create.ctn("div", "main-ctn", "today", "h1");
+  const todayCtn = create.ctn('div', 'main-ctn', 'today', 'h1');
   const todayStr = new Date().toString().slice(0, 10);
   todayCtn.sections = [];
   todayCtn.sectionView = false;
-  todayCtn.sectionHolder = document.createElement("div");
+  todayCtn.sectionHolder = document.createElement('div');
   todayCtn.overdueSection = create.sections(
     1,
     todayCtn.sectionHolder,
     todayCtn.sections,
     false
   );
-  todayCtn.overdueSection.title.textContent = "Overdue";
+  todayCtn.overdueSection.title.textContent = 'Overdue';
   todayCtn.todaySection = create.sections(
     1,
     todayCtn.sectionHolder,
     todayCtn.sections,
     true
   );
-  todayCtn.todaySection.title.textContent = "Today";
+  todayCtn.todaySection.title.textContent = 'Today';
   todayCtn.title.innerHTML = `<span>Today</span><small>${todayStr}</small>`;
   const todayCtnActionCtn = create.actionCtn();
   todayCtn.actions = create.actionBtns(
     todayCtn.main.id,
     todayCtnActionCtn,
-    "sort"
+    'sort'
   );
   todayCtn.main.appendChild(todayCtn.sectionHolder);
   todayCtn.headerContent.appendChild(todayCtnActionCtn);
 
   const upcomingCtn = create.ctn(
-    "div",
-    "main-ctn",
-    "upcoming",
-    "h1",
+    'div',
+    'main-ctn',
+    'upcoming',
+    'h1',
     false,
     false
   );
-  upcomingCtn.title.textContent = "Upcoming";
+  upcomingCtn.title.textContent = 'Upcoming';
   const upcomingCtnActionCtn = create.actionCtn();
   upcomingCtn.actions = create.actionBtns(
     upcomingCtn.main.id,
     upcomingCtnActionCtn,
-    "sort"
+    'sort'
   );
   upcomingCtn.headerContent.appendChild(upcomingCtnActionCtn);
-  upcomingCtn.sectionHolder = document.createElement("div");
+  upcomingCtn.sectionHolder = document.createElement('div');
   upcomingCtn.sections = [];
   upcomingCtn.sectionView = true;
   create.sections(7, upcomingCtn.sectionHolder, upcomingCtn.sections);
@@ -294,23 +294,23 @@ const content = (() => {
       const todos = listOfTodos.filter(
         (item) => item.day == section.todoList.dataset.dateStr
       );
-      if (!todos[0]) return section.title.classList.add("empty");
+      if (!todos[0]) return section.title.classList.add('empty');
       todos.forEach((todo) => section.todoList.prepend(todo.ctn));
       section.todoList.appendChild(section.todoBtn);
     });
   };
 
-  const pjCtn = create.ctn("div", "main-ctn", "pj", "h1");
-  pjCtn.editor = helpers.createPJEditor("header-title-input");
+  const pjCtn = create.ctn('div', 'main-ctn', 'pj', 'h1');
+  pjCtn.editor = helpers.createPJEditor('header-title-input');
   pjCtn.headerContent.appendChild(pjCtn.editor.ctn);
   const pjCtnActionCtn = create.actionCtn();
   pjCtn.actions = create.actionBtns(
     pjCtn.main.id,
     pjCtnActionCtn,
-    "sort",
-    "edit",
-    "comment",
-    "delete"
+    'sort',
+    'edit',
+    'comment',
+    'delete'
   );
   pjCtn.headerContent.appendChild(pjCtnActionCtn);
 
@@ -323,14 +323,14 @@ const content = (() => {
   };
   pjCtn.setDataProject = function (id) {
     pjCtn.main.dataset.project = id;
-    const btnKeys = Object.keys(pjCtn).filter((key) => key.endsWith("Btn"));
+    const btnKeys = Object.keys(pjCtn).filter((key) => key.endsWith('Btn'));
 
     btnKeys.forEach((key) => (pjCtn[key].dataset.project = id));
   };
 
-  const searchCtn = create.ctn("div", "main-ctn", "search", "h1", false, false);
+  const searchCtn = create.ctn('div', 'main-ctn', 'search', 'h1', false, false);
   searchCtn.sections = [];
-  searchCtn.sectionHolder = document.createElement("div");
+  searchCtn.sectionHolder = document.createElement('div');
   searchCtn.main.appendChild(searchCtn.sectionHolder);
   searchCtn.projectSection = create.sections(
     1,
@@ -338,19 +338,19 @@ const content = (() => {
     searchCtn.sections,
     false
   );
-  searchCtn.projectSection.title.textContent = "Projects";
+  searchCtn.projectSection.title.textContent = 'Projects';
   searchCtn.todoSection = create.sections(
     1,
     searchCtn.sectionHolder,
     searchCtn.sections,
     false
   );
-  searchCtn.todoSection.title.textContent = "Todos";
+  searchCtn.todoSection.title.textContent = 'Todos';
 
   return {
+    main,
     mainCtns,
     allCtns,
-    main,
     pjCtn,
     todayCtn,
     upcomingCtn,
