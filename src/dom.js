@@ -137,7 +137,7 @@ const menuEvents = {
       return;
     }
     contentBody.removeEventListener('click', headerEvents.hideMenu);
-    menu.ctn.addEventListener('click', stopPropagation);
+    menu.ctn.addEventListener('click', (e) => e.stopPropagation());
   },
   showPjForm() {
     helpers.show(menu.form);
