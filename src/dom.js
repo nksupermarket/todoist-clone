@@ -770,11 +770,25 @@ const contentEvents = {
     var activeCtn = content.findActiveCtn();
     if (!activeCtn) return;
     contentForm.hide();
+
     if (activeCtn === content.upcomingCtn)
-      return content.upcomingCtn.sections.forEach((section) =>
-        section.todoList.appendChild(section.todoBtn)
+      return content.upcomingCtn.sections.forEach((section) => {
+        helpers.show(section.todoBtn);
+        section.todoList.appendChild(section.todoBtn);
+      });
+
+    if (activeCtn === content.todayCtn && content.todayCtn.checkSectionView()) {
+      helpers.show(content.todayCtn.todaySection.todoBtn);
+      content.todayCtn.todaySection.todoList.appendChild(
+        content.todayCtn.todaySection.todoBtn
       );
-    if (activeCtn.todoBtn) activeCtn.todoList.appendChild(activeCtn.todoBtn);
+      return;
+    }
+
+    if (activeCtn.todoBtn) {
+      helpers.show(activeCtn.todoBtn);
+      activeCtn.todoList.appendChild(activeCtn.todoBtn);
+    }
   },
   setDefaultPjForTodoForm() {
     var defaultPj = contentForm.pjInput.querySelector(
