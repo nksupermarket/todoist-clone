@@ -1,5 +1,5 @@
 export { pjFact, todoFact, listOfPjs, listOfTodos };
-import { helpers } from "./helpers.js";
+import { helpers } from './helpers.js';
 
 let listOfPjs = [];
 let listOfTodos = [];
@@ -18,19 +18,19 @@ pjFactory.prototype.createProject = function (title) {
       date: [],
     },
     menuItem: function () {
-      const pjLink = document.createElement("li");
-      pjLink.classList.add("pj-list-item", "btn");
+      const pjLink = document.createElement('li');
+      pjLink.classList.add('pj-list-item', 'btn');
       pjLink.dataset.project = this.id;
       return pjLink;
     }.call(this),
     menuContent: function () {
-      const div = document.createElement("div");
-      div.classList.add("pj-list-content");
+      const div = document.createElement('div');
+      div.classList.add('pj-list-content');
 
-      const span = document.createElement("span");
+      const span = document.createElement('span');
       span.textContent = title;
 
-      const actionsBtn = helpers.createIconBtn("flaticon-more-1", "more-btn");
+      const actionsBtn = helpers.createIconBtn('flaticon-more-1', 'more-btn');
       actionsBtn.dataset.id = `actions-btn-${this.id}`;
 
       div.appendChild(span);
@@ -43,7 +43,7 @@ pjFactory.prototype.createProject = function (title) {
     },
     addToMenu() {
       this.menuItem.appendChild(this.menuContent);
-      const pjMenu = document.querySelector("#pj-list");
+      const pjMenu = document.querySelector('#pj-list');
       pjMenu.appendChild(this.menuItem);
       return this;
     },
@@ -52,7 +52,7 @@ pjFactory.prototype.createProject = function (title) {
       return this;
     },
     addToForm(input) {
-      var pjOption = document.createElement("option");
+      var pjOption = document.createElement('option');
       pjOption.textContent = this.title;
       pjOption.value = this.id;
 
@@ -97,95 +97,95 @@ todoFactory.prototype.createTodo = function (
     priority,
     notes,
     ctn: function createCtn() {
-      const todoItem = document.createElement("li");
+      const todoItem = document.createElement('li');
       todoItem.dataset.todo = this.id;
-      todoItem.classList.add("todo-ctn");
+      todoItem.classList.add('todo-ctn');
 
       return todoItem;
     }.call(this),
     content: function createContent() {
       const todoId = this.id;
-      const content = document.createElement("div");
-      content.classList.add("todo-content");
+      const content = document.createElement('div');
+      content.classList.add('todo-content');
       content.dataset.todo = this.id;
 
-      const checkbox = document.createElement("span");
+      const checkbox = document.createElement('span');
       const checkboxCtn = (function createFinishedCheckbox() {
-        var checkboxCtn = document.createElement("button");
-        checkboxCtn.setAttribute("type", "button");
-        var checkboxInput = document.createElement("input");
-        checkboxInput.setAttribute("type", "checkbox");
+        var checkboxCtn = document.createElement('button');
+        checkboxCtn.setAttribute('type', 'button');
+        var checkboxInput = document.createElement('input');
+        checkboxInput.setAttribute('type', 'checkbox');
         switch (priority) {
-          case "1":
-            checkbox.setAttribute("class", "priority-1 checkbox");
-            checkbox.style.borderColor = "rgb(209, 69, 59)";
+          case '1':
+            checkbox.setAttribute('class', 'priority-1 checkbox');
+            checkbox.style.borderColor = 'rgb(209, 69, 59)';
             break;
-          case "2":
-            checkbox.setAttribute("class", "priority-2 checkbox");
-            checkbox.style.borderColor = "rgb(235, 137, 9)";
+          case '2':
+            checkbox.setAttribute('class', 'priority-2 checkbox');
+            checkbox.style.borderColor = 'rgb(235, 137, 9)';
             break;
-          case "3":
-            checkbox.setAttribute("class", "priority-3 checkbox");
-            checkbox.style.borderColor = "rgb(36, 111, 224)";
+          case '3':
+            checkbox.setAttribute('class', 'priority-3 checkbox');
+            checkbox.style.borderColor = 'rgb(36, 111, 224)';
             break;
-          case "4":
-            checkbox.setAttribute("class", "priority-4 checkbox");
-            checkbox.style.border = "1px solid rgba(32,32,32,0.6)";
+          case '4':
+            checkbox.setAttribute('class', 'priority-4 checkbox');
+            checkbox.style.border = '1px solid rgba(32,32,32,0.6)';
             break;
-          case "5":
-            checkbox.setAttribute("class", "priority-5 checkbox");
-            checkbox.style.borderColor = "#058527";
+          case '5':
+            checkbox.setAttribute('class', 'priority-5 checkbox');
+            checkbox.style.borderColor = '#058527';
             break;
         }
-        checkbox.classList.add("checkbox");
-        checkboxCtn.classList.add("todo-checkbox", "btn");
+        checkbox.classList.add('checkbox');
+        checkboxCtn.classList.add('todo-checkbox', 'btn');
         checkboxCtn.appendChild(checkboxInput);
         checkboxCtn.appendChild(checkbox);
         content.appendChild(checkboxCtn);
         return checkboxCtn;
       })();
 
-      const rhCtn = document.createElement("div");
-      rhCtn.classList.add("todo-rh-ctn");
+      const rhCtn = document.createElement('div');
+      rhCtn.classList.add('todo-rh-ctn');
 
-      const titleCtn = document.createElement("p");
+      const titleCtn = document.createElement('p');
       (function createTitle() {
-        titleCtn.classList.add("todo-title");
+        titleCtn.classList.add('todo-title');
         titleCtn.textContent = title;
         rhCtn.appendChild(titleCtn);
       })();
 
-      const details = document.createElement("div");
-      details.classList.add("todo-details");
+      const details = document.createElement('div');
+      details.classList.add('todo-details');
       rhCtn.appendChild(details);
 
       function createBtn(name) {
-        var btn = document.createElement("button");
-        btn.setAttribute("type", "button");
-        btn.classList.add("btn", `${name}-btn`);
+        var btn = document.createElement('button');
+        btn.setAttribute('type', 'button');
+        btn.classList.add('btn', `${name}-btn`);
         btn.dataset.id = `${name}-${todoId}`;
         return btn;
       }
       let dayBtn;
-      const dayInput = document.createElement("input");
+      const dayInput = document.createElement('input');
       (function createDayBtn() {
-        dayBtn = createBtn("day");
-        dayInput.setAttribute("type", "date");
-        dayInput.setAttribute("required", "required");
+        dayBtn = createBtn('day');
+        dayInput.setAttribute('type', 'date');
+        dayInput.setAttribute('required', 'required');
         dayInput.value = day;
         dayBtn.appendChild(dayInput);
         details.appendChild(dayBtn);
       })();
 
-      const commentsBtn = createBtn("notes");
-      const commentsCount = document.createElement("span");
+      const commentsBtn = createBtn('notes');
+      const commentsCount = document.createElement('span');
       (function createCommentsBtn() {
-        commentsBtn.classList.add("icon-btn");
-        if (!notes.text[0]) commentsBtn.classList.add("inactive");
-        var commentsIcon = document.createElement("i");
-        commentsIcon.classList.add("flaticon", "flaticon-comment");
+        commentsBtn.classList.add('icon-btn');
+        if (!notes.text[0]) commentsBtn.classList.add('inactive');
+        var commentsIcon = document.createElement('i');
+        commentsIcon.classList.add('flaticon', 'flaticon-comment');
         commentsCount.textContent = 1;
-        commentsCount.classList.add("notes-btn-count");
+        commentsCount.classList.add('notes-btn-count');
         commentsBtn.appendChild(commentsIcon);
         commentsBtn.appendChild(commentsCount);
         details.appendChild(commentsBtn);
@@ -195,11 +195,11 @@ todoFactory.prototype.createTodo = function (
       let commentBtn;
       let deleteBtn;
       (function createActions() {
-        var todoActions = document.createElement("div");
-        todoActions.classList.add("todo-actions");
-        editBtn = createIconBtn("flaticon-pen", "edit-btn");
-        commentBtn = createIconBtn("flaticon-comment", "notes-btn");
-        deleteBtn = createIconBtn("flaticon-trash", "delete-btn");
+        var todoActions = document.createElement('div');
+        todoActions.classList.add('todo-actions');
+        editBtn = createIconBtn('flaticon-pen', 'edit-btn');
+        commentBtn = createIconBtn('flaticon-comment', 'notes-btn');
+        deleteBtn = createIconBtn('flaticon-trash', 'delete-btn');
 
         function createIconBtn(iconName, className) {
           const btn = helpers.createIconBtn(iconName, className);
@@ -227,25 +227,25 @@ todoFactory.prototype.createTodo = function (
           titleCtn.textContent = todo.title;
           dayInput.value = todo.day;
           switch (todo.priority) {
-            case "1":
-              checkbox.setAttribute("class", "priority-1 checkbox");
-              checkbox.style.borderColor = "rgb(209, 69, 59)";
+            case '1':
+              checkbox.setAttribute('class', 'priority-1 checkbox');
+              checkbox.style.borderColor = 'rgb(209, 69, 59)';
               break;
-            case "2":
-              checkbox.setAttribute("class", "priority-2 checkbox");
-              checkbox.style.borderColor = "rgb(235, 137, 9)";
+            case '2':
+              checkbox.setAttribute('class', 'priority-2 checkbox');
+              checkbox.style.borderColor = 'rgb(235, 137, 9)';
               break;
-            case "3":
-              checkbox.setAttribute("class", "priority-3 checkbox");
-              checkbox.style.borderColor = "rgb(36, 111, 224)";
+            case '3':
+              checkbox.setAttribute('class', 'priority-3 checkbox');
+              checkbox.style.borderColor = 'rgb(36, 111, 224)';
               break;
-            case "4":
-              checkbox.setAttribute("class", "priority-4 checkbox");
-              checkbox.style.border = "1px solid rgba(32,32,32,0.6)";
+            case '4':
+              checkbox.setAttribute('class', 'priority-4 checkbox');
+              checkbox.style.border = '1px solid rgba(32,32,32,0.6)';
               break;
-            case "5":
-              checkbox.setAttribute("class", "priority-5 checkbox");
-              checkbox.style.borderColor = "#058527";
+            case '5':
+              checkbox.setAttribute('class', 'priority-5 checkbox');
+              checkbox.style.borderColor = '#058527';
               break;
           }
         },
@@ -285,15 +285,15 @@ todoFactory.prototype.createTodo = function (
       pj.todoList.splice(pjIndex, 1);
     },
     markComplete() {
-      this.priority = "5";
+      this.priority = '5';
       this.content.refresh();
-      this.ctn.classList.add("complete");
-      this.content.dayBtn.classList.remove("overdue");
+      this.ctn.classList.add('complete');
+      this.content.dayBtn.classList.remove('overdue');
     },
     markIncomplete() {
-      this.priority = "4";
+      this.priority = '4';
       this.content.refresh();
-      this.ctn.classList.remove("complete");
+      this.ctn.classList.remove('complete');
       this.checkOverdue();
     },
     editTitle(str) {
@@ -306,6 +306,7 @@ todoFactory.prototype.createTodo = function (
     },
     editDay(date) {
       this.day = date;
+      this.checkOverdue();
       return this;
     },
     editPriority(level) {
@@ -323,17 +324,17 @@ todoFactory.prototype.createTodo = function (
         .editPriority(prioritySelected.dataset.value);
     },
     checkOverdue() {
-      if (this.priority === "5") return;
-      const dateObj = new Date(this.day + " 00:00");
+      if (this.priority === '5') return;
+      const dateObj = new Date(this.day + ' 00:00');
       const todayDate = new Date();
       todayDate.setHours(0, 0, 0, 0);
       dateObj < todayDate
-        ? this.content.dayBtn.classList.add("overdue")
-        : this.content.dayBtn.classList.remove("overdue");
+        ? this.content.dayBtn.classList.add('overdue')
+        : this.content.dayBtn.classList.remove('overdue');
       return this;
     },
     checkComplete() {
-      if (this.priority === "5") this.ctn.classList.add("complete");
+      if (this.priority === '5') this.ctn.classList.add('complete');
       return this;
     },
   };

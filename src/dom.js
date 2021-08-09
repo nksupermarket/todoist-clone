@@ -208,6 +208,8 @@ const menuEvents = {
     header.search.value = '';
     content.removeActiveCtn();
     fillSections();
+    content.main.appendChild(content.upcomingCtn.main);
+
     function fillSections() {
       var dateObj = new Date();
       for (var i = 0; i < content.upcomingCtn.sections.length; i++) {
@@ -257,7 +259,6 @@ const menuEvents = {
         }
       }
     }
-    content.main.appendChild(content.upcomingCtn.main);
   },
   showPj(id) {
     contentEvents.closeOpenEditors();
@@ -380,7 +381,9 @@ const todoFormEvents = {
     popups.comment.reset();
   },
   addTodoCtnEvents(todo) {
-    const dayInput = todo.content.main.querySelector('.day-btn');
+    const dayInput = todo.content.main
+      .querySelector('.day-btn')
+      .querySelector('input');
     dayInput.addEventListener('change', changeTodoDay);
     function changeTodoDay() {
       todo.editDay(dayInput.value);
