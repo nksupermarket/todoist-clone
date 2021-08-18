@@ -1,19 +1,19 @@
-export { content };
 import { helpers } from './helpers.js';
 import { listOfTodos } from './projects.js';
+export { content };
 
 const content = (() => {
   const main = document.getElementById('content');
-  let mainCtns = [];
-  let allCtns = [];
+  const mainCtns = [];
+  const allCtns = [];
 
   const ctnMethods = {
-    show() {
-      contentEvents.closeOpenEditors();
-      header.search.value = '';
-      content.removeActiveCtn();
-      content.main.appendChild(this.main);
-    },
+    // show() {
+    //   contentEvents.closeOpenEditors();
+    //   header.search.value = '';
+    //   content.removeActiveCtn();
+    //   content.main.appendChild(this.main);
+    // },
     checkSectionView() {
       if (!this.sectionView) return false;
       return this.sectionView;
@@ -32,7 +32,7 @@ const content = (() => {
       this.todoList.prepend(fragment);
     },
     removeTodos() {
-      var todoCtns = this.main.querySelectorAll('.todo-ctn');
+      const todoCtns = this.main.querySelectorAll('.todo-ctn');
       if (todoCtns.length === 0) return this;
       todoCtns.forEach((todo) => todo.remove());
       return this;
@@ -45,8 +45,8 @@ const content = (() => {
     sortDate() {
       this.todoArray.sort(dueDateAscending);
       function dueDateAscending(a, b) {
-        var aDate = new Date(a.day);
-        var bDate = new Date(b.day);
+        const aDate = new Date(a.day);
+        const bDate = new Date(b.day);
 
         if (aDate > bDate) return 1;
         if (aDate < bDate) return -1;
@@ -74,7 +74,7 @@ const content = (() => {
     },
     refresh() {
       (function refreshTodoList() {
-        let fragment = document.createDocumentFragment();
+        const fragment = document.createDocumentFragment();
         this.todoArray.forEach((todo) => todo.ctn.remove());
         this.todoArray.forEach((todo) => fragment.appendChild(todo.ctn));
         if (this.todoBtn) {
@@ -119,15 +119,15 @@ const content = (() => {
       return ctn;
     },
     header() {
-      var header = document.createElement('header');
+      const header = document.createElement('header');
       header.classList.add('view-header', 'view-content');
       return header;
     },
     headerContent(titleTag) {
-      var ctn = document.createElement('div');
+      const ctn = document.createElement('div');
       ctn.classList.add('view-header-content');
 
-      var title = document.createElement(titleTag);
+      const title = document.createElement(titleTag);
       title.classList.add('content-title');
       ctn.appendChild(title);
 
@@ -137,13 +137,13 @@ const content = (() => {
       };
     },
     todoBtn() {
-      var btn = document.createElement('button');
+      const btn = document.createElement('button');
       btn.classList.add('btn', 'new-todo-btn');
 
-      var icon = document.createElement('i');
+      const icon = document.createElement('i');
       icon.classList.add('flaticon', 'flaticon-plus');
 
-      var text = document.createElement('span');
+      const text = document.createElement('span');
       text.classList.add('add-todo-btn-text');
       text.textContent = 'Add todo';
 
@@ -153,12 +153,12 @@ const content = (() => {
       return btn;
     },
     actionCtn() {
-      var ctn = document.createElement('div');
+      const ctn = document.createElement('div');
       ctn.classList.add('action-ctn');
       return ctn;
     },
     actionBtns(id, ctn, ...btns) {
-      let obj = {};
+      const obj = {};
 
       if (btns.includes('sort')) {
         const sortedBtn = create.iconBtn('flaticon', 'sorted-btn', '', id);
@@ -206,7 +206,7 @@ const content = (() => {
     iconBtn(iconName, className, str, id) {
       const btn = helpers.createIconBtn(iconName, className);
 
-      var text = document.createElement('span');
+      const text = document.createElement('span');
       text.classList.add('btn-text');
       text.textContent = str;
       btn.appendChild(text);
@@ -216,12 +216,12 @@ const content = (() => {
       return btn;
     },
     todoList() {
-      var todoList = document.createElement('ul');
+      const todoList = document.createElement('ul');
       todoList.classList.add('todo-list', 'view-content');
       return todoList;
     },
     sections(number, sectionHolder, sectionArr, todoBtn = true) {
-      for (var i = 0; i < number; i++) {
+      for (let i = 0; i < number; i++) {
         const ctn = create.ctn(
           'section',
           'section-ctn',
@@ -359,7 +359,7 @@ const content = (() => {
       return mainCtns.find((ctn) => this.main.contains(ctn.main));
     },
     removeActiveCtn() {
-      var activeCtn = this.findActiveCtn();
+      const activeCtn = this.findActiveCtn();
       if (!activeCtn) return;
       activeCtn.main.remove();
       activeCtn.hideSortedBtn().removeTodos();

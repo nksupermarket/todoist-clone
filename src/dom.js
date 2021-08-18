@@ -211,8 +211,8 @@ const menuEvents = {
     content.main.appendChild(content.upcomingCtn.main);
 
     function fillSections() {
-      var dateObj = new Date();
-      for (var i = 0; i < content.upcomingCtn.sections.length; i++) {
+      const dateObj = new Date();
+      for (let i = 0; i < content.upcomingCtn.sections.length; i++) {
         i === 0 ? null : dateObj.setDate(dateObj.getDate() + 1);
         setTitle(i);
         setTodoList(i);
@@ -238,16 +238,16 @@ const menuEvents = {
         }
         function setTodoList(i) {
           const dayStr = (function getDayStr() {
-            var year = dateObj.getFullYear();
-            var month = dateObj.getMonth() + 1;
-            var day = dateObj.getDate();
+            const year = dateObj.getFullYear();
+            let month = dateObj.getMonth() + 1;
+            let day = dateObj.getDate();
             if (month.toString().length === 1)
               month = '0'.concat(month.toString());
             if (day.toString().length === 1) day = '0'.concat(day.toString());
             return `${year}-${month}-${day}`;
           })();
 
-          var todos = listOfTodos.filter((item) => {
+          const todos = listOfTodos.filter((item) => {
             if (item.priority === '5') return false;
             return item.day === dayStr;
           });
@@ -323,7 +323,7 @@ menu.editor.cancelBtn.addEventListener('click', menuEvents.hidePJEditor);
 
 const todoFormEvents = {
   fillPjInput(form) {
-    var options = form.pjInput.querySelectorAll('option');
+    const options = form.pjInput.querySelectorAll('option');
     options.forEach((option) => {
       if (option.textContent === 'None') return;
       option.remove();
@@ -332,7 +332,7 @@ const todoFormEvents = {
   },
   onAddTodo(form) {
     const priority = popups.priority.ctn.querySelector('.active').dataset.value;
-    let notes = {
+    const notes = {
       text: [],
       date: [],
     };
@@ -507,7 +507,7 @@ editorForm.priorityBtn.addEventListener('click', function showPriorityPopup() {
   popups.priority.setDataBtn(`${editorForm.priorityBtn.dataset.id}`);
   popups.priority.position(editorForm.priorityBtn);
   (function setDefaultPriority() {
-    var todo = helpers.findItem(listOfTodos, editorForm.ctn.dataset.id);
+    const todo = helpers.findItem(listOfTodos, editorForm.ctn.dataset.id);
     popups.priority.setActive(todo.priority);
   })();
 });
@@ -527,7 +527,7 @@ const popupEvents = {
     popup.position(btn);
   },
   onSelectPriorityLevel(e) {
-    var btn = e.target.closest('.btn');
+    const btn = e.target.closest('.btn');
     popups.priority.setActive(btn.dataset.value);
 
     (function () {
@@ -703,9 +703,9 @@ commentPopup.textarea.oninput = () => {
 };
 commentPopup.closeBtn.addEventListener('click', popups.hide);
 window.addEventListener('resize', function movePopups() {
-  var activePopup = popups.findActivePopup();
+  const activePopup = popups.findActivePopup();
   if (!activePopup) return;
-  var btn = document.querySelector(
+  const btn = document.querySelector(
     `[data-id = "${activePopup.ctn.dataset.btn}"]`
   );
   activePopup.position(btn);
@@ -770,7 +770,7 @@ const contentEvents = {
     helpers.hide(ctn.todoBtn);
   },
   closeTodoForm() {
-    var activeCtn = content.findActiveCtn();
+    const activeCtn = content.findActiveCtn();
     if (!activeCtn) return;
     contentForm.hide();
 
@@ -794,22 +794,22 @@ const contentEvents = {
     }
   },
   setDefaultPjForTodoForm() {
-    var defaultPj = contentForm.pjInput.querySelector(
+    const defaultPj = contentForm.pjInput.querySelector(
       `[value="${content.pjCtn.main.dataset.project}"]`
     );
     defaultPj.setAttribute('selected', 'selected');
   },
   closeOpenEditors() {
-    var openEditor = document.querySelector('.todo-editor:not(.inactive)');
+    const openEditor = document.querySelector('.todo-editor:not(.inactive)');
     if (!openEditor) return;
     if (openEditor.classList.contains('new-todo-form')) {
-      var activeCtn = content.findActiveCtn();
+      const activeCtn = content.findActiveCtn();
       contentEvents.closeTodoForm(activeCtn);
       return;
     }
     if (!openEditor.dataset.id) return;
-    var openTodo = helpers.findItem(listOfTodos, openEditor.dataset.id);
-    var prioritySelected = priorityPopup.ctn.querySelector('.active');
+    const openTodo = helpers.findItem(listOfTodos, openEditor.dataset.id);
+    const prioritySelected = priorityPopup.ctn.querySelector('.active');
     openTodo.saveEdits(editorForm, prioritySelected);
     openTodo.content.refresh();
     openTodo.appendContent();

@@ -1,14 +1,14 @@
-export { pjFact, todoFact, listOfPjs, listOfTodos };
 import { helpers } from './helpers.js';
+export { pjFact, todoFact, listOfPjs, listOfTodos };
 
-let listOfPjs = [];
-let listOfTodos = [];
+const listOfPjs = [];
+const listOfTodos = [];
 
 function pjFactory() {
   this.id = 1;
 }
 pjFactory.prototype.createProject = function (title) {
-  let todoList = [];
+  const todoList = [];
 
   return {
     title,
@@ -52,7 +52,7 @@ pjFactory.prototype.createProject = function (title) {
       return this;
     },
     addToForm(input) {
-      var pjOption = document.createElement('option');
+      const pjOption = document.createElement('option');
       pjOption.textContent = this.title;
       pjOption.value = this.id;
 
@@ -86,7 +86,7 @@ todoFactory.prototype.createTodo = function (
   notes
 ) {
   function getTodo(id) {
-    var todo = helpers.findItem(listOfTodos, id);
+    const todo = helpers.findItem(listOfTodos, id);
     return todo;
   }
 
@@ -111,9 +111,9 @@ todoFactory.prototype.createTodo = function (
 
       const checkbox = document.createElement('span');
       const checkboxCtn = (function createFinishedCheckbox() {
-        var checkboxCtn = document.createElement('button');
+        const checkboxCtn = document.createElement('button');
         checkboxCtn.setAttribute('type', 'button');
-        var checkboxInput = document.createElement('input');
+        const checkboxInput = document.createElement('input');
         checkboxInput.setAttribute('type', 'checkbox');
         switch (priority) {
           case '1':
@@ -160,7 +160,7 @@ todoFactory.prototype.createTodo = function (
       rhCtn.appendChild(details);
 
       function createBtn(name) {
-        var btn = document.createElement('button');
+        const btn = document.createElement('button');
         btn.setAttribute('type', 'button');
         btn.classList.add('btn', `${name}-btn`);
         btn.dataset.id = `${name}-${todoId}`;
@@ -182,7 +182,7 @@ todoFactory.prototype.createTodo = function (
       (function createCommentsBtn() {
         commentsBtn.classList.add('icon-btn');
         if (!notes.text[0]) commentsBtn.classList.add('inactive');
-        var commentsIcon = document.createElement('i');
+        const commentsIcon = document.createElement('i');
         commentsIcon.classList.add('flaticon', 'flaticon-comment');
         commentsCount.textContent = 1;
         commentsCount.classList.add('notes-btn-count');
@@ -195,7 +195,7 @@ todoFactory.prototype.createTodo = function (
       let commentBtn;
       let deleteBtn;
       (function createActions() {
-        var todoActions = document.createElement('div');
+        const todoActions = document.createElement('div');
         todoActions.classList.add('todo-actions');
         editBtn = createIconBtn('flaticon-pen', 'edit-btn');
         commentBtn = createIconBtn('flaticon-comment', 'notes-btn');
@@ -272,7 +272,7 @@ todoFactory.prototype.createTodo = function (
       return this;
     },
     pushToProject() {
-      var project = helpers.findItem(listOfPjs, this.project);
+      const project = helpers.findItem(listOfPjs, this.project);
       project.todoList.push(this);
       return this;
     },
