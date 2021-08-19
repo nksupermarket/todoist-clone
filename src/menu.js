@@ -1,35 +1,20 @@
-import { helpers } from "./helpers.js";
+import helpers from './helpers.js';
+
+const menu = {
+  ctn: document.getElementById('menu'),
+  today: document.querySelector('#today-menu'),
+  upcoming: document.querySelector('#upcoming-menu'),
+  pjList: document.querySelector('#pj-list'),
+  form: document.querySelector('#new-pj-form'),
+  titleInput: document.querySelector('input[name=pj-title]'),
+  newBtn: document.querySelector('#new-pj-btn'),
+  addBtn: document.querySelector('#add-pj-btn'),
+  cancelBtn: document.querySelector('#cancel-pj-btn'),
+  editor: helpers.createPJEditor('menu-title-input'),
+  hidePjForm() {
+    helpers.hide(this.form);
+    this.formInput.value = '';
+  },
+};
 
 export { menu };
-
-const menu = (() => {
-  const ctn = document.getElementById("menu");
-  const today = ctn.querySelector("#today-menu");
-  const upcoming = ctn.querySelector("#upcoming-menu");
-  const form = ctn.querySelector("#new-pj-form");
-  const formInput = form.querySelector("input");
-  const newBtn = ctn.querySelector("#new-pj-btn");
-  const addBtn = ctn.querySelector("#add-pj-btn");
-  const cancelBtn = ctn.querySelector("#cancel-pj-btn");
-  const titleInput = document.querySelector(
-    "#new-pj-form input[name=pj-title]"
-  );
-  const editor = helpers.createPJEditor("menu-title-input");
-
-  return {
-    ctn,
-    today,
-    upcoming,
-    form,
-    formInput,
-    titleInput,
-    newBtn,
-    addBtn,
-    cancelBtn,
-    editor,
-    hidePjForm() {
-      helpers.hide(this.form);
-      this.formInput.value = "";
-    },
-  };
-})();

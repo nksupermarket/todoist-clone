@@ -1,14 +1,41 @@
-import { helpers } from './helpers.js';
-export { pjFact, todoFact, listOfPjs, listOfTodos };
+import helpers from './helpers.js';
+import { menu } from './menu.js';
 
 const listOfPjs = [];
 const listOfTodos = [];
 
-function pjFactory() {
+function PjFactory() {
   this.id = 1;
 }
-pjFactory.prototype.createProject = function (title) {
+PjFactory.prototype.createProject = function (title) {
   const todoList = [];
+
+  const create = {
+    menuListItem() {
+      const pjLink = document.createElement('li');
+      pjLink.classList.add('pj-list-item', 'btn');
+      pjLink.dataset.project = this.id;
+      return pjLink;
+    },
+    menuContent() {
+      const div = document.createElement('div');
+      div.classList.add('pj-list-content');
+
+      const fragment = new DocumentFragment();
+      const span = document.createElement('span');
+      span.textContent = title;
+
+      const actionsBtn = helpers.createIconBtn('flaticon-more-1', 'more-btn');
+      actionsBtn.dataset.id = `actions-btn-${this.id}`;
+
+      fragment.appendChild(span);
+      fragment.appendChild(actionsBtn);
+
+      div.appendChild(fragment);
+
+      return div;
+    },
+  };
 
   return {
     title,
@@ -17,34 +44,15 @@ pjFactory.prototype.createProject = function (title) {
       text: [],
       date: [],
     },
-    menuItem: function () {
-      const pjLink = document.createElement('li');
-      pjLink.classList.add('pj-list-item', 'btn');
-      pjLink.dataset.project = this.id;
-      return pjLink;
-    }.call(this),
-    menuContent: function () {
-      const div = document.createElement('div');
-      div.classList.add('pj-list-content');
-
-      const span = document.createElement('span');
-      span.textContent = title;
-
-      const actionsBtn = helpers.createIconBtn('flaticon-more-1', 'more-btn');
-      actionsBtn.dataset.id = `actions-btn-${this.id}`;
-
-      div.appendChild(span);
-      div.appendChild(actionsBtn);
-
-      return div;
-    }.call(this),
+    menuItem: create.menuListItem.call(this),
+    menuContent: create.menuContent.call(this),
+    id: this.id++, // needs to be below menuItem and menuContent because their function call requires the correct id
     appendContent() {
       this.menuItem.appendChild(this.menuContent);
     },
     addToMenu() {
       this.menuItem.appendChild(this.menuContent);
-      const pjMenu = document.querySelector('#pj-list');
-      pjMenu.appendChild(this.menuItem);
+      menu.pjList.appendChild(this.menuItem);
       return this;
     },
     pushToList() {
@@ -60,7 +68,7 @@ pjFactory.prototype.createProject = function (title) {
       return this;
     },
     del() {
-      const copy = [...this.todoList];
+      const copy = [...this.todoList]; // deleting off original causes issues with forEach loop
       copy.forEach((todo) => todo.del());
       this.menuItem.remove();
       const index = listOfPjs.findIndex((pj) => pj.id === this.id);
@@ -70,15 +78,14 @@ pjFactory.prototype.createProject = function (title) {
       this.title = str;
       return this;
     },
-    id: this.id++,
   };
 };
-const pjFact = new pjFactory();
+const pjFact = new PjFactory();
 
-function todoFactory() {
+function TodoFactory() {
   this.id = 1;
 }
-todoFactory.prototype.createTodo = function (
+TodoFactory.prototype.createTodo = function (
   project,
   title,
   day,
@@ -86,134 +93,147 @@ todoFactory.prototype.createTodo = function (
   notes
 ) {
   function getTodo(id) {
-    const todo = helpers.findItem(listOfTodos, id);
-    return todo;
+    return helpers.findItem(listOfTodos, id);
   }
 
+  const create = {
+    ctn() {
+      const todoItem = document.createElement('li');
+      todoItem.dataset.todo = this.id;
+      todoItem.classList.add('todo-ctn');
+
+      return todoItem;
+    },
+    completedCheckbox() {
+      const checkboxCtn = document.createElement('button');
+      checkboxCtn.setAttribute('type', 'button');
+      const checkboxInput = document.createElement('input');
+      checkboxInput.setAttribute('type', 'checkbox');
+
+      const checkbox = document.createElement('span');
+
+      switch (priority) {
+        case '1':
+          checkbox.setAttribute('class', 'priority-1 checkbox');
+          checkbox.style.borderColor = 'rgb(209, 69, 59)';
+          break;
+        case '2':
+          checkbox.setAttribute('class', 'priority-2 checkbox');
+          checkbox.style.borderColor = 'rgb(235, 137, 9)';
+          break;
+        case '3':
+          checkbox.setAttribute('class', 'priority-3 checkbox');
+          checkbox.style.borderColor = 'rgb(36, 111, 224)';
+          break;
+        case '4':
+          checkbox.setAttribute('class', 'priority-4 checkbox');
+          checkbox.style.border = '1px solid rgba(32,32,32,0.6)';
+          break;
+        case '5':
+          checkbox.setAttribute('class', 'priority-5 checkbox');
+          checkbox.style.borderColor = '#058527';
+          break;
+      }
+      checkbox.classList.add('checkbox');
+      checkboxCtn.classList.add('todo-checkbox', 'btn');
+      checkboxCtn.appendChild(checkboxInput);
+      checkboxCtn.appendChild(checkbox);
+      return [checkboxCtn, checkbox];
+    },
+    titleCtn() {
+      const titleCtn = document.createElement('p');
+      titleCtn.classList.add('todo-title');
+      titleCtn.textContent = title;
+      return titleCtn;
+    },
+    btn(name, todoID) {
+      const btn = document.createElement('button');
+      btn.setAttribute('type', 'button');
+      btn.classList.add('btn', `${name}-btn`);
+      btn.dataset.id = `${name}-${todoID}`;
+      return btn;
+    },
+    dayBtn(todoID) {
+      const dayInput = document.createElement('input');
+      const dayBtn = create.btn('day', todoID);
+      dayInput.setAttribute('type', 'date');
+      dayInput.setAttribute('required', 'required');
+      dayInput.value = day;
+      dayBtn.appendChild(dayInput);
+
+      return [dayBtn, dayInput];
+    },
+    commentBtn(todoID) {
+      const commentsBtn = create.btn('notes');
+      const commentsCount = document.createElement('span');
+      commentsBtn.classList.add('icon-btn');
+      if (!notes.text[0]) commentsBtn.classList.add('inactive');
+      const commentsIcon = document.createElement('i');
+      commentsIcon.classList.add('flaticon', 'flaticon-comment');
+      commentsCount.textContent = 1;
+      commentsCount.classList.add('notes-btn-count');
+      commentsBtn.appendChild(commentsIcon);
+      commentsBtn.appendChild(commentsCount);
+
+      return [commentsBtn, commentsCount];
+    },
+    rhActionBtns(todoID) {
+      const todoActions = document.createElement('div');
+      todoActions.classList.add('todo-actions');
+      const editBtn = createIconBtn('flaticon-pen', 'edit-btn');
+      const commentBtn = createIconBtn('flaticon-comment', 'notes-btn');
+      const deleteBtn = createIconBtn('flaticon-trash', 'delete-btn');
+
+      return [todoActions, editBtn, commentBtn, deleteBtn];
+
+      function createIconBtn(iconName, className) {
+        const btn = helpers.createIconBtn(iconName, className);
+        btn.dataset.todo = todoID;
+        btn.dataset.id = `${className}-${todoID}`;
+
+        todoActions.appendChild(btn);
+        return btn;
+      }
+    },
+  };
   return {
     project,
     title,
     day,
     priority,
     notes,
-    ctn: function createCtn() {
-      const todoItem = document.createElement('li');
-      todoItem.dataset.todo = this.id;
-      todoItem.classList.add('todo-ctn');
-
-      return todoItem;
-    }.call(this),
+    ctn: create.ctn.call(this),
     content: function createContent() {
-      const todoId = this.id;
+      const todoID = this.id;
       const content = document.createElement('div');
       content.classList.add('todo-content');
       content.dataset.todo = this.id;
 
-      const checkbox = document.createElement('span');
-      const checkboxCtn = (function createFinishedCheckbox() {
-        const checkboxCtn = document.createElement('button');
-        checkboxCtn.setAttribute('type', 'button');
-        const checkboxInput = document.createElement('input');
-        checkboxInput.setAttribute('type', 'checkbox');
-        switch (priority) {
-          case '1':
-            checkbox.setAttribute('class', 'priority-1 checkbox');
-            checkbox.style.borderColor = 'rgb(209, 69, 59)';
-            break;
-          case '2':
-            checkbox.setAttribute('class', 'priority-2 checkbox');
-            checkbox.style.borderColor = 'rgb(235, 137, 9)';
-            break;
-          case '3':
-            checkbox.setAttribute('class', 'priority-3 checkbox');
-            checkbox.style.borderColor = 'rgb(36, 111, 224)';
-            break;
-          case '4':
-            checkbox.setAttribute('class', 'priority-4 checkbox');
-            checkbox.style.border = '1px solid rgba(32,32,32,0.6)';
-            break;
-          case '5':
-            checkbox.setAttribute('class', 'priority-5 checkbox');
-            checkbox.style.borderColor = '#058527';
-            break;
-        }
-        checkbox.classList.add('checkbox');
-        checkboxCtn.classList.add('todo-checkbox', 'btn');
-        checkboxCtn.appendChild(checkboxInput);
-        checkboxCtn.appendChild(checkbox);
-        content.appendChild(checkboxCtn);
-        return checkboxCtn;
-      })();
+      const [checkboxCtn, checkbox] = create.completedCheckbox();
 
       const rhCtn = document.createElement('div');
       rhCtn.classList.add('todo-rh-ctn');
 
-      const titleCtn = document.createElement('p');
-      (function createTitle() {
-        titleCtn.classList.add('todo-title');
-        titleCtn.textContent = title;
-        rhCtn.appendChild(titleCtn);
-      })();
+      const titleCtn = create.titleCtn();
+      rhCtn.appendChild(titleCtn);
 
       const details = document.createElement('div');
       details.classList.add('todo-details');
       rhCtn.appendChild(details);
 
-      function createBtn(name) {
-        const btn = document.createElement('button');
-        btn.setAttribute('type', 'button');
-        btn.classList.add('btn', `${name}-btn`);
-        btn.dataset.id = `${name}-${todoId}`;
-        return btn;
-      }
-      let dayBtn;
-      const dayInput = document.createElement('input');
-      (function createDayBtn() {
-        dayBtn = createBtn('day');
-        dayInput.setAttribute('type', 'date');
-        dayInput.setAttribute('required', 'required');
-        dayInput.value = day;
-        dayBtn.appendChild(dayInput);
-        details.appendChild(dayBtn);
-      })();
+      const [dayBtn, dayInput] = create.dayBtn(todoID);
+      details.appendChild(dayBtn);
 
-      const commentsBtn = createBtn('notes');
-      const commentsCount = document.createElement('span');
-      (function createCommentsBtn() {
-        commentsBtn.classList.add('icon-btn');
-        if (!notes.text[0]) commentsBtn.classList.add('inactive');
-        const commentsIcon = document.createElement('i');
-        commentsIcon.classList.add('flaticon', 'flaticon-comment');
-        commentsCount.textContent = 1;
-        commentsCount.classList.add('notes-btn-count');
-        commentsBtn.appendChild(commentsIcon);
-        commentsBtn.appendChild(commentsCount);
-        details.appendChild(commentsBtn);
-      })();
+      const [commentsBtn, commentsCount] = create.commentBtn(todoID);
+      details.appendChild(commentsBtn);
 
-      let editBtn;
-      let commentBtn;
-      let deleteBtn;
-      (function createActions() {
-        const todoActions = document.createElement('div');
-        todoActions.classList.add('todo-actions');
-        editBtn = createIconBtn('flaticon-pen', 'edit-btn');
-        commentBtn = createIconBtn('flaticon-comment', 'notes-btn');
-        deleteBtn = createIconBtn('flaticon-trash', 'delete-btn');
-
-        function createIconBtn(iconName, className) {
-          const btn = helpers.createIconBtn(iconName, className);
-          btn.dataset.todo = todoId;
-          btn.dataset.id = `${className}-${todoId}`;
-
-          todoActions.appendChild(btn);
-          return btn;
-        }
-        rhCtn.appendChild(todoActions);
-      })();
+      const [todoActions, editBtn, commentBtn, deleteBtn] =
+        create.rhActionBtns(todoID);
+      rhCtn.appendChild(todoActions);
 
       content.appendChild(checkboxCtn);
       content.appendChild(rhCtn);
+
       return {
         dayBtn,
         commentsBtn,
@@ -223,7 +243,7 @@ todoFactory.prototype.createTodo = function (
         checkbox,
         main: content,
         refresh() {
-          const todo = getTodo(todoId);
+          const todo = getTodo(todoID);
           titleCtn.textContent = todo.title;
           dayInput.value = todo.day;
           switch (todo.priority) {
@@ -281,6 +301,7 @@ todoFactory.prototype.createTodo = function (
       const index = listOfTodos.findIndex((todo) => todo.id === this.id);
       listOfTodos.splice(index, 1);
       const pj = helpers.findItem(listOfPjs, this.project);
+      if (pj === undefined) return;
       const pjIndex = pj.todoList.findIndex((todo) => todo.id === this.id);
       pj.todoList.splice(pjIndex, 1);
     },
@@ -339,4 +360,6 @@ todoFactory.prototype.createTodo = function (
     },
   };
 };
-const todoFact = new todoFactory();
+const todoFact = new TodoFactory();
+
+export { pjFact, todoFact, listOfPjs, listOfTodos };

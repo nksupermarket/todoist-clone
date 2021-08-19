@@ -1,3 +1,5 @@
+import { listOfPjs, listOfTodos } from './projects.js';
+
 const helpers = {
   saveToLS(list) {
     const iceBlock = JSON.stringify(list);
@@ -74,4 +76,4 @@ const helpers = {
   },
 };
 
-export { helpers };
+export default helpers;

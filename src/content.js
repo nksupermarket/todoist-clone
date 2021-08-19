@@ -1,6 +1,5 @@
-import { helpers } from './helpers.js';
+import helpers from './helpers.js';
 import { listOfTodos } from './projects.js';
-export { content };
 
 const content = (() => {
   const main = document.getElementById('content');
@@ -292,6 +291,7 @@ const content = (() => {
   upcomingCtn.refresh = function () {
     this.sections.forEach((section) => {
       const todos = listOfTodos.filter(
+        // eslint-disable-next-line eqeqeq
         (item) => item.day == section.todoList.dataset.dateStr
       );
       if (!todos[0]) return section.title.classList.add('empty');
@@ -367,3 +367,5 @@ const content = (() => {
     },
   };
 })();
+
+export { content };

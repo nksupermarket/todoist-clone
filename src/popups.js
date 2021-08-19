@@ -1,6 +1,4 @@
-import { helpers } from './helpers.js';
-
-export { popups };
+import helpers from './helpers.js';
 
 const popups = (() => {
   const modal = document.getElementById('popup-modal');
@@ -11,9 +9,11 @@ const popups = (() => {
       popups.hide();
       helpers.show(modal);
       helpers.show(this.ctn);
+      return this;
     },
     setDataBtn(value) {
       this.ctn.dataset.btn = value;
+      return this;
     },
     position(btn) {
       const btnPos = btn.getBoundingClientRect();
@@ -58,14 +58,6 @@ const popups = (() => {
 
   const priority = createPopup('priority');
   priority.btns = priority.ctn.querySelectorAll('li');
-  priority.removeActive = function () {
-    this.btns.forEach((btn) => {
-      if (btn.classList.contains('active')) {
-        btn.classList.remove('active');
-        btn.dataset.selected = 'false';
-      }
-    });
-  };
   priority.setActive = function (priorityLevel) {
     this.removeActive();
     const btn = this.ctn.querySelector(`[data-value="${priorityLevel}"]`);
@@ -161,3 +153,5 @@ const popups = (() => {
     },
   };
 })();
+
+export { popups };

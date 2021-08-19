@@ -1,4 +1,4 @@
-const today = (() => ({
+const today = {
   getToday() {
     const today = new Date();
     const year = today.getFullYear();
@@ -27,6 +27,6 @@ const today = (() => ({
     });
     return todoList;
   },
-}))();
+};
 
 export { today };

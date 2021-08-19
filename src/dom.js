@@ -1,4 +1,3 @@
-import { helpers } from './helpers.js';
 import { listOfPjs, pjFact, listOfTodos, todoFact } from './projects.js';
 import { today } from './today.js';
 import { commentModal } from './commentModal.js';
@@ -8,20 +7,7 @@ import { todoForm } from './todoForm.js';
 import { samples } from './samples.js';
 import { popups } from './popups.js';
 import { header } from './header.js';
-
-function saveToLS(list) {
-  const iceBlock = JSON.stringify(list);
-  switch (list) {
-    case listOfTodos: {
-      localStorage.setItem('listOfTodos', iceBlock);
-      break;
-    }
-    case listOfPjs: {
-      localStorage.setItem('listOfPjs', iceBlock);
-      break;
-    }
-  }
-}
+import helpers from './helpers.js';
 
 const modalForm = todoForm.modalForm;
 const headerEvents = {
@@ -151,7 +137,7 @@ const menuEvents = {
     if (!menu.titleInput.value) return helpers.inputError('empty');
     const newPj = pjFact.createProject(menu.titleInput.value);
     newPj.pushToList().addToMenu();
-    saveToLS(listOfPjs);
+    helpers.saveToLS(listOfPjs);
     this.addPJMenuItemEvents(newPj.id);
     menu.hidePjForm();
   },
@@ -213,7 +199,7 @@ const menuEvents = {
     function fillSections() {
       const dateObj = new Date();
       for (let i = 0; i < content.upcomingCtn.sections.length; i++) {
-        i === 0 ? null : dateObj.setDate(dateObj.getDate() + 1);
+        if (i !== 0) dateObj.setDate(dateObj.getDate() + 1);
         setTitle(i);
         setTodoList(i);
 
@@ -304,7 +290,7 @@ const menuEvents = {
   savePJEdit() {
     const pj = helpers.findItem(listOfPjs, menu.editor.ctn.dataset.project);
     pj.title = menu.editor.titleInput.value;
-    saveToLS(listOfPjs);
+    helpers.saveToLS(listOfPjs);
     pj.menuContent.querySelector('span').textContent = pj.title;
     if (content.findActiveCtn() === content.pjCtn)
       content.pjCtn.refreshTitle(listOfPjs);
@@ -350,8 +336,8 @@ const todoFormEvents = {
     );
     todoFormEvents.addTodoCtnEvents(newTodo);
     newTodo.pushToList().appendContent();
-    saveToLS(listOfTodos);
-    if (form.pjInput.value != 'None') newTodo.pushToProject();
+    helpers.saveToLS(listOfTodos);
+    if (form.pjInput.value !== 'None') newTodo.pushToProject();
 
     form === todoForm.modalForm ? form.hide() : contentEvents.closeTodoForm();
     popups.comment.reset();
@@ -385,6 +371,7 @@ const todoFormEvents = {
       .querySelector('.day-btn')
       .querySelector('input');
     dayInput.addEventListener('change', changeTodoDay);
+
     function changeTodoDay() {
       todo.editDay(dayInput.value);
     }
@@ -395,7 +382,9 @@ const todoFormEvents = {
         popupEvents.showCommentForm(
           'todo',
           todo.id,
-          helpers.findItem(listOfPjs, todo.project).title,
+          (todo.project !== 'None' &&
+            helpers.findItem(listOfPjs, todo.project).title) ||
+            null,
           todo.title
         )
       )
@@ -443,7 +432,7 @@ const todoFormEvents = {
     checkbox.addEventListener('click', onCheckbox);
     function onCheckbox() {
       todo.priority === '5' ? todo.markIncomplete() : todo.markComplete();
-      saveToLS(listOfTodos);
+      helpers.saveToLS(listOfTodos);
       const activeCtn = content.findActiveCtn();
       if (activeCtn === todayCtn) menuEvents.showToday();
       if (activeCtn === upcomingCtn) menuEvents.showUpcoming();
@@ -453,7 +442,7 @@ const todoFormEvents = {
     const todo = helpers.findItem(listOfTodos, editorForm.ctn.dataset.id);
     const prioritySelected = priorityPopup.ctn.querySelector('.active');
     todo.saveEdits(editorForm, prioritySelected);
-    saveToLS(listOfTodos);
+    helpers.saveToLS(listOfTodos);
     todo.content.refresh();
     editorForm.ctn.remove();
     helpers.hide(editorForm.ctn);
@@ -551,8 +540,8 @@ const popupEvents = {
     const item = helpers.findItem(list, deletePopup.ctn.dataset.itemId);
     item.del();
     deletePopup.ctn.dataset.itemType === 'project'
-      ? saveToLS(listOfPjs)
-      : saveToLS(listOfTodos);
+      ? helpers.saveToLS(listOfPjs)
+      : helpers.saveToLS(listOfTodos);
     if (deletePopup.ctn.dataset.itemType === 'project') {
       menuEvents.showToday();
     }
@@ -586,6 +575,7 @@ const popupEvents = {
     itemType === 'project' ? (list = listOfPjs) : (list = listOfTodos);
     const item = helpers.findItem(list, itemID);
     if (item.notes.text.length === 0) return commentModal.showNoNotesNote();
+    commentModal.hideNoNotesNote();
     for (let i = 0; i < item.notes.text.length; i++) {
       commentModal.attachNote(item.notes.text[i], item.notes.date[i]);
     }
@@ -602,7 +592,7 @@ const popupEvents = {
     const date = today.getToday();
     item.notes.text[item.notes.text.length] = note;
     item.notes.date[item.notes.date.length] = date;
-    saveToLS(list);
+    helpers.saveToLS(list);
 
     commentModal.attachNote(note, date);
     commentModal.form.dataset.itemType === 'todo'
@@ -754,7 +744,7 @@ const contentEvents = {
     const pj = helpers.findItem(listOfPjs, pjCtn.main.dataset.project);
     pj.title = pjCtn.editor.titleInput.value;
     pjCtn.refreshTitle(listOfPjs);
-    saveToLS(listOfPjs);
+    helpers.saveToLS(listOfPjs);
   },
   cancelPjEdit() {
     pjCtn.title.classList.remove('inactive');
@@ -907,7 +897,7 @@ const searchCtn = content.searchCtn;
             item.notes
           );
           todo.pushToList().appendContent().checkComplete();
-          if (item.project != 'None') todo.pushToProject();
+          if (item.project !== 'None') todo.pushToProject();
         }
       }
     }
@@ -920,8 +910,8 @@ const searchCtn = content.searchCtn;
     pjHome.pushToList().addToMenu();
     pjCode.pushToList().addToMenu();
     samples.generate(50);
-    saveToLS(listOfPjs);
-    saveToLS(listOfTodos);
+    helpers.saveToLS(listOfPjs);
+    helpers.saveToLS(listOfTodos);
   }
 
   if (window.matchMedia('(max-width: 710px)').matches) {

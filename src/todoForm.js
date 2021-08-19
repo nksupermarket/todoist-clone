@@ -1,6 +1,5 @@
-import { helpers } from './helpers.js';
+import helpers from './helpers.js';
 import { today } from './today.js';
-export { todoForm };
 
 const todoForm = (() => {
   const list = [];
@@ -17,7 +16,7 @@ const todoForm = (() => {
         : this.commentIcon.classList.add('flaticon-comment-1');
     },
     changeFlagIcon(color, level) {
-      level != '4'
+      level !== '4'
         ? this.priorityIcon.classList.add('flaticon-flag-1')
         : this.priorityIcon.classList.remove('flaticon-flag-1');
       this.priorityIcon.style.color = color;
@@ -142,3 +141,5 @@ const todoForm = (() => {
     },
   };
 })();
+
+export { todoForm };
