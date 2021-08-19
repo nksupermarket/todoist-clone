@@ -1,4 +1,4 @@
-import { listOfPjs, pjFact, listOfTodos, todoFact } from './projects.js';
+import { listOfPjs, pjFact, listOfTodos, todoFact } from './Projects-Todo.js';
 import { today } from './today.js';
 import { commentModal } from './commentModal.js';
 import { menu } from './menu.js';

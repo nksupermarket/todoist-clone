@@ -1,10 +1,9 @@
-import { listOfPjs, todoFact } from "./projects.js";
-export { samples };
+import { listOfPjs, todoFact } from './Projects-Todo.js';
 
 const samples = (() => {
   return {
     generate(quantity) {
-      for (var i = 0; i < quantity; i++) {
+      for (let i = 0; i < quantity; i++) {
         const project = getRandomProject();
         const title = `sample todo ${i}`;
         const day = getRandomDay();
@@ -25,11 +24,11 @@ const samples = (() => {
         }
         function getRandomDay() {
           const currentYear = new Date().getFullYear();
-          let today = new Date();
-          let todayDay = today.getDate();
-          let yesterday = new Date();
+          const today = new Date();
+          const todayDay = today.getDate();
+          const yesterday = new Date();
           yesterday.setDate(todayDay - 1);
-          let nextWeek = new Date();
+          const nextWeek = new Date();
           nextWeek.setDate(todayDay + 7);
           const randomDay = new Date(
             yesterday.getTime() +
@@ -38,10 +37,10 @@ const samples = (() => {
           console.log(yesterday.getDate(), randomDay);
 
           let randomDayMonth = randomDay.getMonth() + 1;
-          if (randomDayMonth.toString().length != 2)
+          if (randomDayMonth.toString().length !== 2)
             randomDayMonth = `0${randomDayMonth}`;
           let randomDayDay = randomDay.getDate();
-          if (randomDayDay.toString().length != 2)
+          if (randomDayDay.toString().length !== 2)
             randomDayDay = `0${randomDayDay}`;
 
           const randomDayStr = `${currentYear}-${randomDayMonth}-${randomDayDay}`;
@@ -54,3 +53,5 @@ const samples = (() => {
     },
   };
 })();
+
+export { samples };

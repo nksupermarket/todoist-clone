@@ -37,7 +37,7 @@ const todoForm = (() => {
     },
   };
 
-  const editor = (function createEditor() {
+  const editor = (function createEditorObj() {
     const ctn = document.querySelector('.todo-editor');
     const titleInput = ctn.querySelector('.title-input');
     const dateInput = ctn.querySelector("input[type='date']");
@@ -60,13 +60,13 @@ const todoForm = (() => {
   })();
   Object.setPrototypeOf(editor, formMethods);
   editor.setDataset = function (id) {
-    this.ctn.dataset.id = id;
+    this.ctn.dataset.id = id; // need to store id of todo
     this.priorityBtn.dataset.id = `editor-priority-${id}`;
     this.saveBtn.dataset.id = id;
   };
   list.push(editor);
 
-  const contentForm = (function createTodoForm() {
+  const contentForm = (function createTodoFormObj() {
     const ctn = document.querySelector('.new-todo-form');
     const form = document.querySelector('.new-todo-form');
     const titleInput = form.querySelector('.title-input');

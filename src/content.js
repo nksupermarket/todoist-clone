@@ -1,28 +1,26 @@
 import helpers from './helpers.js';
-import { listOfTodos } from './projects.js';
+import { listOfTodos } from './Projects-Todo.js';
 
 const content = (() => {
   const main = document.getElementById('content');
-  const mainCtns = [];
+  const mainCtns = []; // all ctns, does not include sections ie 'Today', 'Upcoming' not 'Overdue' or sections in upcoming
   const allCtns = [];
 
   const ctnMethods = {
-    // show() {
-    //   contentEvents.closeOpenEditors();
-    //   header.search.value = '';
-    //   content.removeActiveCtn();
-    //   content.main.appendChild(this.main);
-    // },
     checkSectionView() {
-      if (!this.sectionView) return false;
-      return this.sectionView;
+      return !!this.sectionView;
     },
     changeCommentBtn(status) {
-      if (!this.actions.commentBtn) return;
+      if (!this.actions.commentBtn) return; // sections don't have comment buttons
       const commentIcon = this.actions.commentBtn.querySelector('i');
-      status === 'empty'
-        ? commentIcon.classList.remove('flaticon-comment-1')
-        : commentIcon.classList.add('flaticon-comment-1');
+      switch (status) {
+        case 'empty':
+          commentIcon.classList.remove('flaticon-comment-1');
+          break;
+        case 'not empty':
+          commentIcon.classList.add('flaticon-comment-1');
+          break;
+      }
     },
     fillTodoList(list) {
       this.todoArray = list;
@@ -43,6 +41,7 @@ const content = (() => {
     },
     sortDate() {
       this.todoArray.sort(dueDateAscending);
+
       function dueDateAscending(a, b) {
         const aDate = new Date(a.day);
         const bDate = new Date(b.day);
@@ -54,6 +53,7 @@ const content = (() => {
     },
     sortPriority() {
       this.todoArray.sort(priorityDescending);
+
       function priorityDescending(a, b) {
         if (a.priority > b.priority) return 1;
         if (a.priority < b.priority) return -1;
@@ -62,6 +62,7 @@ const content = (() => {
     },
     sortAlphabetically() {
       this.todoArray.sort(alphabetAsc);
+
       function alphabetAsc(a, b) {
         if (a.title > b.title) return 1;
         if (a.title < b.title) return -1;
@@ -74,6 +75,7 @@ const content = (() => {
     refresh() {
       (function refreshTodoList() {
         const fragment = document.createDocumentFragment();
+        // need to place todos in correct position after adding a todo
         this.todoArray.forEach((todo) => todo.ctn.remove());
         this.todoArray.forEach((todo) => fragment.appendChild(todo.ctn));
         if (this.todoBtn) {
@@ -95,7 +97,7 @@ const content = (() => {
       if (name) ctn.main.id = `${name}-ctn`;
 
       ctn.header = create.header();
-      const headerContentObj = create.headerContent(titleTag);
+      const headerContentObj = create.headerContentObj(titleTag);
       ctn.headerContent = headerContentObj.ctn;
       ctn.header.appendChild(ctn.headerContent);
       ctn.title = headerContentObj.title;
@@ -117,12 +119,12 @@ const content = (() => {
 
       return ctn;
     },
-    header() {
+    headerObj() {
       const header = document.createElement('header');
       header.classList.add('view-header', 'view-content');
       return header;
     },
-    headerContent(titleTag) {
+    headerContentObj(titleTag) {
       const ctn = document.createElement('div');
       ctn.classList.add('view-header-content');
 
@@ -236,125 +238,159 @@ const content = (() => {
         if (number === 1) return ctn;
       }
     },
-  };
+    todayCtnObj() {
+      const todayCtn = create.ctn('div', 'main-ctn', 'today', 'h1');
 
-  const todayCtn = create.ctn('div', 'main-ctn', 'today', 'h1');
-  const todayStr = new Date().toString().slice(0, 10);
-  todayCtn.sections = [];
-  todayCtn.sectionView = false;
-  todayCtn.sectionHolder = document.createElement('div');
-  todayCtn.overdueSection = create.sections(
-    1,
-    todayCtn.sectionHolder,
-    todayCtn.sections,
-    false
-  );
-  todayCtn.overdueSection.title.textContent = 'Overdue';
-  todayCtn.todaySection = create.sections(
-    1,
-    todayCtn.sectionHolder,
-    todayCtn.sections,
-    true
-  );
-  todayCtn.todaySection.title.textContent = 'Today';
-  todayCtn.title.innerHTML = `<span>Today</span><small>${todayStr}</small>`;
-  const todayCtnActionCtn = create.actionCtn();
-  todayCtn.actions = create.actionBtns(
-    todayCtn.main.id,
-    todayCtnActionCtn,
-    'sort'
-  );
-  todayCtn.main.appendChild(todayCtn.sectionHolder);
-  todayCtn.headerContent.appendChild(todayCtnActionCtn);
+      todayCtn.sections = [];
+      todayCtn.sectionView = false;
+      todayCtn.sectionHolder = document.createElement('div');
 
-  const upcomingCtn = create.ctn(
-    'div',
-    'main-ctn',
-    'upcoming',
-    'h1',
-    false,
-    false
-  );
-  upcomingCtn.title.textContent = 'Upcoming';
-  const upcomingCtnActionCtn = create.actionCtn();
-  upcomingCtn.actions = create.actionBtns(
-    upcomingCtn.main.id,
-    upcomingCtnActionCtn,
-    'sort'
-  );
-  upcomingCtn.headerContent.appendChild(upcomingCtnActionCtn);
-  upcomingCtn.sectionHolder = document.createElement('div');
-  upcomingCtn.sections = [];
-  upcomingCtn.sectionView = true;
-  create.sections(7, upcomingCtn.sectionHolder, upcomingCtn.sections);
-  upcomingCtn.main.appendChild(upcomingCtn.sectionHolder);
-  upcomingCtn.refresh = function () {
-    this.sections.forEach((section) => {
-      const todos = listOfTodos.filter(
-        // eslint-disable-next-line eqeqeq
-        (item) => item.day == section.todoList.dataset.dateStr
+      todayCtn.overdueSection = create.sections(
+        1,
+        todayCtn.sectionHolder,
+        todayCtn.sections,
+        false
       );
-      if (!todos[0]) return section.title.classList.add('empty');
-      todos.forEach((todo) => section.todoList.prepend(todo.ctn));
-      section.todoList.appendChild(section.todoBtn);
-    });
+      todayCtn.overdueSection.title.textContent = 'Overdue';
+      todayCtn.todaySection = create.sections(
+        1,
+        todayCtn.sectionHolder,
+        todayCtn.sections,
+        true
+      );
+
+      todayCtn.todaySection.title.textContent = 'Today';
+      const todayStr = new Date().toString().slice(0, 10);
+      todayCtn.title.innerHTML = `<span>Today</span><small>${todayStr}</small>`;
+
+      const todayCtnActionCtn = create.actionCtn();
+      todayCtn.actions = create.actionBtns(
+        todayCtn.main.id,
+        todayCtnActionCtn,
+        'sort'
+      );
+
+      todayCtn.main.appendChild(todayCtn.sectionHolder);
+      todayCtn.headerContent.appendChild(todayCtnActionCtn);
+
+      return todayCtn;
+    },
+    upcomingCtnObj() {
+      const upcomingCtn = create.ctn(
+        'div',
+        'main-ctn',
+        'upcoming',
+        'h1',
+        false,
+        false
+      );
+
+      upcomingCtn.title.textContent = 'Upcoming';
+
+      const upcomingCtnActionCtn = create.actionCtn();
+      upcomingCtn.actions = create.actionBtns(
+        upcomingCtn.main.id,
+        upcomingCtnActionCtn,
+        'sort'
+      );
+      upcomingCtn.headerContent.appendChild(upcomingCtnActionCtn);
+
+      upcomingCtn.sectionHolder = document.createElement('div');
+      upcomingCtn.sections = [];
+      upcomingCtn.sectionView = true;
+      create.sections(7, upcomingCtn.sectionHolder, upcomingCtn.sections);
+      upcomingCtn.main.appendChild(upcomingCtn.sectionHolder);
+
+      upcomingCtn.refresh = function () {
+        this.sections.forEach((section) => {
+          const todos = listOfTodos.filter(
+            // eslint-disable-next-line eqeqeq
+            (item) => item.day == section.todoList.dataset.dateStr
+          );
+          if (!todos[0]) return section.title.classList.add('empty');
+          todos.forEach((todo) => section.todoList.prepend(todo.ctn));
+          section.todoList.appendChild(section.todoBtn);
+        });
+      };
+
+      return upcomingCtn;
+    },
+    pjCtnObj() {
+      const pjCtn = create.ctn('div', 'main-ctn', 'pj', 'h1');
+
+      pjCtn.editor = helpers.createPJEditor('header-title-input');
+      pjCtn.headerContent.appendChild(pjCtn.editor.ctn);
+
+      const pjCtnActionCtn = create.actionCtn();
+      pjCtn.actions = create.actionBtns(
+        pjCtn.main.id,
+        pjCtnActionCtn,
+        'sort',
+        'edit',
+        'comment',
+        'delete'
+      );
+      pjCtn.headerContent.appendChild(pjCtnActionCtn);
+
+      pjCtn.refreshTitle = function (list) {
+        const pj = helpers.findItem(mainCtns, pjCtn.main.dataset.project);
+        pjCtn.title.textContent = pj.title;
+        helpers.show(this.title);
+        helpers.hide(this.editor.ctn);
+        return this;
+      };
+
+      pjCtn.setDataProject = function (id) {
+        pjCtn.main.dataset.project = id;
+        const btnKeys = Object.keys(pjCtn).filter((key) => key.endsWith('Btn'));
+
+        btnKeys.forEach((key) => (pjCtn[key].dataset.project = id));
+      };
+
+      return pjCtn;
+    },
+    searchCtnObj() {
+      const searchCtn = create.ctn(
+        'div',
+        'main-ctn',
+        'search',
+        'h1',
+        false,
+        false
+      );
+
+      searchCtn.sections = [];
+      searchCtn.sectionHolder = document.createElement('div');
+      searchCtn.main.appendChild(searchCtn.sectionHolder);
+
+      searchCtn.projectSection = create.sections(
+        1,
+        searchCtn.sectionHolder,
+        searchCtn.sections,
+        false
+      );
+      searchCtn.projectSection.title.textContent = 'Projects';
+
+      searchCtn.todoSection = create.sections(
+        1,
+        searchCtn.sectionHolder,
+        searchCtn.sections,
+        false
+      );
+      searchCtn.todoSection.title.textContent = 'Todos';
+
+      return searchCtn;
+    },
   };
-
-  const pjCtn = create.ctn('div', 'main-ctn', 'pj', 'h1');
-  pjCtn.editor = helpers.createPJEditor('header-title-input');
-  pjCtn.headerContent.appendChild(pjCtn.editor.ctn);
-  const pjCtnActionCtn = create.actionCtn();
-  pjCtn.actions = create.actionBtns(
-    pjCtn.main.id,
-    pjCtnActionCtn,
-    'sort',
-    'edit',
-    'comment',
-    'delete'
-  );
-  pjCtn.headerContent.appendChild(pjCtnActionCtn);
-
-  pjCtn.refreshTitle = function (list) {
-    const pj = helpers.findItem(mainCtns, pjCtn.main.dataset.project);
-    pjCtn.title.textContent = pj.title;
-    helpers.show(this.title);
-    helpers.hide(this.editor.ctn);
-    return this;
-  };
-  pjCtn.setDataProject = function (id) {
-    pjCtn.main.dataset.project = id;
-    const btnKeys = Object.keys(pjCtn).filter((key) => key.endsWith('Btn'));
-
-    btnKeys.forEach((key) => (pjCtn[key].dataset.project = id));
-  };
-
-  const searchCtn = create.ctn('div', 'main-ctn', 'search', 'h1', false, false);
-  searchCtn.sections = [];
-  searchCtn.sectionHolder = document.createElement('div');
-  searchCtn.main.appendChild(searchCtn.sectionHolder);
-  searchCtn.projectSection = create.sections(
-    1,
-    searchCtn.sectionHolder,
-    searchCtn.sections,
-    false
-  );
-  searchCtn.projectSection.title.textContent = 'Projects';
-  searchCtn.todoSection = create.sections(
-    1,
-    searchCtn.sectionHolder,
-    searchCtn.sections,
-    false
-  );
-  searchCtn.todoSection.title.textContent = 'Todos';
 
   return {
     main,
     mainCtns,
     allCtns,
-    pjCtn,
-    todayCtn,
-    upcomingCtn,
-    searchCtn,
+    pjCtn: create.pjCtnObj(),
+    todayCtn: create.todayCtnObj(),
+    upcomingCtn: create.upcomingCtnObj(),
+    searchCtn: create.searchCtnObj(),
     findActiveCtn() {
       return mainCtns.find((ctn) => this.main.contains(ctn.main));
     },
