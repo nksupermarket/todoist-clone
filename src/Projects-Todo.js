@@ -300,6 +300,7 @@ TodoFactory.prototype.createTodo = function (
       this.ctn.remove();
       const index = listOfTodos.findIndex((todo) => todo.id === this.id);
       listOfTodos.splice(index, 1);
+
       const pj = helpers.findItem(listOfPjs, this.project);
       if (pj === undefined) return;
       const pjIndex = pj.todoList.findIndex((todo) => todo.id === this.id);

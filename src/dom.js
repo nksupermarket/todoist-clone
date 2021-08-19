@@ -9,7 +9,14 @@ import { popups } from './popups.js';
 import { header } from './header.js';
 import helpers from './helpers.js';
 
-const modalForm = todoForm.modalForm;
+const { modalForm } = todoForm;
+const { search } = header;
+const { pjCtn, todayCtn, upcomingCtn } = content;
+
+/// ////////////////
+/* HEADER EVENTS */
+/// ///////////////
+
 const headerEvents = {
   showModalTodoForm() {
     helpers.show(modalForm.ctn);
@@ -35,27 +42,32 @@ const headerEvents = {
   },
   showFullSearchbar() {
     if (window.matchMedia('(max-width: 710px)').matches)
-      return header.search.parentElement.classList.add('focused-sm');
-    header.search.parentElement.classList.add('focused');
+      return search.parentElement.classList.add('focused-sm');
+    search.parentElement.classList.add('focused');
   },
   hideFullSearchbar() {
-    header.search.parentElement.classList.remove('focused', 'focused-sm');
+    search.parentElement.classList.remove('focused', 'focused-sm');
   },
   showSearchResult() {
-    if (!header.search.value || !/\S/.test(header.search.value)) return;
+    if (!search.value || !/\S/.test(search.value)) return;
 
     contentEvents.closeOpenEditors();
     content.removeActiveCtn();
 
-    searchCtn.title.textContent = `Results for "${header.search.value}"`;
+    searchCtn.title.textContent = `Results for "${search.value}"`;
+
     (function fillPJSection() {
       searchCtn.projectSection.todoList.textContent = '';
+
       const projects = listOfPjs.filter((project) =>
-        project.title.toLowerCase().includes(header.search.value.toLowerCase())
+        project.title.toLowerCase().includes(search.value.toLowerCase())
       );
+
       if (projects.length === 0)
         return searchCtn.projectSection.title.classList.add('empty');
+
       searchCtn.projectSection.title.classList.remove('empty');
+
       projects.forEach((project) => {
         const link = document.createElement('a');
         link.classList.add('project-link');
@@ -64,24 +76,30 @@ const headerEvents = {
         link.addEventListener('click', () => menuEvents.showPj(project.id));
       });
     })();
+
     (function fillTodoSection() {
       const todos = listOfTodos.filter((todo) =>
-        todo.title.toLowerCase().includes(header.search.value.toLowerCase())
+        todo.title.toLowerCase().includes(search.value.toLowerCase())
       );
+
       if (todos.length === 0)
         return searchCtn.todoSection.title.classList.add('empty');
+
       searchCtn.todoSection.title.classList.remove('empty');
       searchCtn.todoSection.fillTodoList(todos);
     })();
+
     content.main.appendChild(searchCtn.main);
   },
   changeNewTodoBtnOnResize() {
     const btnText = header.todoBtn.querySelector('.btn-text');
+
     if (window.matchMedia('(max-width: 500px)').matches) {
       btnText.textContent = '';
       header.todoBtn.classList.add('btn-sm');
       return;
     }
+
     btnText.textContent = 'New Task';
     header.todoBtn.classList.remove('btn-sm');
   },
@@ -94,26 +112,30 @@ header.menuBtn.addEventListener('click', () => {
 window.addEventListener('resize', function closeMenuUponResize() {
   if (window.matchMedia('(max-width: 710px)').matches) headerEvents.hideMenu();
 });
-window.addEventListener('resize', function changeSearchbarSize() {
+window.addEventListener('resize', function changeSearchbarSizeOnResize() {
   if (
     window.matchMedia('(max-width: 710px)').matches &&
-    header.search.parentElement.classList.contains('focused')
+    search.parentElement.classList.contains('focused')
   ) {
-    header.search.parentElement.classList.remove('focused');
-    header.search.parentElement.classList.add('focused-sm');
+    search.parentElement.classList.remove('focused');
+    search.parentElement.classList.add('focused-sm');
   }
 });
 window.addEventListener('resize', headerEvents.changeNewTodoBtnOnResize);
 header.todoBtn.addEventListener('click', headerEvents.showModalTodoForm);
-header.search.addEventListener('keyup', (e) => {
+search.addEventListener('keyup', (e) => {
   e.preventDefault();
   if (e.keyCode === 13) headerEvents.showSearchResult();
 });
-header.search.addEventListener('focus', headerEvents.showFullSearchbar);
-header.search.addEventListener('blur', headerEvents.hideFullSearchbar);
+search.addEventListener('focus', headerEvents.showFullSearchbar);
+search.addEventListener('blur', headerEvents.hideFullSearchbar);
+
+/// //////////////
+/* MENU EVENTS */
+/// /////////////
 
 const menuEvents = {
-  addRemoveEventsRelatingToMenu() {
+  toggleEventsRelatingToMenu() {
     const contentBody = document.querySelector('#not-header');
     if (window.matchMedia('(max-width: 710px)').matches) {
       contentBody.addEventListener('click', headerEvents.hideMenu);
@@ -135,11 +157,13 @@ const menuEvents = {
   },
   onAddPj() {
     if (!menu.titleInput.value) return helpers.inputError('empty');
+
     const newPj = pjFact.createProject(menu.titleInput.value);
     newPj.pushToList().addToMenu();
-    helpers.saveToLS(listOfPjs);
     this.addPJMenuItemEvents(newPj.id);
+
     menu.hidePjForm();
+    helpers.saveToLS(listOfPjs);
   },
   addPJMenuItemEvents(pj) {
     pj.menuItem.addEventListener('click', () => {
@@ -151,6 +175,7 @@ const menuEvents = {
     pj.menuItem.addEventListener('mouseleave', (e) =>
       menuEvents.hideActionsBtn(e)
     );
+
     const moreBtn = pj.menuItem.querySelector('.more-btn');
     moreBtn.addEventListener('click', (e) => {
       popupEvents.showPJActionsPopup(e, moreBtn);
@@ -159,8 +184,10 @@ const menuEvents = {
   },
   showToday() {
     contentEvents.closeOpenEditors();
-    header.search.value = '';
-    if (content.findActiveCtn() !== undefined) content.removeActiveCtn();
+
+    search.value = '';
+
+    if (content.findActiveCtn()) content.removeActiveCtn();
     content.main.appendChild(content.todayCtn.main);
 
     const overdueList = today.getOverdueTodos(listOfTodos);
@@ -175,6 +202,7 @@ const menuEvents = {
     showOverdueTodos();
     showTodayTodos(todayCtn.todaySection);
 
+    // helper functions
     function showOverdueTodos() {
       helpers.hide(todayCtn.todoList);
       helpers.show(todayCtn.sectionHolder);
@@ -191,11 +219,15 @@ const menuEvents = {
   },
   showUpcoming() {
     contentEvents.closeOpenEditors();
-    header.search.value = '';
+
+    search.value = '';
+
     content.removeActiveCtn();
+
     fillSections();
     content.main.appendChild(content.upcomingCtn.main);
 
+    // helper functions
     function fillSections() {
       const dateObj = new Date();
       for (let i = 0; i < content.upcomingCtn.sections.length; i++) {
@@ -203,10 +235,12 @@ const menuEvents = {
         setTitle(i);
         setTodoList(i);
 
+        // helper functions
         function setTitle(i) {
           content.upcomingCtn.sections[i].title.textContent = dateObj
             .toString()
             .slice(0, 10);
+
           (function setTodayStr() {
             if (i === 0)
               content.upcomingCtn.sections[i].title.textContent =
@@ -214,6 +248,7 @@ const menuEvents = {
                   content.upcomingCtn.sections[i].title.textContent
                 );
           })();
+
           (function setTomorrowStr() {
             if (i === 1)
               content.upcomingCtn.sections[i].title.textContent =
@@ -227,9 +262,11 @@ const menuEvents = {
             const year = dateObj.getFullYear();
             let month = dateObj.getMonth() + 1;
             let day = dateObj.getDate();
+
             if (month.toString().length === 1)
               month = '0'.concat(month.toString());
             if (day.toString().length === 1) day = '0'.concat(day.toString());
+
             return `${year}-${month}-${day}`;
           })();
 
@@ -237,6 +274,7 @@ const menuEvents = {
             if (item.priority === '5') return false;
             return item.day === dayStr;
           });
+
           if (todos.length === 0)
             return content.upcomingCtn.sections[i].title.classList.add('empty');
           content.upcomingCtn.sections[i].title.classList.remove('empty');
@@ -248,21 +286,27 @@ const menuEvents = {
   },
   showPj(id) {
     contentEvents.closeOpenEditors();
-    header.search.value = '';
+
+    search.value = '';
+
     helpers.hide(pjCtn.actions.sortedBtn);
+
     (function closeOpenCtn() {
       contentEvents.closeTodoForm();
       content.removeActiveCtn();
     })();
 
     pjCtn.setDataProject(id);
+
     const pj = helpers.findItem(listOfPjs, id);
     pj.notes.text.length === 0
       ? pjCtn.changeCommentBtn('empty')
       : pjCtn.changeCommentBtn('not empty');
     content.pjCtn.title.textContent = pj.title;
+
     pjCtn.fillTodoList(pj.todoList);
     pj.todoList.forEach((todo) => todo.checkOverdue());
+
     content.main.appendChild(content.pjCtn.main);
   },
   showActionsBtn(e) {
@@ -283,21 +327,25 @@ const menuEvents = {
   },
   hidePJEditor() {
     helpers.hide(menu.editor.ctn);
+
     const pj = helpers.findItem(listOfPjs, menu.editor.ctn.dataset.project);
+
     helpers.show(pj.menuContent);
     pj.menuItem.classList.remove('editor');
   },
   savePJEdit() {
     const pj = helpers.findItem(listOfPjs, menu.editor.ctn.dataset.project);
     pj.title = menu.editor.titleInput.value;
-    helpers.saveToLS(listOfPjs);
+
     pj.menuContent.querySelector('span').textContent = pj.title;
     if (content.findActiveCtn() === content.pjCtn)
       content.pjCtn.refreshTitle(listOfPjs);
+
     menuEvents.hidePJEditor();
+    helpers.saveToLS(listOfPjs);
   },
 };
-window.addEventListener('resize', menuEvents.addRemoveEventsRelatingToMenu);
+window.addEventListener('resize', menuEvents.toggleEventsRelatingToMenu);
 menu.today.addEventListener('click', menuEvents.showToday);
 menu.upcoming.addEventListener('click', menuEvents.showUpcoming);
 menu.newBtn.addEventListener('click', menuEvents.showPjForm);
@@ -306,6 +354,10 @@ menu.cancelBtn.addEventListener('click', menuEvents.hidePjForm);
 menu.editor.ctn.addEventListener('click', (e) => e.stopPropagation());
 menu.editor.saveBtn.addEventListener('click', menuEvents.savePJEdit);
 menu.editor.cancelBtn.addEventListener('click', menuEvents.hidePJEditor);
+
+/// ///////////////////
+/* TODO FORM EVENTS */
+/// ///////////////////
 
 const todoFormEvents = {
   fillPjInput(form) {
@@ -318,6 +370,7 @@ const todoFormEvents = {
   },
   onAddTodo(form) {
     const priority = popups.priority.ctn.querySelector('.active').dataset.value;
+
     const notes = {
       text: [],
       date: [],
@@ -327,6 +380,7 @@ const todoFormEvents = {
       notes.text[0] = popups.comment.textarea.value;
       notes.date[0] = today.getToday();
     })();
+
     const newTodo = todoFact.createTodo(
       form.pjInput.value,
       form.titleInput.value,
@@ -335,31 +389,38 @@ const todoFormEvents = {
       notes
     );
     todoFormEvents.addTodoCtnEvents(newTodo);
+
+    if (form.pjInput.value !== 'None') newTodo.pushToProject();
     newTodo.pushToList().appendContent();
     helpers.saveToLS(listOfTodos);
-    if (form.pjInput.value !== 'None') newTodo.pushToProject();
 
-    form === todoForm.modalForm ? form.hide() : contentEvents.closeTodoForm();
-    popups.comment.reset();
-    popups.priority.reset();
+    (function closeForm() {
+      form === todoForm.modalForm ? form.hide() : contentEvents.closeTodoForm();
+      popups.comment.reset();
+      popups.priority.reset();
+    })();
 
-    const activeCtn = content.findActiveCtn();
-    activeCtn.checkSectionView()
-      ? activeCtn.sections.forEach((section) => section.refresh())
-      : activeCtn.refresh();
-    switch (activeCtn) {
-      case todayCtn: {
-        menuEvents.showToday();
-        break;
+    (function refreshContent() {
+      const activeCtn = content.findActiveCtn();
+      const sectionView = activeCtn.checkSectionView();
+      if (sectionView === true)
+        activeCtn.sections.forEach((section) => section.refresh());
+      if (sectionView === false) activeCtn.refresh();
+
+      switch (activeCtn) {
+        case todayCtn: {
+          menuEvents.showToday();
+          break;
+        }
+        case upcomingCtn: {
+          menuEvents.showUpcoming();
+          break;
+        }
+        case pjCtn: {
+          break;
+        }
       }
-      case upcomingCtn: {
-        menuEvents.showUpcoming();
-        break;
-      }
-      case pjCtn: {
-        break;
-      }
-    }
+    })();
   },
   close(form) {
     form.hide();
@@ -374,6 +435,7 @@ const todoFormEvents = {
 
     function changeTodoDay() {
       todo.editDay(dayInput.value);
+      helpers.saveToLS(listOfTodos);
     }
 
     const commentsBtn = todo.content.main.querySelectorAll('.notes-btn');
@@ -443,6 +505,7 @@ const todoFormEvents = {
     const prioritySelected = priorityPopup.ctn.querySelector('.active');
     todo.saveEdits(editorForm, prioritySelected);
     helpers.saveToLS(listOfTodos);
+
     todo.content.refresh();
     editorForm.ctn.remove();
     helpers.hide(editorForm.ctn);
@@ -504,6 +567,10 @@ editorForm.priorityBtn.addEventListener('click', function showPriorityPopup() {
 editorForm.saveBtn.addEventListener('click', todoFormEvents.onSaveEdit);
 editorForm.cancelBtn.addEventListener('click', todoFormEvents.onCancelEdit);
 
+/// ///////////////
+/* POPUP EVENTS */
+/// //////////////
+
 const popupEvents = {
   closeModal() {
     if (popups.findActivePopup() === popups.pjActions)
@@ -519,7 +586,7 @@ const popupEvents = {
     const btn = e.target.closest('.btn');
     popups.priority.setActive(btn.dataset.value);
 
-    (function () {
+    (function fillInFlagIcon() {
       const icon = btn.querySelector('i');
       const activeForm = todoForm.findActiveForm();
       activeForm.changeFlagIcon(icon.style.color, btn.dataset.value);
@@ -533,33 +600,37 @@ const popupEvents = {
     popups.toggleModalFull();
   },
   onDelete() {
-    let list;
-    deletePopup.ctn.dataset.itemType === 'project'
-      ? (list = listOfPjs)
-      : (list = listOfTodos);
+    const list =
+      deletePopup.ctn.dataset.itemType === 'project' ? listOfPjs : listOfTodos;
+
     const item = helpers.findItem(list, deletePopup.ctn.dataset.itemId);
     item.del();
+
     deletePopup.ctn.dataset.itemType === 'project'
       ? helpers.saveToLS(listOfPjs)
       : helpers.saveToLS(listOfTodos);
+
     if (deletePopup.ctn.dataset.itemType === 'project') {
       menuEvents.showToday();
     }
+
     if (deletePopup.ctn.dataset.itemType === 'todo') {
       (function removeFromContentTodoList() {
         content.allCtns.forEach((ctn) => {
           if (!ctn.todoArray || ctn.todoArray.length === 0) return;
-          const todoIndex = ctn.todoArray.findIndex(findTodo);
-          function findTodo(todo) {
-            return todo.id.toString() === deletePopup.ctn.dataset.itemId;
-          }
-          if (todoIndex !== -1) {
-            ctn.todoArray.splice(todoIndex, 1);
-            if (ctn.todoArray.length === 0 && ctn === todayCtn.overdueSection)
-              return menuEvents.showToday();
-            if (ctn.todoArray.length === 0)
-              return ctn.title.classList.add('empty');
-          }
+
+          const todoIndex = ctn.todoArray.findIndex(
+            (todo) => todo.id.toString() === deletePopup.ctn.dataset.itemId
+          );
+
+          const foundTodo = todoIndex !== -1;
+          if (foundTodo) ctn.todoArray.splice(todoIndex, 1);
+
+          // tells content what to do when their todo list is empty after del
+          if (ctn.todoArray.length === 0 && ctn === todayCtn.overdueSection)
+            return menuEvents.showToday();
+          if (ctn.todoArray.length === 0)
+            return ctn.title.classList.add('empty');
         });
       })();
     }
@@ -571,10 +642,12 @@ const popupEvents = {
     commentModal.setDataItemID(itemID);
     commentModal.changePjTitle(pjTitle);
     commentModal.changeTodoTitle(todoTitle);
-    let list;
-    itemType === 'project' ? (list = listOfPjs) : (list = listOfTodos);
+
+    const list = itemType === 'project' ? listOfPjs : listOfTodos;
     const item = helpers.findItem(list, itemID);
+
     if (item.notes.text.length === 0) return commentModal.showNoNotesNote();
+
     commentModal.hideNoNotesNote();
     for (let i = 0; i < item.notes.text.length; i++) {
       commentModal.attachNote(item.notes.text[i], item.notes.date[i]);
@@ -583,21 +656,24 @@ const popupEvents = {
   onAddComment() {
     commentModal.hideNoNotesNote();
 
-    let list;
-    commentModal.form.dataset.itemType === 'project'
-      ? (list = listOfPjs)
-      : (list = listOfTodos);
+    const list =
+      commentModal.form.dataset.itemType === 'project'
+        ? listOfPjs
+        : listOfTodos;
+
     const item = helpers.findItem(list, commentModal.form.dataset.itemId);
+
     const note = commentModal.textarea.value;
     const date = today.getToday();
     item.notes.text[item.notes.text.length] = note;
     item.notes.date[item.notes.date.length] = date;
-    helpers.saveToLS(list);
 
     commentModal.attachNote(note, date);
     commentModal.form.dataset.itemType === 'todo'
       ? item.content.updateCommentCounter()
       : pjCtn.changeCommentBtn('not empty');
+
+    helpers.saveToLS(list);
 
     commentModal.textarea.value = '';
   },
@@ -615,26 +691,26 @@ const popupEvents = {
       'flaticon flaticon-down-arrow-1'
     );
 
-    let sortCtn;
-    activeCtn.checkSectionView()
-      ? (sortCtn = activeCtn.sections)
-      : (sortCtn = activeCtn);
+    const isSectionView = activeCtn.checkSectionView();
+    const sortCtn = isSectionView ? activeCtn.sections : activeCtn;
     switch (method) {
       case 'date':
         activeCtn.actions.sortedBtnText.textContent = 'Sorted by due date';
-        Array.isArray(sortCtn)
+
+        isSectionView
           ? sortCtn.forEach((ctn) => ctn.sortDate())
           : sortCtn.sortDate();
         break;
       case 'priority':
         activeCtn.actions.sortedBtnText.textContent = 'Sorted by priority';
-        Array.isArray(sortCtn)
+
+        isSectionView
           ? sortCtn.forEach((ctn) => ctn.sortPriority())
           : sortCtn.sortPriority();
         break;
       case 'alphabet':
         activeCtn.actions.sortedBtnText.textContent = 'Sorted alphabetically';
-        Array.isArray(sortCtn)
+        isSectionView
           ? sortCtn.forEach((ctn) => ctn.sortAlphabetically())
           : sortCtn.sortAlphabetically();
         break;
@@ -648,14 +724,12 @@ const popupEvents = {
               'class',
               'flaticon flaticon-up-arrow'
             );
-        Array.isArray(sortCtn)
+        isSectionView
           ? sortCtn.forEach((ctn) => ctn.sortReverse())
           : sortCtn.sortReverse();
         break;
     }
-    Array.isArray(sortCtn)
-      ? sortCtn.forEach((ctn) => ctn.refresh())
-      : sortCtn.refresh();
+    isSectionView ? sortCtn.forEach((ctn) => ctn.refresh()) : sortCtn.refresh();
   },
   showPJActionsPopup(e, btn) {
     menuEvents.addFocusToListItem(e);
@@ -666,8 +740,10 @@ const popupEvents = {
   showPJMenuEditor() {
     popups.hide();
     menuEvents.removeFocusFromListItem();
+
     const pj = helpers.findItem(listOfPjs, pjActionsPopup.ctn.dataset.project);
     helpers.hide(pj.menuContent);
+
     helpers.show(menu.editor.ctn);
     menu.editor.titleInput.value = pj.title;
     menu.editor.ctn.dataset.project = pj.id;
@@ -808,19 +884,16 @@ const contentEvents = {
     helpers.hide(editorForm.ctn);
   },
 };
-const pjCtn = content.pjCtn;
 pjCtn.todoBtn.addEventListener('click', () => {
   contentEvents.showTodoForm(pjCtn);
   contentEvents.setDefaultPjForTodoForm();
 });
-const todayCtn = content.todayCtn;
 todayCtn.todoBtn.addEventListener('click', () => {
   contentEvents.showTodoForm(todayCtn);
 });
 todayCtn.todaySection.todoBtn.addEventListener('click', () =>
   contentEvents.showTodoForm(todayCtn.todaySection)
 );
-const upcomingCtn = content.upcomingCtn;
 upcomingCtn.sections.forEach((section) => {
   section.todoBtn.addEventListener('click', () => {
     contentEvents.showTodoForm(section);
@@ -916,7 +989,7 @@ const searchCtn = content.searchCtn;
 
   if (window.matchMedia('(max-width: 710px)').matches) {
     headerEvents.hideMenu();
-    menuEvents.addRemoveEventsRelatingToMenu();
+    menuEvents.toggleEventsRelatingToMenu();
   }
   headerEvents.changeNewTodoBtnOnResize();
   listOfTodos.forEach((todo) => todoFormEvents.addTodoCtnEvents(todo));

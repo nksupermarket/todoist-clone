@@ -119,7 +119,7 @@ const content = (() => {
 
       return ctn;
     },
-    headerObj() {
+    header() {
       const header = document.createElement('header');
       header.classList.add('view-header', 'view-content');
       return header;
