@@ -5,7 +5,7 @@ const listOfPjs = [];
 const listOfTodos = [];
 
 function PjFactory() {
-  this.id = 1;
+  this.id = 1; // need this so each project has a different ID
 }
 PjFactory.prototype.createProject = function (title) {
   const todoList = [];
@@ -83,7 +83,7 @@ PjFactory.prototype.createProject = function (title) {
 const pjFact = new PjFactory();
 
 function TodoFactory() {
-  this.id = 1;
+  this.id = 1; // need this so every TODO has a different ID
 }
 TodoFactory.prototype.createTodo = function (
   project,

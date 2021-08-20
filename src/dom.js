@@ -9,9 +9,9 @@ import { popups } from './popups.js';
 import { header } from './header.js';
 import helpers from './helpers.js';
 
-const { modalForm } = todoForm;
+const { headerForm } = todoForm;
 const { search } = header;
-const { pjCtn, todayCtn, upcomingCtn } = content;
+const { pjCtn, todayCtn, upcomingCtn, searchCtn } = content;
 
 /// ////////////////
 /* HEADER EVENTS */
@@ -19,10 +19,10 @@ const { pjCtn, todayCtn, upcomingCtn } = content;
 
 const headerEvents = {
   showModalTodoForm() {
-    helpers.show(modalForm.ctn);
+    helpers.show(headerForm.ctn);
     popups.priority.reset();
-    todoFormEvents.fillPjInput(modalForm);
-    modalForm.setDefaultDate();
+    todoFormEvents.fillPjInput(headerForm);
+    headerForm.setDefaultDate();
   },
   hideMenu() {
     menu.ctn.classList.add('minimize');
@@ -104,6 +104,9 @@ const headerEvents = {
     header.todoBtn.classList.remove('btn-sm');
   },
 };
+
+/* HEADER EVENT LISTENERS */
+
 header.menuBtn.addEventListener('click', () => {
   menu.ctn.classList.contains('minimize')
     ? headerEvents.showMenu()
@@ -345,6 +348,9 @@ const menuEvents = {
     helpers.saveToLS(listOfPjs);
   },
 };
+
+/* MENU EVENT LISTENERS */
+
 window.addEventListener('resize', menuEvents.toggleEventsRelatingToMenu);
 menu.today.addEventListener('click', menuEvents.showToday);
 menu.upcoming.addEventListener('click', menuEvents.showUpcoming);
@@ -395,7 +401,9 @@ const todoFormEvents = {
     helpers.saveToLS(listOfTodos);
 
     (function closeForm() {
-      form === todoForm.modalForm ? form.hide() : contentEvents.closeTodoForm();
+      form === todoForm.headerForm
+        ? form.hide()
+        : contentEvents.closeTodoForm();
       popups.comment.reset();
       popups.priority.reset();
     })();
@@ -502,7 +510,7 @@ const todoFormEvents = {
   },
   onSaveEdit() {
     const todo = helpers.findItem(listOfTodos, editorForm.ctn.dataset.id);
-    const prioritySelected = priorityPopup.ctn.querySelector('.active');
+    const prioritySelected = popups.priority.ctn.querySelector('.active');
     todo.saveEdits(editorForm, prioritySelected);
     helpers.saveToLS(listOfTodos);
 
@@ -518,28 +526,33 @@ const todoFormEvents = {
     todo.appendContent();
   },
 };
+
+/* TODO FORM EVENT LISTENERS */
+
 const contentForm = todoForm.contentForm;
-modalForm.titleInput.addEventListener('input', () => {
-  modalForm.changeAddBtn();
+headerForm.titleInput.addEventListener('input', () => {
+  headerForm.changeAddBtn();
 });
 contentForm.titleInput.addEventListener('input', () => {
   contentForm.changeAddBtn();
 });
-modalForm.addBtn.addEventListener('click', () =>
-  todoFormEvents.onAddTodo(modalForm)
+headerForm.addBtn.addEventListener('click', () =>
+  todoFormEvents.onAddTodo(headerForm)
 );
-modalForm.form.addEventListener('click', function (e) {
+headerForm.form.addEventListener('click', function (e) {
   e.stopPropagation();
 });
-modalForm.ctn.addEventListener('click', () => todoFormEvents.close(modalForm));
-modalForm.cancelBtn.addEventListener('click', () =>
-  todoFormEvents.close(modalForm)
+headerForm.ctn.addEventListener('click', () =>
+  todoFormEvents.close(headerForm)
 );
-modalForm.commentBtn.addEventListener('click', () =>
-  popupEvents.onIconBtn(popups.comment, todoForm.modalForm.commentBtn)
+headerForm.cancelBtn.addEventListener('click', () =>
+  todoFormEvents.close(headerForm)
 );
-modalForm.priorityBtn.addEventListener('click', () =>
-  popupEvents.onIconBtn(popups.priority, modalForm.priorityBtn)
+headerForm.commentBtn.addEventListener('click', () =>
+  popupEvents.onIconBtn(popups.comment, todoForm.headerForm.commentBtn)
+);
+headerForm.priorityBtn.addEventListener('click', () =>
+  popupEvents.onIconBtn(popups.priority, headerForm.priorityBtn)
 );
 contentForm.addBtn.addEventListener('click', () =>
   todoFormEvents.onAddTodo(contentForm)
@@ -593,34 +606,34 @@ const popupEvents = {
     })();
   },
   showDeletePopup(itemType, itemID, itemTitle) {
-    deletePopup.show();
-    deletePopup.setDataItemType(itemType);
-    deletePopup.setDataItemID(itemID);
-    deletePopup.updateText(itemTitle);
+    popups.del.show();
+    popups.del.setDataItemType(itemType);
+    popups.del.setDataItemID(itemID);
+    popups.del.updateText(itemTitle);
     popups.toggleModalFull();
   },
   onDelete() {
     const list =
-      deletePopup.ctn.dataset.itemType === 'project' ? listOfPjs : listOfTodos;
+      popups.del.ctn.dataset.itemType === 'project' ? listOfPjs : listOfTodos;
 
-    const item = helpers.findItem(list, deletePopup.ctn.dataset.itemId);
+    const item = helpers.findItem(list, popups.del.ctn.dataset.itemId);
     item.del();
 
-    deletePopup.ctn.dataset.itemType === 'project'
+    popups.del.ctn.dataset.itemType === 'project'
       ? helpers.saveToLS(listOfPjs)
       : helpers.saveToLS(listOfTodos);
 
-    if (deletePopup.ctn.dataset.itemType === 'project') {
+    if (popups.del.ctn.dataset.itemType === 'project') {
       menuEvents.showToday();
     }
 
-    if (deletePopup.ctn.dataset.itemType === 'todo') {
+    if (popups.del.ctn.dataset.itemType === 'todo') {
       (function removeFromContentTodoList() {
         content.allCtns.forEach((ctn) => {
           if (!ctn.todoArray || ctn.todoArray.length === 0) return;
 
           const todoIndex = ctn.todoArray.findIndex(
-            (todo) => todo.id.toString() === deletePopup.ctn.dataset.itemId
+            (todo) => todo.id.toString() === popups.del.ctn.dataset.itemId
           );
 
           const foundTodo = todoIndex !== -1;
@@ -741,7 +754,10 @@ const popupEvents = {
     popups.hide();
     menuEvents.removeFocusFromListItem();
 
-    const pj = helpers.findItem(listOfPjs, pjActionsPopup.ctn.dataset.project);
+    const pj = helpers.findItem(
+      listOfPjs,
+      popups.pjActions.ctn.dataset.project
+    );
     helpers.hide(pj.menuContent);
 
     helpers.show(menu.editor.ctn);
@@ -753,9 +769,11 @@ const popupEvents = {
     menu.editor.titleInput.focus();
   },
 };
+
+/* POPUP EVENT LISTENERS */
+
 popups.modal.addEventListener('click', popupEvents.closeModal);
-const priorityPopup = popups.priority;
-priorityPopup.ctn.addEventListener('click', function (e) {
+popups.priority.ctn.addEventListener('click', function (e) {
   e.stopPropagation();
 });
 const commentPopup = popups.comment;
@@ -776,27 +794,29 @@ window.addEventListener('resize', function movePopups() {
   );
   activePopup.position(btn);
 });
-priorityPopup.btns.forEach((btn) =>
+popups.priority.btns.forEach((btn) =>
   btn.addEventListener('click', function (e) {
     popupEvents.onSelectPriorityLevel(e);
   })
 );
-const deletePopup = popups.del;
-deletePopup.ctn.addEventListener('click', (e) => e.stopPropagation());
-deletePopup.cancelBtn.addEventListener('click', () => popups.hide());
-deletePopup.deleteBtn.addEventListener('click', popupEvents.onDelete);
 
-const pjActionsPopup = popups.pjActions;
-pjActionsPopup.ctn.addEventListener('click', (e) => e.stopPropagation());
-pjActionsPopup.editBtn.addEventListener('click', popupEvents.showPJMenuEditor);
-pjActionsPopup.deleteBtn.addEventListener('click', () => {
+popups.del.ctn.addEventListener('click', (e) => e.stopPropagation());
+popups.del.cancelBtn.addEventListener('click', () => popups.hide());
+popups.del.deleteBtn.addEventListener('click', popupEvents.onDelete);
+
+popups.pjActions.ctn.addEventListener('click', (e) => e.stopPropagation());
+popups.pjActions.editBtn.addEventListener(
+  'click',
+  popupEvents.showPJMenuEditor
+);
+popups.pjActions.deleteBtn.addEventListener('click', () => {
   const pjTitle = helpers.findItem(
     listOfPjs,
-    pjActionsPopup.ctn.dataset.project
+    popups.pjActions.ctn.dataset.project
   ).title;
   popupEvents.showDeletePopup(
     'project',
-    pjActionsPopup.ctn.dataset.project,
+    popups.pjActions.ctn.dataset.project,
     pjTitle
   );
   menuEvents.removeFocusFromListItem();
@@ -808,6 +828,10 @@ commentModal.form.addEventListener('click', (e) => {
 });
 commentModal.modal.addEventListener('click', () => commentModal.close());
 commentModal.closeBtn.addEventListener('click', () => commentModal.close());
+
+/// /////////////////
+/* CONTENT EVENTS */
+/// ////////////////
 
 const contentEvents = {
   showPJEditor() {
@@ -828,11 +852,14 @@ const contentEvents = {
   },
   showTodoForm(ctn) {
     contentEvents.closeOpenEditors();
+
     todoFormEvents.fillPjInput(contentForm);
     contentForm.setDefaultDate();
+    contentForm.titleInput.focus();
+
     ctn.todoList.appendChild(contentForm.form);
     helpers.show(contentForm.form);
-    contentForm.titleInput.focus();
+
     helpers.hide(ctn.todoBtn);
   },
   closeTodoForm() {
@@ -848,10 +875,10 @@ const contentEvents = {
 
     if (activeCtn === content.todayCtn && content.todayCtn.checkSectionView()) {
       helpers.show(content.todayCtn.todaySection.todoBtn);
-      content.todayCtn.todaySection.todoList.appendChild(
+
+      return content.todayCtn.todaySection.todoList.appendChild(
         content.todayCtn.todaySection.todoBtn
       );
-      return;
     }
 
     if (activeCtn.todoBtn) {
@@ -867,15 +894,18 @@ const contentEvents = {
   },
   closeOpenEditors() {
     const openEditor = document.querySelector('.todo-editor:not(.inactive)');
+
     if (!openEditor) return;
+
     if (openEditor.classList.contains('new-todo-form')) {
       const activeCtn = content.findActiveCtn();
       contentEvents.closeTodoForm(activeCtn);
       return;
     }
     if (!openEditor.dataset.id) return;
+
     const openTodo = helpers.findItem(listOfTodos, openEditor.dataset.id);
-    const prioritySelected = priorityPopup.ctn.querySelector('.active');
+    const prioritySelected = popups.priority.ctn.querySelector('.active');
     openTodo.saveEdits(editorForm, prioritySelected);
     openTodo.content.refresh();
     openTodo.appendContent();
@@ -884,6 +914,9 @@ const contentEvents = {
     helpers.hide(editorForm.ctn);
   },
 };
+
+/* CONTENT EVENT LISTENERS */
+
 pjCtn.todoBtn.addEventListener('click', () => {
   contentEvents.showTodoForm(pjCtn);
   contentEvents.setDefaultPjForTodoForm();
@@ -944,15 +977,38 @@ todayCtn.actions.sortedBtn.addEventListener('click', () =>
 upcomingCtn.actions.sortedBtn.addEventListener('click', () =>
   popupEvents.onSort('reverse')
 );
-const searchCtn = content.searchCtn;
 
 (function init() {
-  if (localStorage.listOfPjs) {
-    const LOPzombie = JSON.parse(localStorage.getItem('listOfPjs'));
-    LOPzombie.forEach((pj) => bringToLife(pj, 'project'));
-    const LOTzombie = JSON.parse(localStorage.getItem('listOfTodos'));
-    LOTzombie.forEach((todo) => bringToLife(todo, 'todo'));
+  if (localStorage.listOfPjs) loadFromLS('projects');
+  if (localStorage.listOfTodos) loadFromLS('todos');
 
+  if (!localStorage.listOfPjs) createSampleOnFirstVisit();
+
+  if (window.matchMedia('(max-width: 710px)').matches) {
+    headerEvents.hideMenu();
+    menuEvents.toggleEventsRelatingToMenu();
+  }
+  headerEvents.changeNewTodoBtnOnResize();
+
+  listOfTodos.forEach((todo) => todoFormEvents.addTodoCtnEvents(todo));
+  listOfPjs.forEach((pj) => menuEvents.addPJMenuItemEvents(pj));
+
+  menuEvents.showToday();
+
+  // helper functions
+  function loadFromLS(itemType) {
+    switch (itemType) {
+      case 'projects': {
+        const LOPzombie = JSON.parse(localStorage.getItem('listOfPjs'));
+        LOPzombie.forEach((pj) => bringToLife(pj, 'project'));
+        break;
+      }
+      case 'todos': {
+        const LOTzombie = JSON.parse(localStorage.getItem('listOfTodos'));
+        LOTzombie.forEach((todo) => bringToLife(todo, 'todo'));
+        break;
+      }
+    }
     function bringToLife(item, itemType) {
       switch (itemType) {
         case 'project': {
@@ -975,7 +1031,7 @@ const searchCtn = content.searchCtn;
       }
     }
   }
-  if (!localStorage.listOfPjs) {
+  function createSampleOnFirstVisit() {
     const pjWork = pjFact.createProject('Work');
     const pjHome = pjFact.createProject('Home');
     const pjCode = pjFact.createProject('Code');
@@ -986,13 +1042,4 @@ const searchCtn = content.searchCtn;
     helpers.saveToLS(listOfPjs);
     helpers.saveToLS(listOfTodos);
   }
-
-  if (window.matchMedia('(max-width: 710px)').matches) {
-    headerEvents.hideMenu();
-    menuEvents.toggleEventsRelatingToMenu();
-  }
-  headerEvents.changeNewTodoBtnOnResize();
-  listOfTodos.forEach((todo) => todoFormEvents.addTodoCtnEvents(todo));
-  listOfPjs.forEach((pj) => menuEvents.addPJMenuItemEvents(pj));
-  menuEvents.showToday();
 })();
