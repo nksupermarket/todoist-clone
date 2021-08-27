@@ -9,7 +9,7 @@ import { popups } from './popups.js';
 import { header } from './header.js';
 import helpers from './helpers.js';
 
-const { headerForm } = todoForm;
+const { headerForm, contentForm } = todoForm;
 const { search } = header;
 const { pjCtn, todayCtn, upcomingCtn, searchCtn } = content;
 
@@ -529,7 +529,6 @@ const todoFormEvents = {
 
 /* TODO FORM EVENT LISTENERS */
 
-const contentForm = todoForm.contentForm;
 headerForm.titleInput.addEventListener('input', () => {
   headerForm.changeAddBtn();
 });

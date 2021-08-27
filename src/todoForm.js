@@ -99,7 +99,7 @@ const todoForm = (() => {
   Object.setPrototypeOf(contentForm, formMethods);
   list.push(contentForm);
 
-  const modalForm = (() => {
+  const headerForm = (() => {
     const form = document.getElementById('new-todo-form');
     const ctn = form.closest('.modal');
     const addBtn = form.querySelector('#add-todo-btn');
@@ -129,12 +129,12 @@ const todoForm = (() => {
       pjInput,
     };
   })();
-  Object.setPrototypeOf(modalForm, formMethods);
-  list.push(modalForm);
+  Object.setPrototypeOf(headerForm, formMethods);
+  list.push(headerForm);
 
   return {
     editor,
-    modalForm,
+    headerForm,
     contentForm,
     findActiveForm() {
       return list.find((form) => !form.ctn.classList.contains('inactive'));
