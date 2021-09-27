@@ -938,6 +938,11 @@ main .new-todo-btn:hover {
     pointer-events: none;
   }
 }
+@media screen and (max-device-width: 800px) {
+  .todo-actions {
+    opacity: 1;
+  }
+}
 @media screen and (max-width: 710px) {
   #menu {
     position: absolute;
