@@ -3,6 +3,7 @@ import helpers from './helpers.js';
 const commentModal = (() => {
   return {
     modal: document.querySelector('.comment-modal'),
+    popup: document.querySelector('#add-comment'),
     commentList: document.querySelector('.comment-list'),
     closeBtn: document.querySelector('.close-btn'),
     pjTitle: document.querySelector('.project-title'),

@@ -163,7 +163,7 @@ TodoFactory.prototype.createTodo = function (
 
       return [dayBtn, dayInput];
     },
-    commentBtn(todoID) {
+    commentBtn() {
       const commentsBtn = create.btn('notes');
       const commentsCount = document.createElement('span');
       commentsBtn.classList.add('icon-btn');

@@ -822,7 +822,7 @@ popups.pjActions.deleteBtn.addEventListener('click', () => {
 });
 
 commentModal.addBtn.addEventListener('click', popupEvents.onAddComment);
-commentModal.form.addEventListener('click', (e) => {
+commentModal.popup.addEventListener('click', (e) => {
   e.stopPropagation();
 });
 commentModal.modal.addEventListener('click', () => commentModal.close());
