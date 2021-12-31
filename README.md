@@ -1,7 +1,15 @@
-todoist clone
+# todoist clone
 --
 live demo: https://lookingcoolonavespa.github.io/todoist-clone/dist/
 
+## app in action
+[screenshot of home page](https://i.postimg.cc/7P38pMqW/Screenshot-from-2021-12-30-20-33-00.png)
+[screenshot of upcoming](https://i.postimg.cc/ncT8LFjK/Screenshot-from-2021-12-30-20-33-31.png)
+[screenshot of project page](https://i.postimg.cc/wT98HyvT/Screenshot-from-2021-12-30-20-33-43.png)
+[screenshot of comments popup](https://i.postimg.cc/0jYsn7yh/Screenshot-from-2021-12-30-20-34-00.png)
+
+
+## features
 - keep track of all your todos in one place
 - set todos to 1 of 4 priority levels
 - edit, make comments on, or delete todos
