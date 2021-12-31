@@ -23,16 +23,16 @@ live demo: https://lookingcoolonavespa.github.io/todoist-clone/dist/
 - easily find your todos or projects with the search function
 - fully responsive
 
-##tech stack
+## tech stack
 - vanilla js
 - html/css
 
-##how the code is orgranized
+## how the code is orgranized
 - every distinct "block" is seperated into its own module (eg. header module, menu module, content module, popups module)
 - the modules would house all its instances (eg. popups module would hold the comment popup, sort popup, and so on; the content module houses the project view, today view, and upcoming view)
 - the modules also house any buttons located inside the "block"
 - dom.js pulls everything together and is where all the events + event listeners are located 
 
-##challenges i faced
+## challenges i faced
 - **organizing the code** - I really focused on having my modules live seperately from one another to avoid side-effects. I think I took it a little too far. Having every event written in my dom.js is overkill. 
 - **state management** - Looking back at my code, I think one of the biggest flaws of how I wrote it was how I managed state. I didn't want to have global variables and I didn't understand closures and how to interact with variables inside closures back then - which meant I had manually check the current state of my app every time I needed it. If I were to update my code, this would be on top of my list.
