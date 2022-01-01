@@ -35,4 +35,4 @@ live demo: https://lookingcoolonavespa.github.io/todoist-clone/dist/
 
 ## challenges i faced
 - **organizing the code** - I really focused on having my modules live seperately from one another to avoid side-effects. I think I took it a little too far. Having every event written in my dom.js is overkill. 
-- **state management** - Looking back at my code, I think one of the biggest flaws of how I wrote it was how I managed state. I didn't want to have global variables and I didn't understand closures and how to interact with variables inside closures back then - which meant I had manually check the current state of my app every time I needed it. If I were to update my code, this would be on top of my list.
+- **state management** - Looking back at my code, I think one of the biggest flaws of how I wrote it was how I managed state. I didn't want to have global variables and back then I didn't understand closures that well - which meant I had stored my state in my dom via classes. Real ugly design which led to a lot of extra code. If I were to update my code, this would be on top of my list.
