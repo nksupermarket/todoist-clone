@@ -34,5 +34,5 @@ live demo: https://lookingcoolonavespa.github.io/todoist-clone/dist/
 - dom.js pulls everything together and is where all the events + event listeners are located 
 
 ## challenges i faced
-- **organizing the code** - I really focused on having my modules live seperately from one another to avoid side-effects. I think I took it a little too far. Having every event written in my dom.js is overkill. 
+- **organizing the code** - I should have seperated my dom elements from my logic. I could have written my methods to take in dom elements as arguments. This would have led to more manageable code I think. Feels like code would be more reusable and easier to read had I done it that way.
 - **state management** - Looking back at my code, I think one of the biggest flaws of how I wrote it was how I managed state. I didn't want to have global variables and back then I didn't understand closures that well - which meant I had stored my state in my dom via classes. Real ugly design which led to a lot of extra code. If I were to update my code, this would be on top of my list.
