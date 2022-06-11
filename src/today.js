@@ -13,6 +13,7 @@ const today = {
     const today = this.getToday();
     const todoList = list.filter((item) => {
       if (item.priority === '5') return false;
+      // eslint-disable-next-line eqeqeq
       return item.day == today;
     });
     return todoList;
